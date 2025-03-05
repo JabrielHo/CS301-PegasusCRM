@@ -5,7 +5,7 @@ frontend:
             commands:
                 - 'npm run build'
     artifacts:
-        baseDirectory: /ITSA_Team2
+        baseDirectory: ./ITSA_Team2/
         files:
             - '**/*'
     cache:
