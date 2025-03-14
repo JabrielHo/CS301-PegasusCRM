@@ -1,53 +1,79 @@
-import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
+// data/resource.ts
+import { a, defineData } from '@aws-amplify/backend';
+import { userManagement } from '../functions/userManagement/resource';
 
-/*== STEP 1 ===============================================================
-The section below creates a Todo database table with a "content" field. Try
-adding a new "isDone" field as a boolean. The authorization rule below
-specifies that any unauthenticated user can "create", "read", "update", 
-and "delete" any "Todo" records.
-=========================================================================*/
 const schema = a.schema({
-  Todo: a
-    .model({
-      content: a.string(),
+  // Define custom types for return values
+  UserResponse: a.customType({
+    id: a.string(),
+    email: a.string(),
+    firstName: a.string(),
+    lastName: a.string(),
+    role: a.string(),
+    status: a.string()
+  }),
+  
+  AdminStatusResponse: a.customType({
+    message: a.string(),
+    success: a.boolean()
+  }),
+  
+  UserStatusResponse: a.customType({
+    message: a.string(),
+    success: a.boolean()
+  }),
+  
+  // Add a dummy query to satisfy the schema requirement
+  getVersion: a.query()
+    .returns(a.string())
+    .authorization(allow => [allow.publicApiKey()])
+    .handler(a.handler.function(userManagement)),
+  
+  // Define custom API routes that connect to your Lambda function
+  createUser: a.mutation()
+    .arguments({ 
+      email: a.string().required(),
+      password: a.string().required(),
+      firstName: a.string().required(),
+      lastName: a.string().required(),
+      phoneNumber: a.string(),
+      role: a.string().required()
     })
-    .authorization((allow) => [allow.guest()]),
+    .returns(a.ref('UserResponse'))
+    .authorization(allow => [allow.groups(['ADMINS'])])
+    .handler(a.handler.function(userManagement)),
+  
+  disableUser: a.mutation()
+    .arguments({ email: a.string().required() })
+    .returns(a.ref('AdminStatusResponse'))
+    .authorization(allow => [allow.groups(['ADMINS'])])
+    .handler(a.handler.function(userManagement)),
+  
+  updateUser: a.mutation()
+    .arguments({ 
+      email: a.string().required(),
+      firstName: a.string(),
+      lastName: a.string(),
+      phoneNumber: a.string()
+    })
+    .returns(a.ref('AdminStatusResponse'))
+    .authorization(allow => [allow.groups(['ADMINS'])])
+    .handler(a.handler.function(userManagement)),
+  
+  resetPassword: a.mutation()
+    .arguments({ email: a.string().required() })
+    .returns(a.ref('UserStatusResponse'))
+    .authorization(allow => [allow.authenticated()])
+    .handler(a.handler.function(userManagement))
 });
-
-export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
-  schema,
-  authorizationModes: {
-    defaultAuthorizationMode: 'iam',
-  },
-});
-
-/*== STEP 2 ===============================================================
-Go to your frontend source code. From your client-side code, generate a
-Data client to make CRUDL requests to your table. (THIS SNIPPET WILL ONLY
-WORK IN THE FRONTEND CODE FILE.)
-
-Using JavaScript or Next.js React Server Components, Middleware, Server 
-Actions or Pages Router? Review how to generate Data clients for those use
-cases: https://docs.amplify.aws/gen2/build-a-backend/data/connect-to-API/
-=========================================================================*/
-
-/*
-"use client"
-import { generateClient } from "aws-amplify/data";
-import type { Schema } from "@/amplify/data/resource";
-
-const client = generateClient<Schema>() // use this Data client for CRUDL requests
-*/
-
-/*== STEP 3 ===============================================================
-Fetch records from the database and use them in your frontend component.
-(THIS SNIPPET WILL ONLY WORK IN THE FRONTEND CODE FILE.)
-=========================================================================*/
-
-/* For example, in a React component, you can use this snippet in your
-  function's RETURN statement */
-// const { data: todos } = await client.models.Todo.list()
-
-// return <ul>{todos.map(todo => <li key={todo.id}>{todo.content}</li>)}</ul>
+    schema,
+    authorizationModes: {
+      defaultAuthorizationMode: 'userPool',
+      apiKeyAuthorizationMode: {
+        expiresInDays: 30
+      }
+    }
+  });
+  

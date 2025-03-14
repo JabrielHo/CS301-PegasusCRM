@@ -1,11 +1,12 @@
+// backend.ts
 import { defineBackend } from '@aws-amplify/backend';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
+import { userManagement } from './functions/userManagement/resource';
 
-/**
- * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
- */
-defineBackend({
+
+const backend = defineBackend({
   auth,
   data,
+  userManagement
 });

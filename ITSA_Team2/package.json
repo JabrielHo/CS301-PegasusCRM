@@ -9,12 +9,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-amplify/ui-vue": "^4.2.30",
     "aws-amplify": "^6.13.4",
-    "vue": "^3.5.13"
+    "vue": "^3.5.13",
+    "vue-jwt-decode": "^0.1.0",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@aws-amplify/backend": "^1.14.2",
     "@aws-amplify/backend-cli": "^1.4.12",
+    "@aws-sdk/client-cognito-identity-provider": "^3.760.0",
+    "@types/aws-lambda": "^8.10.147",
+    "@types/node": "^22.13.10",
     "@vitejs/plugin-vue": "^5.2.1",
     "aws-cdk": "^2.1000.2",
     "aws-cdk-lib": "^2.180.0",
