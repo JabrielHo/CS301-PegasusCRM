@@ -1,79 +1,43 @@
-// data/resource.ts
-import { a, defineData } from '@aws-amplify/backend';
-import { userManagement } from '../functions/userManagement/resource';
+import type { ClientSchema } from "@aws-amplify/backend"
+import { a, defineData } from "@aws-amplify/backend"
+import { addUserToGroup } from "./add-user-to-group/resource"
+import { getVersion } from "./get-version/resource"
+import { createUserToGroup } from "./create-user-to-group/resource"
 
 const schema = a.schema({
-  // Define custom types for return values
-  UserResponse: a.customType({
-    id: a.string(),
-    email: a.string(),
-    firstName: a.string(),
-    lastName: a.string(),
-    role: a.string(),
-    status: a.string()
-  }),
-  
-  AdminStatusResponse: a.customType({
-    message: a.string(),
-    success: a.boolean()
-  }),
-  
-  UserStatusResponse: a.customType({
-    message: a.string(),
-    success: a.boolean()
-  }),
-  
-  // Add a dummy query to satisfy the schema requirement
-  getVersion: a.query()
-    .returns(a.string())
-    .authorization(allow => [allow.publicApiKey()])
-    .handler(a.handler.function(userManagement)),
-  
-  // Define custom API routes that connect to your Lambda function
-  createUser: a.mutation()
-    .arguments({ 
-      email: a.string().required(),
-      password: a.string().required(),
-      firstName: a.string().required(),
-      lastName: a.string().required(),
-      phoneNumber: a.string(),
-      role: a.string().required()
+  getVersion: a
+  .query()
+  .returns(a.string())
+  .authorization((allow) => [allow.group("ADMINS")])
+  .handler(a.handler.function(getVersion)),
+
+  addUserToGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required(),
+      groupName: a.string().required(),
     })
-    .returns(a.ref('UserResponse'))
-    .authorization(allow => [allow.groups(['ADMINS'])])
-    .handler(a.handler.function(userManagement)),
-  
-  disableUser: a.mutation()
-    .arguments({ email: a.string().required() })
-    .returns(a.ref('AdminStatusResponse'))
-    .authorization(allow => [allow.groups(['ADMINS'])])
-    .handler(a.handler.function(userManagement)),
-  
-  updateUser: a.mutation()
-    .arguments({ 
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(addUserToGroup))
+    .returns(a.json()),
+    
+  createUserToGroup: a
+    .mutation()
+    .arguments({
       email: a.string().required(),
-      firstName: a.string(),
-      lastName: a.string(),
-      phoneNumber: a.string()
+      preferredusername: a.string().required(),
+      temporaryPassword: a.string().required(), // Optional, system will generate one if not provided
     })
-    .returns(a.ref('AdminStatusResponse'))
-    .authorization(allow => [allow.groups(['ADMINS'])])
-    .handler(a.handler.function(userManagement)),
-  
-  resetPassword: a.mutation()
-    .arguments({ email: a.string().required() })
-    .returns(a.ref('UserStatusResponse'))
-    .authorization(allow => [allow.authenticated()])
-    .handler(a.handler.function(userManagement))
-});
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(createUserToGroup))
+    .returns(a.json())
+})
+
+export type Schema = ClientSchema<typeof schema>
 
 export const data = defineData({
-    schema,
-    authorizationModes: {
-      defaultAuthorizationMode: 'userPool',
-      apiKeyAuthorizationMode: {
-        expiresInDays: 30
-      }
-    }
-  });
-  
+  schema,
+  authorizationModes: {
+    defaultAuthorizationMode: "iam",
+  },
+})

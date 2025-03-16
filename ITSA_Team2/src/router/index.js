@@ -1,8 +1,8 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
-import { requireAuth, requireAdmin } from '../services/auth-guards';
 import HomeView from '../pages/HomeView.vue';
-import UserManagementView from '../pages/UserManagementView.vue';
+import addUserToGroup from '../components/addUserToGroup.vue';
+import createUser from '../components/createUser.vue'
 
 const routes = [
   {
@@ -11,11 +11,15 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/user-management',
-    name: 'userManagement',
-    component: UserManagementView,
-    beforeEnter: requireAdmin
-  }
+    path: '/addUserToGroup',
+    name: 'addUserToGroup',
+    component: addUserToGroup,
+  },
+  {
+    path: '/createUser',
+    name: 'createUser',
+    component: createUser,
+  },
 ];
 
 const router = createRouter({

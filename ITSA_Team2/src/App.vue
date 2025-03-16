@@ -1,36 +1,49 @@
-<script setup>
-import { Authenticator } from "@aws-amplify/ui-vue";
-import "@aws-amplify/ui-vue/styles.css";
-
-import { Amplify } from 'aws-amplify';
-import outputs from '../amplify_outputs.json';
-
-Amplify.configure(outputs);
-</script>
-
 <template>
   <authenticator :hide-sign-up="true">
     <template v-slot="{ user, signOut }">
-
       <div id="app">
         <div class="user-header">
-          <h2>Hello {{ user.username }}!</h2>
+          <h2>Hello {{ displayName }}!</h2>
           <button @click="signOut">Sign Out</button>
         </div>
         
         <!-- Navigation links -->
         <nav>
           <router-link to="/">Home</router-link> |
-          <router-link to="/user-management">User Management</router-link>
+          <router-link to="/addUserToGroup">Add User To Group</router-link> |
+          <router-link to="/createUser">Create User</router-link>
         </nav>
         
         <!-- This is where your route components will be rendered -->
         <router-view/>
       </div>
-
     </template>
   </authenticator>
 </template>
+
+<script setup>
+import { Authenticator } from "@aws-amplify/ui-vue";
+import "@aws-amplify/ui-vue/styles.css";
+import { ref, onMounted } from 'vue';
+import { Amplify } from 'aws-amplify';
+import { fetchUserAttributes } from 'aws-amplify/auth';
+import outputs from '../amplify_outputs.json';
+
+Amplify.configure(outputs);
+
+const displayName = ref('');
+
+onMounted(async () => {
+  try {
+    const userAttributes = await fetchUserAttributes();
+    // Use preferred_username if available, otherwise fall back to username or email
+    displayName.value = userAttributes.preferred_username || userAttributes.email || 'User';
+  } catch (error) {
+    console.error('Error fetching user attributes:', error);
+    displayName.value = 'User';
+  }
+});
+</script>
 
 <style scoped>
 #app {
