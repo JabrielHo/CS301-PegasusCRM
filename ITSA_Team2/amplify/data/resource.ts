@@ -3,6 +3,7 @@ import { a, defineData } from "@aws-amplify/backend"
 import { addUserToGroup } from "./add-user-to-group/resource"
 import { getVersion } from "./get-version/resource"
 import { createUserToGroup } from "./create-user-to-group/resource"
+import { deleteUserFromGroup } from "./delete-user-from-group/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -30,7 +31,16 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(createUserToGroup))
-    .returns(a.json())
+    .returns(a.json()),
+
+  deleteUserFromGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required()
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(deleteUserFromGroup))
+    .returns(a.json()),
 })
 
 export type Schema = ClientSchema<typeof schema>

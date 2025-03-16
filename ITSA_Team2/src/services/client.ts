@@ -38,3 +38,16 @@ export async function createUserToGroup(email, userName, temporaryPassword) {
     throw error;
   }
 }
+
+export async function deleteUserFromGroup(email){
+  try{
+    const result = await client.mutations.deleteUserFromGroup({
+      userId: email
+    })
+    console.log('User deleted from group successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error deleting user from group:', error);
+    throw error;
+  }
+}

@@ -2,7 +2,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../pages/HomeView.vue';
 import addUserToGroup from '../components/addUserToGroup.vue';
-import createUser from '../components/createUser.vue'
+import createUser from '../components/createUser.vue';
+import deleteUser from '../components/deleteUser.vue';
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     name: 'createUser',
     component: createUser,
   },
+  {
+    path: '/deleteUser',
+    name: 'deleteUser',
+    component: deleteUser,
+  }
 ];
 
 const router = createRouter({
