@@ -4,6 +4,9 @@ import { addUserToGroup } from "./add-user-to-group/resource"
 import { getVersion } from "./get-version/resource"
 import { createUserToGroup } from "./create-user-to-group/resource"
 import { deleteUserFromGroup } from "./delete-user-from-group/resource"
+import { disableUserInGroup } from "./disable-user-in-group/resource"
+import { enableUserInGroup } from "./enable-user-in-group/resource"
+import { resetUserPassword } from "./reset-user-password/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -40,6 +43,33 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(deleteUserFromGroup))
+    .returns(a.json()),
+
+  disableUserInGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required()
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(disableUserInGroup))
+    .returns(a.json()),
+
+  enableUserInGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required()
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(enableUserInGroup))
+    .returns(a.json()),
+
+  resetUserPassword: a
+    .mutation()
+    .arguments({
+      userId: a.string().required()
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(resetUserPassword))
     .returns(a.json()),
 })
 

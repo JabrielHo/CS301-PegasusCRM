@@ -4,6 +4,9 @@ import HomeView from '../pages/HomeView.vue';
 import addUserToGroup from '../components/addUserToGroup.vue';
 import createUser from '../components/createUser.vue';
 import deleteUser from '../components/deleteUser.vue';
+import disableUser from '../components/disableUser.vue';
+import enableUser from '../components/enableUser.vue';
+import resetUserPassword from '../components/resetUserPassword.vue';
 
 const routes = [
   {
@@ -25,7 +28,22 @@ const routes = [
     path: '/deleteUser',
     name: 'deleteUser',
     component: deleteUser,
-  }
+  },
+  {
+    path: '/disableUser',
+    name: 'disableUser',
+    component: disableUser,
+  },
+  {
+    path: '/enableUser',
+    name: 'enableUser',
+    component: enableUser,
+  },
+  {
+    path: '/resetUserPassword',
+    name: 'resetUserPassword',
+    component: resetUserPassword,
+  },
 ];
 
 const router = createRouter({

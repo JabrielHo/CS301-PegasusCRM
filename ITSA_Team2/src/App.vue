@@ -12,7 +12,10 @@
           <router-link to="/">Home</router-link> |
           <router-link to="/addUserToGroup">Add User To Group</router-link> |
           <router-link to="/createUser">Create User</router-link> |
-          <router-link to="/deleteUser">Delete User</router-link>
+          <router-link to="/deleteUser">Delete User</router-link> |
+          <router-link to="/disableUser">Disable User</router-link> |
+          <router-link to="/enableUser">Enable User</router-link> |
+          <router-link to="/resetUserPassword">Reset User Password</router-link> |
         </nav>
         
         <!-- This is where your route components will be rendered -->

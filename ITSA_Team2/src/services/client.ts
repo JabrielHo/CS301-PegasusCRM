@@ -51,3 +51,42 @@ export async function deleteUserFromGroup(email){
     throw error;
   }
 }
+
+export async function disableUserInGroup(email){
+  try{
+    const result = await client.mutations.disableUserInGroup({
+      userId: email
+    })
+    console.log('User disabled from group successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error disabling user from group:', error);
+    throw error;
+  }
+}
+
+export async function enableUserInGroup(email){
+  try{
+    const result = await client.mutations.enableUserInGroup({
+      userId: email
+    })
+    console.log('User enabled from group successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error enabling user from group:', error);
+    throw error;
+  }
+}
+
+export async function resetUserPassword(email){
+  try{
+    const result = await client.mutations.resetUserPassword({
+      userId: email
+    })
+    console.log('User reset password successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error reset password:', error);
+    throw error;
+  }
+}

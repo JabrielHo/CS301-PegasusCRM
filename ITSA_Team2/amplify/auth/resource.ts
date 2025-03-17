@@ -2,6 +2,9 @@ import { defineAuth } from '@aws-amplify/backend';
 import { addUserToGroup } from '../data/add-user-to-group/resource'
 import { createUserToGroup } from '../data/create-user-to-group/resource';
 import { deleteUserFromGroup } from '../data/delete-user-from-group/resource'
+import { disableUserInGroup } from '../data/disable-user-in-group/resource';
+import { enableUserInGroup } from '../data/enable-user-in-group/resource'
+import { resetUserPassword } from '../data/reset-user-password/resource';
 /**
  * Define and configure your auth resource
  * @see https://docs.amplify.aws/gen2/build-a-backend/auth
@@ -37,6 +40,15 @@ export const auth = defineAuth({
     ]),
     allow.resource(deleteUserFromGroup).to([
       "deleteUser"
-    ])
+    ]),
+    allow.resource(disableUserInGroup).to([
+      "disableUser"
+    ]),
+    allow.resource(enableUserInGroup).to([
+      'enableUser'
+    ]),
+    allow.resource(resetUserPassword).to([
+      'resetUserPassword'
+    ]),
   ]
 });
