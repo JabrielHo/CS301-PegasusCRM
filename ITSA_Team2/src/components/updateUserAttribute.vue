@@ -1,6 +1,6 @@
 <template>
-    <div class="user-creation-form">
-      <h2>Create New User</h2>
+    <div class="user-update-form">
+      <h2>Update User</h2>
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="email">Email:</label>
@@ -14,40 +14,29 @@
         </div>
         
         <div class="form-group">
-          <label for="firstName">firstName:</label>
+          <label for="firstName">First Name:</label>
           <input 
             type="text" 
             id="firstName" 
             v-model="formData.firstName" 
             required
-            placeholder="johndoe"
+            placeholder="John"
           />
         </div>
-
+  
         <div class="form-group">
-          <label for="lastName">lastName:</label>
+          <label for="lastName">Last Name:</label>
           <input 
             type="text" 
             id="lastName" 
             v-model="formData.lastName" 
             required
-            placeholder="johndoe"
-          />
-        </div>
-        
-        <div class="form-group">
-          <label for="temporaryPassword">Temporary Password:</label>
-          <input 
-            type="password" 
-            id="temporaryPassword" 
-            v-model="formData.temporaryPassword" 
-            required
-            placeholder="Minimum 8 characters"
+            placeholder="Doe"
           />
         </div>
         
         <button type="submit" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Creating...' : 'Create User' }}
+          {{ isSubmitting ? 'Updating...' : 'Update User' }}
         </button>
       </form>
       
@@ -58,17 +47,16 @@
   </template>
   
   <script>
-  import { createUserToGroup } from '../services/client';
-
+  import { updateUserAttribute } from '../services/client.ts';
+  
   export default {
-    name: 'UserCreationForm',
+    name: 'UserUpdateForm',
     data() {
       return {
         formData: {
           email: '',
           firstName: '',
-          lastName: '',
-          temporaryPassword: ''
+          lastName: ''
         },
         isSubmitting: false,
         message: '',
@@ -81,27 +69,22 @@
         this.message = '';
         
         try {
-          // Replace this with your actual API call
-          // For example: await createUserToGroup(this.formData.email, this.formData.username, this.formData.temporaryPassword);
-          
-          await createUserToGroup(this.formData.email, this.formData.firstName, this.formData.lastName,this.formData.temporaryPassword);
-          alert(this.formData.username + "account created successfully!");
-          
-          // Simulate API call
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          
-          this.message = 'User created successfully!';
+          await updateUserAttribute(this.formData.email, this.formData.firstName, this.formData.lastName);
+          alert(this.formData.firstName + "account updated successfully!");
+
+          this.message = 'User updated successfully!';
           this.messageType = 'success';
-          
-          // Reset form after successful submission
-          this.formData = {
+
+        // Reset form after successful submission
+        this.formData = {
             email: '',
             username: '',
             temporaryPassword: ''
           };
+        
         } catch (error) {
-          console.error('Error creating user:', error);
-          this.message = `Failed to create user: ${error.message || 'Unknown error'}`;
+          console.error('Error updating user:', error);
+          this.message = `Failed to update user: ${error.message || 'Unknown error'}`;
           this.messageType = 'error';
         } finally {
           this.isSubmitting = false;
@@ -112,7 +95,7 @@
   </script>
   
   <style scoped>
-  .user-creation-form {
+  .user-update-form {
     max-width: 500px;
     margin: 0 auto;
     padding: 20px;
@@ -142,6 +125,11 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+  }
+  
+  input:disabled {
+    background-color: #f0f0f0;
+    cursor: not-allowed;
   }
   
   button {

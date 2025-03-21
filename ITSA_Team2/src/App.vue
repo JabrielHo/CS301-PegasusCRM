@@ -16,6 +16,7 @@
           <router-link to="/disableUser">Disable User</router-link> |
           <router-link to="/enableUser">Enable User</router-link> |
           <router-link to="/resetUserPassword">Reset User Password</router-link> |
+          <router-link to="/updateUserAttribute">Update User Attribute</router-link> |
         </nav>
         
         <!-- This is where your route components will be rendered -->
@@ -41,7 +42,7 @@ onMounted(async () => {
   try {
     const userAttributes = await fetchUserAttributes();
     // Use preferred_username if available, otherwise fall back to username or email
-    displayName.value = userAttributes.preferred_username || userAttributes.email || 'User';
+    displayName.value = `${userAttributes.given_name} ${userAttributes.family_name}` || userAttributes.email || 'User';
   } catch (error) {
     console.error('Error fetching user attributes:', error);
     displayName.value = 'User';

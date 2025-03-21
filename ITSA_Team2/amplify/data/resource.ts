@@ -7,6 +7,7 @@ import { deleteUserFromGroup } from "./delete-user-from-group/resource"
 import { disableUserInGroup } from "./disable-user-in-group/resource"
 import { enableUserInGroup } from "./enable-user-in-group/resource"
 import { resetUserPassword } from "./reset-user-password/resource"
+import { updateUserAttribute } from "./update-user-attribute/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -29,7 +30,8 @@ const schema = a.schema({
     .mutation()
     .arguments({
       email: a.string().required(),
-      preferredusername: a.string().required(),
+      givenName: a.string().required(),
+      familyName: a.string().required(),
       temporaryPassword: a.string().required(), // Optional, system will generate one if not provided
     })
     .authorization((allow) => [allow.group("ADMINS")])
@@ -71,6 +73,17 @@ const schema = a.schema({
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(resetUserPassword))
     .returns(a.json()),
+
+  updateUserAttribute: a
+    .mutation()
+    .arguments({
+      email: a.string().required(),
+      givenName: a.string().required(),
+      familyName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(updateUserAttribute))
+    .returns(a.json())
 })
 
 export type Schema = ClientSchema<typeof schema>

@@ -24,11 +24,12 @@ export async function addUserToGroup(userId, groupName) {
   }
 }
 
-export async function createUserToGroup(email, userName, temporaryPassword) {
+export async function createUserToGroup(email, firstName, lastName, temporaryPassword) {
   try{
     const result = await client.mutations.createUserToGroup({
       email: email,
-      preferredusername: userName,
+      givenName: firstName,
+      familyName: lastName,
       temporaryPassword: temporaryPassword
     })
     console.log('User created successfully:', result);
@@ -87,6 +88,21 @@ export async function resetUserPassword(email){
     return result
   } catch (error){
     console.log('Error reset password:', error);
+    throw error;
+  }
+}
+
+export async function updateUserAttribute(email, firstName, lastName) {
+  try{
+    const result = await client.mutations.updateUserAttribute({
+      email: email,
+      givenName: firstName,
+      familyName: lastName,
+    })
+    console.log('User updated successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error updating user in group:', error);
     throw error;
   }
 }

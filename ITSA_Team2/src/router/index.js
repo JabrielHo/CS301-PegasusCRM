@@ -7,6 +7,7 @@ import deleteUser from '../components/deleteUser.vue';
 import disableUser from '../components/disableUser.vue';
 import enableUser from '../components/enableUser.vue';
 import resetUserPassword from '../components/resetUserPassword.vue';
+import updateUserAttribute from '../components/updateUserAttribute.vue';
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
     path: '/resetUserPassword',
     name: 'resetUserPassword',
     component: resetUserPassword,
+  },
+  {
+    path: '/updateUserAttribute',
+    name: 'updateUserAttribute',
+    component: updateUserAttribute,
   },
 ];
 

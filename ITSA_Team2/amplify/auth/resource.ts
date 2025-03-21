@@ -5,6 +5,7 @@ import { deleteUserFromGroup } from '../data/delete-user-from-group/resource'
 import { disableUserInGroup } from '../data/disable-user-in-group/resource';
 import { enableUserInGroup } from '../data/enable-user-in-group/resource'
 import { resetUserPassword } from '../data/reset-user-password/resource';
+import { updateUserAttribute } from '../data/update-user-attribute/resource';
 /**
  * Define and configure your auth resource
  * @see https://docs.amplify.aws/gen2/build-a-backend/auth
@@ -23,13 +24,17 @@ export const auth = defineAuth({
   groups: ["ADMINS", "AGENTS"],
   // Add preferred username for display purposes
   userAttributes: {
-    preferredUsername: {
+
+    // Maps to Cognito standard attribute 'given_name'
+    givenName: {
       mutable: true,
-      required: true
+      required: true,
     },
-    // phoneNumber: {
-    //   required: true
-    // }
+
+    familyName: {
+      mutable: true,
+      required: true,
+    },
   },
   access: (allow) => [
     allow.resource(addUserToGroup).to([
@@ -49,6 +54,9 @@ export const auth = defineAuth({
     ]),
     allow.resource(resetUserPassword).to([
       'resetUserPassword'
+    ]),
+    allow.resource(updateUserAttribute).to([
+      'updateUserAttributes'
     ]),
   ]
 });
