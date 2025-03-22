@@ -24,6 +24,20 @@ export async function addUserToGroup(userId, groupName) {
   }
 }
 
+export async function removeUserFromGroup(userId, groupName) {
+  try{
+    const result = await client.mutations.removeUserFromGroup({
+      groupName: groupName,
+      userId: userId,
+    })
+    console.log('User remove from group successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error removing user from group:', error);
+    throw error;
+  }
+}
+
 export async function createUserToGroup(email, firstName, lastName, temporaryPassword) {
   try{
     const result = await client.mutations.createUserToGroup({

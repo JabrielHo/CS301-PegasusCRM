@@ -9,6 +9,7 @@ import { enableUserInGroup } from "./enable-user-in-group/resource"
 import { resetUserPassword } from "./reset-user-password/resource"
 import { updateUserAttribute } from "./update-user-attribute/resource"
 import { getListOfUsers } from "./get-list-of-users/resource"
+import { removeUserFromGroup } from "./remove-user-from-group/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -34,6 +35,16 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(addUserToGroup))
+    .returns(a.json()),
+
+  removeUserFromGroup: a
+    .mutation()
+    .arguments({
+      userId: a.string().required(),
+      groupName: a.string().required(),
+    })
+    .authorization((allow) => [allow.group("ADMINS")])
+    .handler(a.handler.function(removeUserFromGroup))
     .returns(a.json()),
     
   createUserToGroup: a
