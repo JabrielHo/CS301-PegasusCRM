@@ -8,6 +8,7 @@ import disableUser from '../components/disableUser.vue';
 import enableUser from '../components/enableUser.vue';
 import resetUserPassword from '../components/resetUserPassword.vue';
 import updateUserAttribute from '../components/updateUserAttribute.vue';
+import getListOfUsers from '../components/getListOfUsers.vue'
 
 const routes = [
   {
@@ -49,6 +50,11 @@ const routes = [
     path: '/updateUserAttribute',
     name: 'updateUserAttribute',
     component: updateUserAttribute,
+  },
+  {
+    path: '/getListOfUsers',
+    name: 'getListOfUsers',
+    component: getListOfUsers,
   },
 ];
 

@@ -8,6 +8,7 @@ import { disableUserInGroup } from "./disable-user-in-group/resource"
 import { enableUserInGroup } from "./enable-user-in-group/resource"
 import { resetUserPassword } from "./reset-user-password/resource"
 import { updateUserAttribute } from "./update-user-attribute/resource"
+import { getListOfUsers } from "./get-list-of-users/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -15,6 +16,15 @@ const schema = a.schema({
   .returns(a.string())
   .authorization((allow) => [allow.group("ADMINS")])
   .handler(a.handler.function(getVersion)),
+
+  getListOfUsers: a
+  .query()
+  .arguments({
+    paginationToken : a.string()
+  })
+  .authorization((allow) => [allow.group("ADMINS")])
+  .handler(a.handler.function(getListOfUsers))
+  .returns(a.json()),
 
   addUserToGroup: a
     .mutation()
@@ -83,7 +93,8 @@ const schema = a.schema({
     })
     .authorization((allow) => [allow.group("ADMINS")])
     .handler(a.handler.function(updateUserAttribute))
-    .returns(a.json())
+    .returns(a.json()),
+
 })
 
 export type Schema = ClientSchema<typeof schema>

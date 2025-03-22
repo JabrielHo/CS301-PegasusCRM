@@ -17,6 +17,7 @@
           <router-link to="/enableUser">Enable User</router-link> |
           <router-link to="/resetUserPassword">Reset User Password</router-link> |
           <router-link to="/updateUserAttribute">Update User Attribute</router-link> |
+          <router-link to="/getListOfUsers">Get User List</router-link> |
         </nav>
         
         <!-- This is where your route components will be rendered -->

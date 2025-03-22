@@ -106,3 +106,16 @@ export async function updateUserAttribute(email, firstName, lastName) {
     throw error;
   }
 }
+
+export async function getListOfUsers(paginationToken) {
+  try{
+    const result = await client.queries.getListOfUsers({
+      paginationToken : paginationToken
+    })
+    console.log('User list retrieved successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error getting user list:', error);
+    throw error;
+  }
+}
