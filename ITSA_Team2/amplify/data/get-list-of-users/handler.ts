@@ -13,8 +13,8 @@ export const handler: Handler = async (event) => {
   const command = new ListUsersCommand({
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     // AttributesToGet : AttributesToGet,
-    Limit : 20,
-    // PaginationToken : paginationToken,
+    Limit : 2,
+    ...(paginationToken ? { PaginationToken: paginationToken } : {}),
     // Filter: filter
   })
   const response = await client.send(command)

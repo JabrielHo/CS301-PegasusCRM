@@ -66,11 +66,12 @@ export default {
         const result = await getListOfUsers(token);
         
         // No need to parse if result is already an object
-        users.value = JSON.parse(result.data) || [];
-        users.value = users.value.Users
+        const parsedResult = JSON.parse(result.data) || [];
+        users.value = parsedResult.Users
+        
         
         // Store the pagination token for next page
-        paginationToken.value = result.PaginationToken || null;
+        paginationToken.value = parsedResult.PaginationToken || null;
         hasMoreUsers.value = !!paginationToken.value;
         
         console.log('Users fetched:', users.value);

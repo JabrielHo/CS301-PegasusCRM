@@ -19,11 +19,11 @@ export const handler: Handler = async (event) => {
             Value: email
         },
         {
-            Name: "givenName",
+            Name: "given_name",
             Value: givenName
         },
         {
-            Name: "familyName",
+            Name: "family_name",
             Value: familyName
         }
     ],
