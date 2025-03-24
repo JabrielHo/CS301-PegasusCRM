@@ -1,3 +1,5 @@
+CREATE DATABASE account_service;
+use account_service; 
 CREATE TABLE Account (
     accountId CHAR(36) PRIMARY KEY DEFAULT (UUID()),    -- Auto-generated unique identifier as a UUID
     clientId CHAR(36) NOT NULL,                         -- Unique identifier for the associated client as a string
