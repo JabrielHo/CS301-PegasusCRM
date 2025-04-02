@@ -1,0 +1,12 @@
+{
+    "action": "Update|Client",
+    "attributeName": "FirstName|Address",
+    "beforeValue": "Lee|Pasir Ris",
+    "afterValue": "Tan|Tampines",
+    "agentID": 1,
+    "clientID": 1,
+    "dateTime": "",
+    "clientName": "Ka Yong",
+    "clientEmail": "yakong@gmail.com"
+}
+

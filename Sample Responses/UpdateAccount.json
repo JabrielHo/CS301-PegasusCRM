@@ -1,0 +1,12 @@
+{
+    "action": "Update|Account",
+    "attributeName": "Status",
+    "beforeValue": "Pending",
+    "afterValue": "Active",
+    "agentID": 1,
+    "clientID": 1,
+    "dateTime": "",
+    "clientName": "Ka Yong",
+    "clientEmail": "yakong@gmail.com"
+}
+
