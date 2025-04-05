@@ -1,16 +1,33 @@
 from flask import Blueprint, Flask, jsonify, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-
 import uuid
 import json
-
 import re
 from datetime import datetime
+import boto3
+from botocore.exceptions import ClientError
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-# Query from Local MySQL UBS DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@localhost:3306/UBS'
+
+load_dotenv()
+
+# Initialize a session using Amazon S3
+s3 = boto3.client("s3")
+BUCKET_NAME = "ubs-agents"
+EXPIRATION = 3600 # URL expires in 1 hour
+ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
+
+# Securely retrieve the database connection details from environment variables
+db_host = os.getenv("DB_HOST")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_name = os.getenv("DB_NAME")
+
+# Set the SQLAlchemy URI using environment variables
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:3306/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
@@ -20,6 +37,89 @@ CORS(app)
 
 client_blueprint = Blueprint("client",__name__)
 
+# Helper Function
+# Send Email
+def send_email(recipient, clientId, user_name):
+
+    client = boto3.client('ses', region_name='ap-southeast-1')
+
+    # Construct email body
+    subject = "Upload Your Documents Securely via the Provided Link"
+    body_text = f"""
+    Dear {user_name},
+
+    To facilitate the secure upload of your documents, please use the link below, which is unique to you and can only be used by you to upload your documents:
+
+    www.google.com?id={clientId}
+
+    Instructions for Uploading Your Documents:
+      1.  Click the Link: Open the link provided above in your web browser.
+      2.  Select Your Documents: Use the upload interface to select the documents you wish to upload.
+      3.  Upload: Follow the on-screen prompts to complete the upload process.
+
+    Important: Please do not share this link with others. It is meant for your secure and private use only.
+
+    Thank you for your prompt attention to this matter.
+
+    Best regards,
+    Scrooge Global Bank
+    """
+    
+    body_html = f"""
+    <html>
+    <head></head>
+    <body>
+      <p>Dear {user_name},</p>
+
+      <p>To facilitate the secure upload of your documents, please use the link below, which is unique to you and can only be used by you to upload your documents:</p>
+
+      <p><a href="www.google.com?id={clientId}">Upload Document</a></p>
+
+      <p><b>Instructions for Uploading Your Documents:</b></p>
+      <ul>
+        <li>Click the Link: Open the link provided above in your web browser.</li>
+        <li>Select Your Documents: Use the upload interface to select the documents you wish to upload.</li>
+        <li>Upload: Follow the on-screen prompts to complete the upload process.</li>
+      </ul>
+      
+      <p><b>Important:</b> Please do not share this link with others. It is meant for your secure and private use only.</p>
+
+      <p>Thank you for your prompt attention to this matter.</p>
+
+      <p>Best regards,</p>
+      <p>Scrooge Global Bank</p>
+    </body>
+    </html>
+    """
+
+    try:
+        response = client.send_email(
+            Source="noreplyitsag2t2@gmail.com",
+            Destination={
+                'ToAddresses': [recipient],
+            },
+            Message={
+                'Subject': {
+                    'Data': subject,
+                    'Charset': 'UTF-8'
+                },
+                'Body': {
+                    'Text': {
+                        'Data': body_text,
+                        'Charset': 'UTF-8'
+                    },
+                    'Html': {
+                        'Data': body_html,
+                        'Charset': 'UTF-8'
+                    }
+                }
+            }
+        )
+        print(f"Email sent! Message ID: {response['MessageId']}")
+    except ClientError as e:
+        print(f"Error sending email: {e.response['Error']['Message']}")
+
+# Client Model
 class Client(db.Model):
     # Table Name is client
     __tablename__ = 'client'
@@ -37,8 +137,10 @@ class Client(db.Model):
     Country = db.Column(db.String(50), nullable=False)
     PostalCode = db.Column(db.String(10), nullable=False)
     Gender = db.Column(db.Enum('Male', 'Female', 'Non-binary', 'Prefer not to say'), nullable=False)
+    Verified = db.Column(db.Boolean, default=False, nullable=False)  # Added Verified field
+    deleted_at = db.Column(db.DateTime, default=None, nullable=True)  # Added deleted_at field
 
-    def __init__(self, AgentID, FirstName, LastName, DateOfBirth, EmailAddress, PhoneNumber, Address, City, State, Country, PostalCode, Gender):
+    def __init__(self, AgentID, FirstName, LastName, DateOfBirth, EmailAddress, PhoneNumber, Address, City, State, Country, PostalCode, Gender, Verified=False, deleted_at=None):
         self.ClientID = str(uuid.uuid4())
         self.AgentID = AgentID
         self.FirstName = FirstName
@@ -52,6 +154,9 @@ class Client(db.Model):
         self.Country = Country
         self.PostalCode = PostalCode
         self.Gender = Gender
+        self.Verified = Verified
+        self.deleted_at = deleted_at
+        
 
     def json(self):
         return {
@@ -67,7 +172,9 @@ class Client(db.Model):
             "State": self.State,
             "Country": self.Country,
             "PostalCode": self.PostalCode,
-            "Gender": self.Gender
+            "Gender": self.Gender,
+            "Verified": self.Verified,
+            "deleted_at": self.deleted_at
         }
 
 # Create Client
@@ -103,10 +210,16 @@ def create_client():
     try:
         db.session.add(client)
         db.session.commit()
-    except:
+
+        # Create S3 bucket directory using ClientID
+        s3_directory = f"{client.AgentID}/{client.ClientID}/"
+        s3.put_object(Bucket=BUCKET_NAME, Key=s3_directory)
+
+    except Exception as e:
         return jsonify({
             "status": "error",
-            "message": "An error occurred creating the client"
+            "message": "An error occurred creating the client",
+            "error": str(e)
         }),500
 
     return jsonify(
@@ -116,10 +229,35 @@ def create_client():
         ),201
 
 # Verify Client
-# BRUH WTF DO I DO FOR THIS
-@client_blueprint.route('<clientId>/verify', methods=['POST'])
-def verify_client():
-    return
+@client_blueprint.route('<string:clientId>/verify', methods=['POST'])
+def verify_client(clientId):
+
+    # Check if client exists
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+
+    if not client:
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Client not found"
+            }
+        ), 404
+    
+    # Send email to client with link to upload their credentials
+    send_email(client.EmailAddress, client.ClientID, client.FirstName + " " + client.LastName)    
+
+    return jsonify(
+        {
+            "status": "success",
+            "message": f"Verification email sent to {client.EmailAddress}"
+        }
+    ), 200
+
+    # If First Time, send email to client with link to upload their credentials
+    
+    # If Second Time, bring agent to the page to check if credentials are correct
+
+    # Generate pre assigned link to S3 object for user to upload their credentials
 
 # Update Client
 @client_blueprint.route('<string:clientId>', methods=['PUT'])
@@ -222,14 +360,16 @@ def get_client(clientId):
     ), 404
 
 # Delete Client
-# NOTE: They say do a soft deletion? Should I change to become active/inactive instead?
 @client_blueprint.route('/<string:clientId>', methods=["DELETE"])
 def delete_client(clientId):
 
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+    # NOTE: 
+    # Set up Cron Job to hard delete periodically?
     if client:
         try:
-            db.session.delete(client)
+            # Soft Delete by setting datetime to datetime.now()
+            client.deleted_at = datetime.now()
             db.session.commit()
             return jsonify(
                 {
@@ -252,7 +392,43 @@ def delete_client(clientId):
             }            
         ), 404
 
-app.register_blueprint(client_blueprint, url_prefix="/clients")
+# Generate Presigned URL
+@client_blueprint.route('/<string:clientId>/presigned_url', methods=['POST'])
+def generate_presigned_url(clientId, expiration=EXPIRATION):
+
+    data = request.get_json()
+    filename = data.get('filename')
+    content_type = data.get('content_type')
+
+    if not filename or not content_type:
+        return jsonify({"error": "Filename and content type are required"}), 400
+    
+    # Validate content type
+    if content_type not in ALLOWED_CONTENT_TYPES:
+        return jsonify({"error": "Invalid content type"}), 400
+    
+    try:
+        # Construct the object key dynamically using the client ID and filename
+        object_key = f"{clientId}/{filename}"
+
+        # Generate the presigned URL for the 'put_object' action
+        url = s3.generate_presigned_url(
+            'put_object',
+            Params={
+                "Bucket": BUCKET_NAME,
+                "Key": object_key,
+                "ContentType": content_type
+            },
+            ExpiresIn=expiration
+        )
+        
+        return jsonify({
+            "link": url
+        }), 200
+
+    except ClientError as e:
+        print(f"Error generating presigned URL: {e}")
+        return jsonify({"error": "Error generating presigned URL"}), 500
 
 def validate_input(data):
     errors = []
@@ -331,7 +507,9 @@ def validate_input(data):
     else:
         return {"status": "success", "message": "Validation passed."}
 
+app.register_blueprint(client_blueprint, url_prefix="/clients")
+
 #region Setting up Flask app
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port = 8080, debug=True)
+    app.run(host='0.0.0.0', port = 5001)
 #endregion

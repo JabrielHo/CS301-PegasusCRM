@@ -1,1 +1,3 @@
-Client/cs301-aws-generic.pem
+cs301-aws-generic.pem
+.env
+node_modules
