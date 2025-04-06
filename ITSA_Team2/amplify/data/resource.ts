@@ -15,7 +15,7 @@ const schema = a.schema({
   getVersion: a
   .query()
   .returns(a.string())
-  .authorization((allow) => [allow.group("ADMINS")])
+  .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
   .handler(a.handler.function(getVersion)),
 
   getListOfUsers: a
@@ -23,7 +23,7 @@ const schema = a.schema({
   .arguments({
     paginationToken : a.string()
   })
-  .authorization((allow) => [allow.group("ADMINS")])
+  .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
   .handler(a.handler.function(getListOfUsers))
   .returns(a.json()),
 
@@ -33,7 +33,7 @@ const schema = a.schema({
       userId: a.string().required(),
       groupName: a.string().required(),
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(addUserToGroup))
     .returns(a.json()),
 
@@ -43,7 +43,7 @@ const schema = a.schema({
       userId: a.string().required(),
       groupName: a.string().required(),
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(removeUserFromGroup))
     .returns(a.json()),
     
@@ -55,7 +55,7 @@ const schema = a.schema({
       familyName: a.string().required(),
       temporaryPassword: a.string().required(), // Optional, system will generate one if not provided
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(createUserToGroup))
     .returns(a.json()),
 
@@ -64,7 +64,7 @@ const schema = a.schema({
     .arguments({
       userId: a.string().required()
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(deleteUserFromGroup))
     .returns(a.json()),
 
@@ -73,7 +73,7 @@ const schema = a.schema({
     .arguments({
       userId: a.string().required()
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(disableUserInGroup))
     .returns(a.json()),
 
@@ -82,7 +82,7 @@ const schema = a.schema({
     .arguments({
       userId: a.string().required()
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(enableUserInGroup))
     .returns(a.json()),
 
@@ -91,7 +91,7 @@ const schema = a.schema({
     .arguments({
       userId: a.string().required()
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(resetUserPassword))
     .returns(a.json()),
 
@@ -102,7 +102,7 @@ const schema = a.schema({
       givenName: a.string().required(),
       familyName: a.string().required(),
     })
-    .authorization((allow) => [allow.group("ADMINS")])
+    .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(updateUserAttribute))
     .returns(a.json()),
 

@@ -23,7 +23,7 @@ export const auth = defineAuth({
   //   sms: true,
   // },
   // Define user groups
-  groups: ["ADMINS", "AGENTS"],
+  groups: ["ROOT_ADMIN", "ADMINS", "AGENTS"],
   // Add preferred username for display purposes
   userAttributes: {
 
@@ -49,7 +49,8 @@ export const auth = defineAuth({
       "removeUserFromGroup"
     ]),
     allow.resource(deleteUserFromGroup).to([
-      "deleteUser"
+      "deleteUser",
+      "listGroupsForUser"
     ]),
     allow.resource(disableUserInGroup).to([
       "disableUser"

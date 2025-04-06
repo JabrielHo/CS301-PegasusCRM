@@ -8,3 +8,6 @@ const backend = defineBackend({
   auth,
   data
 });
+
+const { cfnUserPool } = backend.auth.resources.cfnResources;
+cfnUserPool.deletionProtection = "ACTIVE";
