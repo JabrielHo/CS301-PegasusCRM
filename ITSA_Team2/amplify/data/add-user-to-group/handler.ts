@@ -4,11 +4,13 @@ import {
   AdminAddUserToGroupCommand,
   CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider"
+import { validateAdminOrRootAccess } from "../../utils/auth-utils"
 
 type Handler = Schema["addUserToGroup"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
+  await validateAdminOrRootAccess(event);
   const { userId, groupName } = event.arguments
   const command = new AdminAddUserToGroupCommand({
     Username: userId,

@@ -4,11 +4,13 @@ import {
   CognitoIdentityProviderClient,
   AdminUpdateUserAttributesCommand
 } from "@aws-sdk/client-cognito-identity-provider"
+import { validateAdminOrRootAccess } from "../../utils/auth-utils"
 
 type Handler = Schema["updateUserAttribute"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
+  await validateAdminOrRootAccess(event);
   const { email, givenName, familyName  } = event.arguments
   const command = new AdminUpdateUserAttributesCommand({
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,

@@ -27,7 +27,7 @@ export const handler: Handler = async (event) => {
   const targetGroups = groupsResponse.Groups?.map(g => g.GroupName) || [];
   // This is assuming more than one root admin
   if (targetGroups.includes("ROOT_ADMIN") && !requesterGroups.includes("ROOT_ADMIN")) {
-    throw new Error("ROOT_ADMIN users can only be deleted by other ROOT_ADMIN members");
+    throw new Error("ROOT_ADMIN users cannot be deleted");
   }
   const command = new AdminDeleteUserCommand({
     Username: userId,

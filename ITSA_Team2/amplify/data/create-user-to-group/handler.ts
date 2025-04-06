@@ -4,11 +4,13 @@ import {
   CognitoIdentityProviderClient,
   AdminCreateUserCommand
 } from "@aws-sdk/client-cognito-identity-provider"
+import { validateAdminOrRootAccess } from "../../utils/auth-utils"
 
 type Handler = Schema["createUserToGroup"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
+  await validateAdminOrRootAccess(event);
   const { email, givenName, familyName, temporaryPassword  } = event.arguments
   const command = new AdminCreateUserCommand({
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
