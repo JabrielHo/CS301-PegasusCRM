@@ -10,6 +10,8 @@ frontend:
   phases:
     preBuild:
       commands:
+        - nvm install npm@latest
+        - nvm use npm@latest
         - npm ci
     build:
       commands:
