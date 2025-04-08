@@ -9,6 +9,7 @@
         
         <!-- Navigation links -->
         <nav>
+<<<<<<< Updated upstream
           <router-link to="/">Home</router-link> |
           <router-link to="/addUserToGroup">Add User To Group</router-link> |
           <router-link to="/createUser">Create User</router-link> |
@@ -18,6 +19,18 @@
           <router-link to="/resetUserPassword">Reset User Password</router-link> |
           <router-link to="/updateUserAttribute">Update User Attribute</router-link> |
           <router-link to="/getListOfUsers">Get User List</router-link> |
+=======
+          <!-- Admin Links -->
+          <router-link to="/admin-dashboard">Dashboard</router-link> |
+          <router-link to="/admin-create-account">Create New Account</router-link> |
+          <router-link to="/admin-manage-account">Manage Account</router-link> |
+          <router-link to="/admin-agent-activities">Agent Activities</router-link> |
+          <!-- Agent links -->
+          <router-link to="/agent-dashboard">Dashboard</router-link> |
+          <router-link to="/agent-create-client-profile">Create Client Profile</router-link> |
+          <router-link to="/agent-view-transactions">View Transactions</router-link> |
+          <router-link to="/agent-manage-profiles">Manage Profiles</router-link> |
+>>>>>>> Stashed changes
         </nav>
         
         <!-- This is where your route components will be rendered -->
