@@ -15,7 +15,7 @@ class Account(db.Model):
     initialDeposit = db.Column(db.Numeric(precision=10, scale=2), nullable=False)
     currency = db.Column(db.String(3), nullable=False)
     branchId = db.Column(db.String(36), nullable=False)
-    isDeleted = db.Column(db.Boolean, nullable=False, default=False)
+    deleted_at = db.Column(db.DateTime, nullable=True, default=None)
     
     def to_dict(self):
         return {
@@ -27,5 +27,9 @@ class Account(db.Model):
             'initialDeposit': float(self.initialDeposit),
             'currency': self.currency,
             'branchId': self.branchId,
-            'isDeleted': self.isDeleted
+            'deleted_at': self.deleted_at.isoformat() if self.deleted_at else None
         }
+        
+    @property
+    def is_deleted(self):
+        return self.deleted_at is not None
