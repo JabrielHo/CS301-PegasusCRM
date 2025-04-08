@@ -1,5 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
+// Pages
 import HomeView from '../pages/HomeView.vue';
 import AdminDashboard from '../pages/AdminDashboard.vue';
 import AdminManageAccount from '../pages/AdminManageAccount.vue';
@@ -20,7 +21,9 @@ import resetUserPassword from '../components/resetUserPassword.vue';
 import updateUserAttribute from '../components/updateUserAttribute.vue';
 import getListOfUsers from '../components/getListOfUsers.vue'
 
+
 const routes = [
+  // Pages
   {
     path: '/',
     name: 'home',
