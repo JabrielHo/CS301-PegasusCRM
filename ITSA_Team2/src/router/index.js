@@ -1,8 +1,6 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../pages/HomeView.vue';
-<<<<<<< Updated upstream
-=======
 import AdminDashboard from '../pages/AdminDashboard.vue';
 import AdminManageAccount from '../pages/AdminManageAccount.vue';
 import AdminCreateAccount from '../pages/AdminCreateAccount.vue';
@@ -13,7 +11,6 @@ import AgentViewTransactions from '../pages/AgentViewTransactions.vue';
 import AgentManageProfiles from '../pages/AgentManageProfiles.vue';
 
 // Components
->>>>>>> Stashed changes
 import addUserToGroup from '../components/addUserToGroup.vue';
 import createUser from '../components/createUser.vue';
 import deleteUser from '../components/deleteUser.vue';
@@ -30,8 +27,6 @@ const routes = [
     component: HomeView
   },
   {
-<<<<<<< Updated upstream
-=======
     path: '/admin-dashboard',
     name: 'Admin Dashboard',
     component: AdminDashboard
@@ -76,7 +71,6 @@ const routes = [
 
   // Components
   {
->>>>>>> Stashed changes
     path: '/addUserToGroup',
     name: 'addUserToGroup',
     component: addUserToGroup,
