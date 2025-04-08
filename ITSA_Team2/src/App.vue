@@ -47,6 +47,7 @@ onMounted(async () => {
   } catch (error) {
     console.error('Error fetching user attributes:', error);
     displayName.value = 'User';
+    
   }
 });
 </script>
