@@ -10,7 +10,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd ITSA_Team2
+        - nvm install -g npm@latest
+        - nvm use npm@latest
         - npm ci
     build:
       commands:
