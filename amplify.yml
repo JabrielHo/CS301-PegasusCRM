@@ -5,7 +5,7 @@ backend:
       commands:
         - cd ITSA_Team2
         - npm ci
-        - npx ampx pipeline-deploy --branch $BRANCH_NAME --app-id $AWS_APP_ID
+        - npx ampx pipeline-deploy --branch $BRANCH_NAME --app-id $APP_ID
 frontend:
   phases:
     preBuild:
