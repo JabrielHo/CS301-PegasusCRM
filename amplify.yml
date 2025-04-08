@@ -1,0 +1,24 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - cd ITSA_Team2
+        - npm ci
+        - npx ampx pipeline deploy
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd ITSA_Team2
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: ITSA_Team2/dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - ITSA_Team2/node_modules/**/*
