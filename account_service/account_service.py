@@ -68,6 +68,7 @@ def create_account():
     required_fields = [
         "clientId",
         "accountType",
+        "accountStatus",
         "initialDeposit",
         "currency",
         "branchId",
@@ -78,22 +79,6 @@ def create_account():
         return (
             jsonify(
                 {"message": "Missing required fields", "missing_fields": missing_fields}
-            ),
-            400,
-        )
-
-        # Update the date handling in create_account:
-    try:
-        if "openingDate" in data:
-            opening_date = datetime.datetime.fromisoformat(data["openingDate"]).date()
-        else:
-            opening_date = datetime.datetime.now(timezone.utc).date()
-    except ValueError:
-        return (
-            jsonify(
-                {
-                    "message": "Invalid date format for openingDate. Use YYYY-MM-DD format."
-                }
             ),
             400,
         )
@@ -118,15 +103,12 @@ def create_account():
     new_account = Account(
         clientId=data["clientId"],
         accountType=data["accountType"],
-        accountStatus="Active",  # Auto set to Active
-        openingDate=opening_date,
+        accountStatus=data["accountStatus"],
+        openingDate=datetime.datetime.now(timezone.utc).date(),
         initialDeposit=initial_deposit,
         currency=data["currency"],
         branchId=data["branchId"],
     )
-
-    db.session.add(new_account)
-    db.session.commit()
 
     try:
         db.session.add(new_account)
@@ -157,7 +139,7 @@ def update_account_status(accountId):
     
     account_status = data["accountStatus"]
     
-    allowed_statuses = ["Active", "Inactive", "Pending", "Closed"]
+    allowed_statuses = ["Active", "Inactive", "Pending"]
     if account_status not in allowed_statuses:
         return (
             jsonify({
@@ -209,6 +191,7 @@ def delete_account_by_accountId(accountId):
             }), 409
         
         account_check.deleted_at = datetime.datetime.now(timezone.utc)
+        account_check.accountStatus = "Inactive"
         db.session.commit()
 
         return jsonify({
@@ -219,6 +202,5 @@ def delete_account_by_accountId(accountId):
         db.session.rollback()
         return jsonify({"message": "Failed to delete account due to database error"}), 500
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5003)

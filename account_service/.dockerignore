@@ -1,3 +1,5 @@
 .env
 account.sql
 .gitignore
+docker-compose.yml
+.dockerignore
