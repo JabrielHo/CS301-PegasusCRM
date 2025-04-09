@@ -3,6 +3,7 @@
     <!-- Header with Title -->
     <div class="dashboard-header">
       <h1>User Management Dashboard</h1>
+      <p class="dashboard-subtitle">Manage administrators and agents with ease</p>
     </div>
 
     <!-- Toggle Buttons -->
@@ -22,10 +23,23 @@
       <div class="card-header">
         <div class="search-container">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..." />
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..." @keyup.enter="performGlobalSearch" />
+          <button class="btn-search" @click="performGlobalSearch" title="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Search
+          </button>
         </div>
         <div class="table-info">
-          <span>{{ filteredAccounts.length }} users found</span>
+          <span v-if="isSearchMode">
+            {{ filteredAccounts.length }} of {{ allSearchResults.length }} users found
+          </span>
+          <span v-else>
+            {{ filteredAccounts.length }} users found
+          </span>
+          <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            Clear Search
+          </button>
         </div>
       </div>
 
@@ -44,7 +58,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="account in filteredAccounts" :key="account.sub" :class="{ 'disabled-row': !account.enabled }">
+            <tr v-for="account in displayedAccounts" :key="account.sub" :class="{ 'disabled-row': !account.enabled }">
               <td>{{ account.email }}</td>
               <td>{{ account.given_name }}</td>
               <td>{{ account.family_name }}</td>
@@ -66,8 +80,13 @@
                 </button>
               </td>
             </tr>
-            <tr v-if="filteredAccounts.length === 0">
-              <td colspan="8" class="no-results">No users found matching your search criteria</td>
+            <tr v-if="displayedAccounts.length === 0">
+              <td colspan="8" class="no-results">
+                <div class="empty-state">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <p>No users found matching your search criteria</p>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -75,11 +94,21 @@
 
       <!-- Pagination Buttons -->
       <div class="pagination">
-        <button class="btn-pagination" @click="previousPage" :disabled="!paginationHistory.length">
+        <!-- Show page numbers for search mode -->
+        <div v-if="isSearchMode" class="pagination-pages">
+          <button 
+            v-for="page in totalPages" 
+            :key="page" 
+            @click="goToPage(page)"
+            :class="['page-number', { active: currentPage === page }]">
+            {{ page }}
+          </button>
+        </div>
+        <button class="btn-pagination" @click="previousPage" :disabled="isPreviousDisabled">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
           Previous
         </button>
-        <button class="btn-pagination" @click="nextPage" :disabled="!hasMoreUsers">
+        <button class="btn-pagination" @click="nextPage" :disabled="isNextDisabled">
           Next
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
@@ -87,7 +116,7 @@
     </div>
 
     <!-- Edit Modal -->
-    <div v-if="showEditModal" class="modal-overlay">
+    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
       <div class="modal">
         <div class="modal-header">
           <h3>Edit User</h3>
@@ -97,7 +126,10 @@
         </div>
         
         <div class="modal-content">
-          <div class="user-email">{{ editUser.email }}</div>
+          <div class="user-email">
+            <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>{{ editUser.email }}</span>
+          </div>
           
           <div class="form-group">
             <label for="givenName">Given Name</label>
@@ -144,25 +176,38 @@
         </div>
 
         <div class="modal-footer">
-          <div class="danger-zone">
-            <button class="btn-delete" @click="deleteUser">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              Delete User
-            </button>
-          </div>
           <div class="action-buttons">
-            <button class="btn-cancel" @click="closeEditModal">Cancel</button>
+            <button class="btn-cancel" @click="closeEditModal">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              Cancel
+            </button>
             <button class="btn-save" @click="saveUserChanges">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
               Save Changes
+            </button>
+          </div>
+          
+          <div class="danger-zone">
+            <h4>Danger Zone</h4>
+            <button class="btn-delete" @click="deleteUser">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              Delete User
             </button>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Loading Overlay -->
+    <div v-if="isSearching" class="modal-overlay">
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Searching all users...</p>
+      </div>
+    </div>
+
     <!-- No selection popup -->
-    <div v-if="showNoSelectionPopup" class="popup-overlay">
+    <div v-if="showNoSelectionPopup" class="popup-overlay" @click.self="closePopup">
       <div class="popup">
         <div class="popup-header">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
@@ -178,7 +223,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
   getListOfUsersFromGroups,
   updateUserAttribute,
@@ -201,10 +246,22 @@ export default {
       paginationHistory: [], // History of pagination tokens for "Previous Page"
       hasMoreUsers: true, // Flag to indicate if there are more users to fetch
       selectedGroup: 'ADMINS', // Default group to display
+      
+      // New properties for enhanced search
+      isSearching: false, // Flag to show loading state during global search
+      isSearchMode: false, // Flag to indicate if we're in search mode
+      allSearchResults: [], // All users from search across pages
+      currentPage: 1, // Current page in search results pagination
+      usersPerPage: 5, // Number of users to display per page in search results
     };
   },
   computed: {
+    // Filter accounts based on the search query (only for standard mode)
     filteredAccounts() {
+      if (this.isSearchMode) {
+        return this.allSearchResults;
+      }
+      
       const query = this.searchQuery.toLowerCase();
       return this.accounts.filter(account => {
         return (
@@ -214,6 +271,37 @@ export default {
         );
       });
     },
+    
+    // Get accounts to display based on current pagination or search mode
+    displayedAccounts() {
+      if (this.isSearchMode) {
+        const start = (this.currentPage - 1) * this.usersPerPage;
+        const end = start + this.usersPerPage;
+        return this.allSearchResults.slice(start, end);
+      }
+      return this.filteredAccounts;
+    },
+    
+    // Total pages for search pagination
+    totalPages() {
+      return Math.ceil(this.allSearchResults.length / this.usersPerPage);
+    },
+    
+    // Check if Previous button should be disabled
+    isPreviousDisabled() {
+      if (this.isSearchMode) {
+        return this.currentPage <= 1;
+      }
+      return !this.paginationHistory.length;
+    },
+    
+    // Check if Next button should be disabled
+    isNextDisabled() {
+      if (this.isSearchMode) {
+        return this.currentPage >= this.totalPages;
+      }
+      return !this.hasMoreUsers;
+    }
   },
   methods: {
     async fetchUsers(groupName, token = null) {
@@ -242,6 +330,131 @@ export default {
         console.error('Error fetching users:', error);
       }
     },
+    
+    // New method to perform global search across all pages
+    async performGlobalSearch() {
+      if (!this.searchQuery.trim()) {
+        // If search query is empty, switch back to normal mode
+        this.isSearchMode = false;
+        this.allSearchResults = [];
+        this.currentPage = 1;
+        return;
+      }
+      
+      this.isSearching = true;
+      this.allSearchResults = [];
+      let allUsers = [];
+      let token = null;
+      let hasMorePages = true;
+      
+      try {
+        // Fetch all pages of users
+        while (hasMorePages) {
+          const result = await getListOfUsersFromGroups(token, this.selectedGroup);
+          const parsedResult = JSON.parse(result.data) || [];
+          
+          const users = parsedResult.Users.map(user => ({
+            email: user.Attributes.find(attr => attr.Name === 'email')?.Value || '',
+            given_name: user.Attributes.find(attr => attr.Name === 'given_name')?.Value || '',
+            family_name: user.Attributes.find(attr => attr.Name === 'family_name')?.Value || '',
+            sub: user.Attributes.find(attr => attr.Name === 'sub')?.Value || '',
+            UserDateOfBirth: user.Attributes.find(attr => attr.Name === 'birthdate')?.Value || '',
+            UserStatus: user.UserStatus,
+            UserCreateDate: user.UserCreateDate,
+            enabled: user.Enabled,
+          }));
+          
+          allUsers = [...allUsers, ...users];
+          
+          // Check if there are more pages
+          token = parsedResult.NextToken || null;
+          hasMorePages = !!token;
+        }
+        
+        // Apply search filter to all users
+        const query = this.searchQuery.toLowerCase();
+        this.allSearchResults = allUsers.filter(user => {
+          return (
+            (user.email && user.email.toLowerCase().includes(query)) ||
+            (user.given_name && user.given_name.toLowerCase().includes(query)) ||
+            (user.family_name && user.family_name.toLowerCase().includes(query))
+          );
+        });
+        
+        // Switch to search mode and reset to first page
+        this.isSearchMode = true;
+        this.currentPage = 1;
+        
+        console.log('Global search results:', this.allSearchResults);
+      } catch (error) {
+        console.error('Error performing global search:', error);
+      } finally {
+        this.isSearching = false;
+      }
+    },
+    
+    // Navigation methods for search pagination
+    goToPage(page) {
+      this.currentPage = page;
+    },
+    
+    nextPage() {
+      if (this.isSearchMode) {
+        if (this.currentPage < this.totalPages) {
+          this.currentPage++;
+        }
+      } else {
+        if (this.hasMoreUsers) {
+          if (this.paginationToken) {
+            this.paginationHistory.push(this.paginationToken);
+          }
+          this.fetchUsers(this.selectedGroup, this.paginationToken);
+        }
+      }
+    },
+    
+    previousPage() {
+      if (this.isSearchMode) {
+        if (this.currentPage > 1) {
+          this.currentPage--;
+        }
+      } else {
+        if (this.paginationHistory.length > 0) {
+          const previousToken = this.paginationHistory.length > 1
+            ? this.paginationHistory[this.paginationHistory.length - 2]
+            : null;
+
+          this.paginationHistory.pop();
+          this.fetchUsers(this.selectedGroup, previousToken);
+        } else {
+          this.fetchUsers(this.selectedGroup);
+        }
+      }
+    },
+    
+    // Reset search and go back to normal mode
+    clearSearch() {
+      this.searchQuery = '';
+      this.isSearchMode = false;
+      this.allSearchResults = [];
+      this.currentPage = 1;
+      this.fetchUsers(this.selectedGroup);
+    },
+    
+    switchGroup(groupName) {
+      this.selectedGroup = groupName;
+      this.paginationToken = null;
+      this.paginationHistory = [];
+      
+      // Reset search state when switching groups
+      this.isSearchMode = false;
+      this.allSearchResults = [];
+      this.currentPage = 1;
+      this.searchQuery = '';
+      
+      this.fetchUsers(groupName);
+    },
+
     async disableUser() {
       try {
         const confirmation = confirm('Are you sure you want to disable this user?');
@@ -250,11 +463,21 @@ export default {
         await disableUserInGroup(this.editUser.email);
         console.log('User disabled successfully');
         this.editUser.enabled = false; // Update the enabled property locally
+        
+        // Update the user in search results if in search mode
+        if (this.isSearchMode) {
+          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
+          if (index !== -1) {
+            this.allSearchResults[index].enabled = false;
+          }
+        }
+        
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error disabling user:', error);
       }
     },
+    
     async enableUser() {
       try {
         const confirmation = confirm('Are you sure you want to enable this user?');
@@ -263,46 +486,34 @@ export default {
         await enableUserInGroup(this.editUser.email);
         console.log('User enabled successfully');
         this.editUser.enabled = true; // Update the enabled property locally
+        
+        // Update the user in search results if in search mode
+        if (this.isSearchMode) {
+          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
+          if (index !== -1) {
+            this.allSearchResults[index].enabled = true;
+          }
+        }
+        
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error enabling user:', error);
       }
     },
-    switchGroup(groupName) {
-      this.selectedGroup = groupName;
-      this.paginationToken = null;
-      this.paginationHistory = [];
-      this.fetchUsers(groupName);
-    },
-    nextPage() {
-      if (this.hasMoreUsers) {
-        if (this.paginationToken) {
-          this.paginationHistory.push(this.paginationToken);
-        }
-        this.fetchUsers(this.selectedGroup, this.paginationToken);
-      }
-    },
-    previousPage() {
-      if (this.paginationHistory.length > 0) {
-        const previousToken = this.paginationHistory.length > 1
-          ? this.paginationHistory[this.paginationHistory.length - 2]
-          : null;
-
-        this.paginationHistory.pop();
-        this.fetchUsers(this.selectedGroup, previousToken);
-      } else {
-        this.fetchUsers(this.selectedGroup);
-      }
-    },
+    
     openEditModal(account) {
       this.editUser = { ...account }; // Clone the selected user
       console.log('Editing user:', this.editUser);
       this.showEditModal = true;
+      document.body.classList.add('modal-open'); // Add class to body
     },
+    
     closeEditModal() {
       this.showEditModal = false;
       this.editUser = {};
+      document.body.classList.remove('modal-open'); // Remove class from body
     },
+    
     async saveUserChanges() {
       try {
         await updateUserAttribute(
@@ -312,12 +523,22 @@ export default {
           this.editUser.UserDateOfBirth
         );
         console.log('User updated successfully');
+        
+        // Update the user in search results if in search mode
+        if (this.isSearchMode) {
+          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
+          if (index !== -1) {
+            this.allSearchResults[index] = {...this.editUser};
+          }
+        }
+        
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error updating user:', error);
       }
     },
+    
     async deleteUser() {
       try {
         const confirmation = confirm('Are you sure you want to delete this user?');
@@ -325,39 +546,67 @@ export default {
 
         await deleteUserFromGroup(this.editUser.email);
         console.log('User deleted successfully');
+        
+        // Remove user from search results if in search mode
+        if (this.isSearchMode) {
+          this.allSearchResults = this.allSearchResults.filter(
+            user => user.email !== this.editUser.email
+          );
+        }
+        
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error deleting user:', error);
       }
     },
+    
     async promoteToAdmin() {
       try {
         await removeUserFromGroup(this.editUser.email, 'AGENTS');
         await addUserToGroup(this.editUser.email, 'ADMINS');
         console.log('User promoted to Admin successfully');
+        
+        // If in search mode and viewing agents, remove this user from results
+        if (this.isSearchMode && this.selectedGroup === 'AGENTS') {
+          this.allSearchResults = this.allSearchResults.filter(
+            user => user.email !== this.editUser.email
+          );
+        }
+        
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error promoting user to Admin:', error);
       }
     },
+    
     async demoteToAgent() {
       try {
         await removeUserFromGroup(this.editUser.email, 'ADMINS');
         await addUserToGroup(this.editUser.email, 'AGENTS');
         console.log('User demoted to Agent successfully');
+        
+        // If in search mode and viewing admins, remove this user from results
+        if (this.isSearchMode && this.selectedGroup === 'ADMINS') {
+          this.allSearchResults = this.allSearchResults.filter(
+            user => user.email !== this.editUser.email
+          );
+        }
+        
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error demoting user to Agent:', error);
       }
     },
+    
     formatDate(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleString();
     },
+    
     closePopup() {
       this.showNoSelectionPopup = false;
     }
@@ -369,7 +618,6 @@ export default {
 </script>
 
 <style scoped>
-/* Base Variables */
 :root {
   --primary-color: #3b82f6;
   --primary-hover: #2563eb;
@@ -444,6 +692,27 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
 .toggle-container button:hover {
   background-color: #cbd5e1;
   transform: translateY(-1px);
@@ -479,11 +748,13 @@ export default {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Search Container */
 .search-container {
   position: relative;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .search-container svg {
@@ -503,6 +774,7 @@ export default {
   color: var(--text-primary);
   transition: all 0.2s ease;
   background-color: white;
+  flex: 1;
 }
 
 .search-container input:focus {
@@ -520,17 +792,20 @@ export default {
 /* Table Styles */
 .client-table {
   overflow-x: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .client-table table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .client-table th {
   text-align: left;
   padding: 1rem;
-  background-color: #e2e8f0;
+  background-color: #f1f5f9;
   color: #334155;
   font-weight: 600;
   font-size: 0.875rem;
@@ -646,6 +921,38 @@ export default {
   background-color: #f8fafc;
 }
 
+.pagination-pages {
+  display: flex;
+  gap: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #334155;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-number.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.page-number:hover:not(.active) {
+  background-color: #e2e8f0;
+}
+
 .btn-pagination {
   display: flex;
   align-items: center;
@@ -684,6 +991,11 @@ export default {
   justify-content: center;
   z-index: 50;
   backdrop-filter: blur(3px);
+  overflow: hidden; /* Prevent scrolling of background */
+}
+
+body.modal-open {
+  overflow: hidden; /* Add this class to body when modal is open */
 }
 
 .modal {
@@ -695,6 +1007,8 @@ export default {
   animation: modalFadeIn 0.3s ease forwards;
   max-height: 90vh;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes modalFadeIn {
@@ -808,6 +1122,77 @@ export default {
   gap: 1rem;
 }
 
+.btn-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state svg {
+  color: #94a3b8;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  color: #64748b;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.loading-container p {
+  color: #475569;
+  font-weight: 500;
+}
+
+.btn-search:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.btn-clear {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background-color: white;
+  color: #475569;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+  background-color: #f1f5f9;
+}
+
+.btn-search svg {
+  color: white;
+}
 /* Action Buttons */
 .btn-disable, .btn-enable, .btn-promote, .btn-demote, .btn-delete, .btn-cancel, .btn-save, .btn-primary {
   display: flex;
