@@ -12,67 +12,68 @@ import { removeUserFromGroup } from '../data/remove-user-from-group/resource';
  * Define and configure your auth resource
  * @see https://docs.amplify.aws/gen2/build-a-backend/auth
  */
-export const auth = defineAuth(
-  {
-  loginWith: {
-    email: true
-  },
-  // Configure MFA
-  // multifactor: {
-  //   mode: 'OPTIONAL',
-  //   totp: true,
-  //   sms: true,
-  // },
-  // Define user groups
-  groups: ["ROOT_ADMIN", "ADMINS", "AGENTS"],
-  // Add preferred username for display purposes
-  userAttributes: {
+export const auth = null
+// defineAuth(
+//   {
+//   loginWith: {
+//     email: true
+//   },
+//   // Configure MFA
+//   // multifactor: {
+//   //   mode: 'OPTIONAL',
+//   //   totp: true,
+//   //   sms: true,
+//   // },
+//   // Define user groups
+//   groups: ["ROOT_ADMIN", "ADMINS", "AGENTS"],
+//   // Add preferred username for display purposes
+//   userAttributes: {
 
-    // Maps to Cognito standard attribute 'given_name'
-    givenName: {
-      mutable: true,
-      required: true,
-    },
+//     // Maps to Cognito standard attribute 'given_name'
+//     givenName: {
+//       mutable: true,
+//       required: true,
+//     },
 
-    familyName: {
-      mutable: true,
-      required: true,
-    },
+//     familyName: {
+//       mutable: true,
+//       required: true,
+//     },
 
-    birthdate: {
-      mutable: true,
-      required: true
-    }
-  },
-  access: (allow) => [
-    allow.resource(addUserToGroup).to([
-      "addUserToGroup"
-    ]),
-    allow.resource(createUserToGroup).to([
-      "createUser"
-    ]),
-    allow.resource(removeUserFromGroup).to([
-      "removeUserFromGroup"
-    ]),
-    allow.resource(deleteUserFromGroup).to([
-      "deleteUser",
-      "listGroupsForUser"
-    ]),
-    allow.resource(disableUserInGroup).to([
-      "disableUser"
-    ]),
-    allow.resource(enableUserInGroup).to([
-      'enableUser'
-    ]),
-    allow.resource(resetUserPassword).to([
-      'resetUserPassword'
-    ]),
-    allow.resource(updateUserAttribute).to([
-      'updateUserAttributes'
-    ]),
-    allow.resource(getListOfUsers).to([
-      'listUsers'
-    ]),
-  ]
-}
-);
+//     birthdate: {
+//       mutable: true,
+//       required: true
+//     }
+//   },
+//   access: (allow) => [
+//     allow.resource(addUserToGroup).to([
+//       "addUserToGroup"
+//     ]),
+//     allow.resource(createUserToGroup).to([
+//       "createUser"
+//     ]),
+//     allow.resource(removeUserFromGroup).to([
+//       "removeUserFromGroup"
+//     ]),
+//     allow.resource(deleteUserFromGroup).to([
+//       "deleteUser",
+//       "listGroupsForUser"
+//     ]),
+//     allow.resource(disableUserInGroup).to([
+//       "disableUser"
+//     ]),
+//     allow.resource(enableUserInGroup).to([
+//       'enableUser'
+//     ]),
+//     allow.resource(resetUserPassword).to([
+//       'resetUserPassword'
+//     ]),
+//     allow.resource(updateUserAttribute).to([
+//       'updateUserAttributes'
+//     ]),
+//     allow.resource(getListOfUsers).to([
+//       'listUsers'
+//     ]),
+//   ]
+// }
+// );
