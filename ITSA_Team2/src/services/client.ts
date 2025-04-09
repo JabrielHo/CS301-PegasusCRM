@@ -135,3 +135,32 @@ export async function getListOfUsers(paginationToken) {
     throw error;
   }
 }
+
+export async function getListOfUsersFromGroups(paginationToken, groupName) {
+  try{
+    const result = await client.queries.listUsersInGroup({
+      paginationToken : paginationToken,
+      groupName : groupName
+    })
+    console.log('User list retrieved successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error getting user list:', error);
+    throw error;
+  }
+}
+
+
+export async function getUser(email) {
+  try{
+    const result = await client.queries.getUser({
+      userId : email
+    })
+    console.log('User list retrieved successfully:', result);
+    return result
+  } catch (error){
+    console.log('Error getting user list:', error);
+    throw error;
+  }
+}
+

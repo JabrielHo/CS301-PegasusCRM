@@ -10,6 +10,8 @@ import { resetUserPassword } from "./reset-user-password/resource"
 import { updateUserAttribute } from "./update-user-attribute/resource"
 import { getListOfUsers } from "./get-list-of-users/resource"
 import { removeUserFromGroup } from "./remove-user-from-group/resource"
+import { getUser } from "./get-user/resource"
+import { listUsersInGroup } from "./list-users-in-group/resource"
 
 const schema = a.schema({
   getVersion: a
@@ -25,6 +27,25 @@ const schema = a.schema({
   })
   .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
   .handler(a.handler.function(getListOfUsers))
+  .returns(a.json()),
+
+  listUsersInGroup: a
+  .query()
+  .arguments({
+    groupName: a.string().required(),
+    paginationToken : a.string()
+  })
+  .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
+  .handler(a.handler.function(listUsersInGroup))
+  .returns(a.json()),
+
+  getUser: a
+  .query()
+  .arguments({
+    userId: a.string().required()
+  })
+  .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
+  .handler(a.handler.function(getUser))
   .returns(a.json()),
 
   addUserToGroup: a

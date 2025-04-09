@@ -1,7 +1,7 @@
 <template>
   <div class="create-client-profile">
     <header>
-      <h1>Create Client Profile</h1>
+      <h1>Create  Profile</h1>
       <p class="subtitle">Please fill in the details below to create a new client account</p>
     </header>
     

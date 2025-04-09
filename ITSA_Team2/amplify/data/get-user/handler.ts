@@ -1,23 +1,20 @@
 import type { Schema } from "../resource"
 import { env } from "$amplify/env/disable-user-in-group"
 import {
-  ListUsersCommand,
+  AdminGetUserCommand,
   CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider"
 import { validateAdminOrRootAccess } from "../../utils/auth-utils"
 
-type Handler = Schema["getListOfUsers"]["functionHandler"]
+type Handler = Schema["getUser"]["functionHandler"]
 const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
   await validateAdminOrRootAccess(event);
-  const { paginationToken } = event.arguments
-  const command = new ListUsersCommand({
+  const { userId } = event.arguments
+  const command = new AdminGetUserCommand({
+    Username: userId,
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
-    // AttributesToGet : AttributesToGet,
-    Limit : 1,
-    ...(paginationToken ? { PaginationToken: paginationToken } : {}),
-    // Filter: filter
   })
   const response = await client.send(command)
   return response
