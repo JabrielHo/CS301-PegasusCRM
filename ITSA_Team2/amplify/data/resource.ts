@@ -54,6 +54,7 @@ const schema = a.schema({
       givenName: a.string().required(),
       familyName: a.string().required(),
       temporaryPassword: a.string().required(), // Optional, system will generate one if not provided
+      birthDate: a.string().required()
     })
     .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(createUserToGroup))
@@ -101,6 +102,7 @@ const schema = a.schema({
       email: a.string().required(),
       givenName: a.string().required(),
       familyName: a.string().required(),
+      birthDate: a.string().required(),
     })
     .authorization((allow) => [allow.groups(["ROOT_ADMIN", "ADMINS"])])
     .handler(a.handler.function(updateUserAttribute))

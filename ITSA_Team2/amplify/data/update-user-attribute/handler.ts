@@ -11,7 +11,7 @@ const client = new CognitoIdentityProviderClient()
 
 export const handler: Handler = async (event) => {
   await validateAdminOrRootAccess(event);
-  const { email, givenName, familyName  } = event.arguments
+  const { email, givenName, familyName, birthDate } = event.arguments
   const command = new AdminUpdateUserAttributesCommand({
     UserPoolId: env.AMPLIFY_AUTH_USERPOOL_ID,
     Username: email,
@@ -27,6 +27,10 @@ export const handler: Handler = async (event) => {
         {
             Name: "family_name",
             Value: familyName
+        },
+        {
+            Name : "birthdate",
+            Value: birthDate
         }
     ],
   })

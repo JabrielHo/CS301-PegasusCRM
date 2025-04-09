@@ -38,13 +38,14 @@ export async function removeUserFromGroup(userId, groupName) {
   }
 }
 
-export async function createUserToGroup(email, firstName, lastName, temporaryPassword) {
+export async function createUserToGroup(email, firstName, lastName, temporaryPassword, birthDate) {
   try{
     const result = await client.mutations.createUserToGroup({
       email: email,
       givenName: firstName,
       familyName: lastName,
-      temporaryPassword: temporaryPassword
+      temporaryPassword: temporaryPassword,
+      birthDate: birthDate
     })
     console.log('User created successfully:', result);
     return result
@@ -106,12 +107,13 @@ export async function resetUserPassword(email){
   }
 }
 
-export async function updateUserAttribute(email, firstName, lastName) {
+export async function updateUserAttribute(email, firstName, lastName, birthDate) {
   try{
     const result = await client.mutations.updateUserAttribute({
       email: email,
       givenName: firstName,
       familyName: lastName,
+      birthDate: birthDate
     })
     console.log('User updated successfully:', result);
     return result

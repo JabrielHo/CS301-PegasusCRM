@@ -37,6 +37,11 @@ export const auth = defineAuth({
       mutable: true,
       required: true,
     },
+
+    birthdate: {
+      mutable: true,
+      required: true
+    }
   },
   access: (allow) => [
     allow.resource(addUserToGroup).to([
