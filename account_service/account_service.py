@@ -235,7 +235,7 @@ def delete_account_by_accountId(accountId):
             500,
         )
 
-
+# Get All Branches
 @app.route("/api/branches", methods=["GET"])
 def get_all_branches():
     try:
