@@ -86,7 +86,7 @@ const routes = [
     meta: { roles: ["AGENTS"] },
   },
   {
-    path: "/client-profile-page/:id",
+    path: "/client-profile-page/:clientID",
     name: "Client Profile Page",
     component: ClientProfilePage,
     props: true,

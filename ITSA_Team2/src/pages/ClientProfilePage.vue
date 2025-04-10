@@ -19,43 +19,51 @@
           <div class="profile-info">
             <div class="info-group">
               <div class="info-label">Client ID</div>
-              <div class="info-value">{{ client.id }}</div>
+              <div class="info-value">{{ client.ClientID }}</div>
             </div>
             <div class="info-group">
               <div class="info-label">Client Name</div>
-              <div class="info-value">{{ client.clientName }}</div>
+              <div class="info-value">{{ client.FirstName + " " + client.LastName }}</div>
             </div>
             <div class="info-group">
-              <div class="info-label">Date Created</div>
-              <div class="info-value">{{ formatDate(client.dateCreated) }}</div>
+              <div class="info-label">Address</div>
+              <div class="info-value">{{ client.Address || 'Not provided' }}</div>
             </div>
             <div class="info-group">
-              <div class="info-label">Status</div>
-              <div class="info-value">
-                <span :class="['status-badge', client.active ? 'confirmed' : 'pending']">
-                  {{ client.active ? 'Active' : 'Inactive' }}
-                </span>
-              </div>
+              <div class="info-label">City</div>
+              <div class="info-value">{{ client.City || 'Not provided' }}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">State</div>
+              <div class="info-value">{{ client.State || 'Not provided' }}</div>
+            </div>
+            <div class="info-group">
+              <div class="info-label">Postal Code</div>
+              <div class="info-value">{{ client.PostalCode || 'Not provided' }}</div>
             </div>
           </div>
           <div class="profile-info">
             <div class="info-group">
+              <div class="info-label">Gender</div>
+              <div class="info-value">{{ client.Gender || 'Not provided' }}</div>
+            </div>
+            <div class="info-group">
               <div class="info-label">Email</div>
-              <div class="info-value">{{ client.email || 'Not provided' }}</div>
+              <div class="info-value">{{ client.EmailAddress || 'Not provided' }}</div>
             </div>
             <div class="info-group">
               <div class="info-label">Phone</div>
-              <div class="info-value">{{ client.phone || 'Not provided' }}</div>
+              <div class="info-value">{{ client.PhoneNumber || 'Not provided' }}</div>
             </div>
             <div class="info-group">
-              <div class="info-label">Address</div>
-              <div class="info-value">{{ client.address || 'Not provided' }}</div>
+              <div class="info-label">Date of Birth</div>
+              <div class="info-value">{{ formatDate(client.DateOfBirth) || 'Not provided' }}</div>
             </div>
             <div class="info-group">
-              <div class="info-label">KYC Status</div>
+              <div class="info-label">Status</div>
               <div class="info-value">
-                <span :class="['status-badge', client.kycVerified ? 'confirmed' : 'pending']">
-                  {{ client.kycVerified ? 'Verified' : 'Pending' }}
+                <span :class="['status-badge', client.Verified ? 'confirmed' : 'pending']">
+                  {{ client.Verified ? 'Verified' : 'Not Verified' }}
                 </span>
               </div>
             </div>
@@ -74,7 +82,7 @@
         </div>
         
         <!-- Account Search and Filter -->
-        <div class="accounts-filter">
+        <!-- <div class="accounts-filter">
           <div class="search-container">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="accountSearch" v-model="accountSearchQuery" type="text" placeholder="Search accounts..." />
@@ -88,10 +96,10 @@
               <option value="Investment">Investment</option>
             </select>
           </div>
-        </div>
+        </div> -->
   
         <!-- Accounts Table -->
-        <div class="accounts-table">
+        <!-- <div class="accounts-table">
           <table>
             <thead>
               <tr>
@@ -143,10 +151,10 @@
               </tr>
             </tbody>
           </table>
-        </div>
+        </div> -->
   
         <!-- Account Summary Footer -->
-        <div class="account-summary">
+        <!-- <div class="account-summary">
           <div class="summary-item">
             <div class="summary-label">Total Accounts</div>
             <div class="summary-value">{{ client.bankAccounts.length }}</div>
@@ -159,7 +167,7 @@
             <div class="summary-label">Total Balance</div>
             <div class="summary-value">{{ formatCurrency(totalBalance, 'USD') }}</div>
           </div>
-        </div>
+        </div> -->
       </div>
   
       <!-- Edit Profile Modal -->
@@ -175,7 +183,7 @@
           <div class="modal-content">
             <div class="form-group">
               <label for="editClientName">Client Name</label>
-              <input id="editClientName" v-model="editedClient.clientName" type="text" />
+              <input id="editClientName" v-model="client.clientName" type="text" />
             </div>
             
             <div class="form-group">
@@ -320,53 +328,56 @@
   </template>
   
   <script>
+  import axios from 'axios';
   export default {
     name: 'ClientProfilePage',
     data() {
       return {
         // Client data
-        client: {
-          id: '1234',
-          clientName: 'John Haaland',
-          dateCreated: '2021-03-20',
-          active: true,
-          email: 'john.haaland@example.com',
-          phone: '+1 (555) 123-4567',
-          address: '123 Main Street, New York, NY 10001',
-          kycVerified: true,
-          bankAccounts: [
-            { 
-              id: 'BA001', 
-              type: 'Checking', 
-              balance: 5420.75,
-              active: true, 
-              openingDate: '2021-03-25',
-              initialDeposit: 5000,
-              currency: 'USD',
-              branchId: 'BR001'
-            },
-            { 
-              id: 'BA002', 
-              type: 'Savings', 
-              balance: 12500.00,
-              active: true,
-              openingDate: '2021-04-12',
-              initialDeposit: 10000,
-              currency: 'USD',
-              branchId: 'BR001'
-            },
-            { 
-              id: 'BA003', 
-              type: 'Investment', 
-              balance: 35000.00,
-              active: false,
-              openingDate: '2021-06-18',
-              initialDeposit: 25000,
-              currency: 'EUR',
-              branchId: 'BR003'
-            }
-          ]
-        },
+        clientID: null,
+        client: {},
+        // client: {
+        //   id: '1234',
+        //   clientName: 'John Haaland',
+        //   dateCreated: '2021-03-20',
+        //   active: true,
+        //   email: 'john.haaland@example.com',
+        //   phone: '+1 (555) 123-4567',
+        //   address: '123 Main Street, New York, NY 10001',
+        //   kycVerified: true,
+        //   bankAccounts: [
+        //     { 
+        //       id: 'BA001', 
+        //       type: 'Checking', 
+        //       balance: 5420.75,
+        //       active: true, 
+        //       openingDate: '2021-03-25',
+        //       initialDeposit: 5000,
+        //       currency: 'USD',
+        //       branchId: 'BR001'
+        //     },
+        //     { 
+        //       id: 'BA002', 
+        //       type: 'Savings', 
+        //       balance: 12500.00,
+        //       active: true,
+        //       openingDate: '2021-04-12',
+        //       initialDeposit: 10000,
+        //       currency: 'USD',
+        //       branchId: 'BR001'
+        //     },
+        //     { 
+        //       id: 'BA003', 
+        //       type: 'Investment', 
+        //       balance: 35000.00,
+        //       active: false,
+        //       openingDate: '2021-06-18',
+        //       initialDeposit: 25000,
+        //       currency: 'EUR',
+        //       branchId: 'BR003'
+        //     }
+        //   ]
+        // },
         
         // UI state variables
         showEditProfileModal: false,
@@ -382,17 +393,17 @@
     },
     computed: {
       // Filter bank accounts based on search and type filter
-      filteredBankAccounts() {
-        return this.client.bankAccounts.filter(account => {
-          // Search by account ID
-          const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
+      // filteredBankAccounts() {
+      //   return this.client.bankAccounts.filter(account => {
+      //     // Search by account ID
+      //     const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
           
-          // Filter by account type
-          const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
+      //     // Filter by account type
+      //     const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
           
-          return matchesSearch && matchesType;
-        });
-      },
+      //     return matchesSearch && matchesType;
+      //   });
+      // },
       
       // Calculate total balance across all accounts
       totalBalance() {
@@ -408,7 +419,23 @@
         }, 0);
       }
     },
+    mounted() {
+      // Retrieve the clientID from the URL params
+      this.clientID = this.$route.params.clientID;
+      this.loadClient();  // Call the method to load client data using the clientID
+    },
     methods: {
+      loadClient() {
+        // Assuming your API is set to retrieve client by ID
+        axios.get(`http://127.0.0.1:5001/clients/${this.clientID}`)
+          .then(response => {
+            this.client = response.data.client;
+            console.log('Client data loaded:', this.client);
+          })
+          .catch(error => {
+            console.error('Error fetching client data:', error);
+          });
+      },
       // Format date to a readable format
       formatDate(dateString) {
         if (!dateString) return 'N/A';
@@ -419,7 +446,6 @@
           day: 'numeric'
         });
       },
-      
       // Format currency for display
       formatCurrency(amount, currency = 'USD') {
         return new Intl.NumberFormat('en-US', {
@@ -427,27 +453,24 @@
           currency: currency
         }).format(amount);
       },
-      
       // Open edit profile modal
       openEditModal() {
         this.editedClient = { ...this.client };
         this.showEditProfileModal = true;
-      },
-      
+      },     
       // Close edit profile modal
       closeEditModal() {
         this.showEditProfileModal = false;
         this.editedClient = {};
-      },
-      
+      },      
       // Toggle client status
       toggleClientStatus() {
         this.editedClient.active = !this.editedClient.active;
-      },
-      
+      },   
       // Save profile changes
       saveProfileChanges() {
         this.client = { ...this.editedClient };
+        console.log(this.editedClient)
         this.closeEditModal();
         // In a real app, this would send an API request to update the client data
       },
@@ -729,10 +752,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: var(--primary-color);
-  border: none;
+  background-color: white;
+  border: 1px solid var(--border-color);
   border-radius: 0.5rem;
-  color: white;
+  color: var(--text-primary);
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
@@ -740,9 +763,9 @@
 }
 
 .btn-add:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(79, 70, 229, 0.25);
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 /* Accounts Filter */
@@ -1147,14 +1170,12 @@
 }
 
 .btn-save {
-  background-color: var(--primary-color);
-  color: white;
+  background-color: #f1f5f9;
+  color: #475569;
 }
 
 .btn-save:hover {
-  background-color: var(--primary-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 5px rgba(79, 70, 229, 0.25);
+  background-color: #e2e8f0;
 }
 
 .btn-delete {

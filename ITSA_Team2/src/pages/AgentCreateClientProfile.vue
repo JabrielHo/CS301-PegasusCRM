@@ -151,7 +151,7 @@ export default {
       this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, '');
       // Get AgentID
       this.getUserAttributes();
-
+      
       console.log('Saving client profile:', this.client);
 
       // Call the save function to handle the data

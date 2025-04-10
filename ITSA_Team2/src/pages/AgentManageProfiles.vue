@@ -18,10 +18,10 @@
         </div>
         <div class="table-info">
           <span v-if="isSearchMode">
-            {{ filteredAccounts.length }} of {{ allSearchResults.length }} accounts found
+            {{ clients.length }} of {{ allSearchResults.length }} accounts found
           </span>
           <span v-else>
-            {{ filteredAccounts.length }} accounts found
+            {{ clients.length }} accounts found
           </span>
           <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
@@ -34,7 +34,7 @@
         <table>
           <thead>
             <tr>
-              <th>Account ID</th>
+              <th>Client ID</th>
               <th>Client Name</th>
               <th>Status</th>
               <th>Accounts</th>
@@ -42,24 +42,25 @@
           </thead>
           <tbody>
             <tr 
-              v-for="account in paginatedAccounts" 
-              :key="account.id"
-              @click="navigateToProfile(account.id)"
+              v-for="client in clients" 
+              :key="client.ClientID"
+              @click="navigateToProfile(client.ClientID)"
               class="account-row"
             >
-              <td>{{ account.id }}</td>
-              <td>{{ account.clientName }}</td>
+              <td>{{ client.ClientID }}</td>
+              <td>{{ client.FirstName + " " + client.LastName }}</td>
               <td>
                 <span :class="[
                   'status-badge', 
-                  account.active ? 'confirmed' : 'pending'
+                  client.Verified ? 'confirmed' : 'pending'
                 ]">
-                  {{ account.active ? 'Active' : 'Inactive' }}
+                  {{ client.Verified ? 'Verified' : 'Not Verified' }}
                 </span>
               </td>
               <td>
+                Jabriel
                 <!-- Placeholder for number of bank accounts -->
-                {{ account.bankAccounts ? account.bankAccounts.length : 0 }}
+                <!-- {{ account.bankAccounts ? account.bankAccounts.length : 0 }} -->
               </td>
             </tr>
             <tr v-if="paginatedAccounts.length === 0">
@@ -229,10 +230,16 @@
 </template>
 
 <script>
+import axios from 'axios';
+// Get AgentID
+import { fetchUserAttributes } from 'aws-amplify/auth'
+
 export default {
   data() {
     return {
       searchQuery: '',
+      agentID: '',
+      clients: [],
       accounts: [
         { 
           id: '1234', 
@@ -368,6 +375,23 @@ export default {
     }
   },
   methods: {
+    async getUserAttributes() {
+      const user = await fetchUserAttributes();
+      this.agentID = user.sub;
+    },
+    async loadClientProfiles() {
+      await this.getUserAttributes();
+      // TODO: Replace with actual API call
+      axios.get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
+        .then(response => {
+          this.clients = response.data.clients;
+          console.log('Client profiles loaded:', this.clients);
+        })
+        .catch(error => {
+          console.error('Error fetching client profiles:', error);
+        });
+
+    },
     // Navigate to profile detail page
     navigateToProfile(accountId) {
       if (!accountId){ 
@@ -376,7 +400,7 @@ export default {
       }
       // Use router to navigate
       if (this.$router) {
-        this.$router.push({ name: 'Client Profile Page', params: { id: accountId } });
+        this.$router.push({ name: 'Client Profile Page', params: { clientID: accountId } });
       } else {
         // Fallback if router is not defined (for demo purposes)
         console.log(`Navigating to client profile with ID: ${accountId}`);
@@ -534,7 +558,10 @@ export default {
       this.showDeleteConfirmationPopup = false;
       this.showDeletedPopup = false;
     }
-  }
+  },
+  mounted() {
+    this.loadClientProfiles();
+  },
 };
 </script>
 
@@ -612,7 +639,6 @@ export default {
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
-
 
 /* Card Styles */
 .card {
