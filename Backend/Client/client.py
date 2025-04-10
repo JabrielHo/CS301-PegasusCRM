@@ -19,16 +19,12 @@ secret_string = os.getenv("SECRET_STRING")
 secrets = json.loads(secret_string)
 
 AWS_REGION = secrets.get("AWS_REGION")
-print(f"AWS_REGION: {AWS_REGION}")
 AWS_ACCESS_KEY_ID = secrets.get("AWS_ACCESS_KEY_ID")
-print(f"AWS_ACCESS_KEY_ID: {AWS_ACCESS_KEY_ID}")
 DB_USER = secrets.get("DB_USER")
-print(f"DB_USER: {DB_USER}")
 DB_PASSWORD = secrets.get("DB_PASSWORD")
 DB_HOST = secrets.get("DB_HOST")
 DB_NAME = secrets.get("DB_NAME")
-DB_PORT = secrets.get("DB_PORT")
-print(f"DB_PORT: {DB_PORT}")
+DB_PORT = 3306
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
