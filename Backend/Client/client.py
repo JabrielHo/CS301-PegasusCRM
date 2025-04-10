@@ -15,15 +15,10 @@ app = Flask(__name__)
 load_dotenv()
 
 db_user = os.getenv("DB_USER")
-print(f"DB_USER: {db_user}")
 db_password = os.getenv("DB_PASSWORD")
-print(f"DB_PASSWORD: {db_password}")
 db_host = os.getenv("DB_HOST")
-print(f"DB_HOST: {db_host}")
 db_name = os.getenv("DB_NAME")
-print(f"DB_NAME: {db_name}")
 port = os.getenv("DB_PORT")
-print(f"DB_PORT: {port}")
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{port}/{db_name}'
