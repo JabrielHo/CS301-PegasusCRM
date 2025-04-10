@@ -91,6 +91,7 @@ const auth = useAuthenticator();
 const fetchUserData = async () => {
   try {
     const userAttributes = await fetchUserAttributes();
+    console.log(userAttributes.sub)
 
     // Use preferred_username if available, otherwise fall back to username or email
     displayName.value = `${userAttributes.given_name} ${userAttributes.family_name}` || userAttributes.email || 'User';
@@ -100,7 +101,6 @@ const fetchUserData = async () => {
     console.log("User:", userAttributes); // Log user groups for debugging
     roleName.value = userGroups.join(', '); // Join groups for display
 
-    console.log(userGroups); // Log user groups for debugging
     isAdmin.value = userGroups.includes('ADMINS') || userGroups.includes('ROOT_ADMIN');
     isAgent.value = userGroups.includes('AGENTS');
   } catch (error) {
@@ -111,16 +111,13 @@ const fetchUserData = async () => {
 
 // Watch for changes in the user object
 watch(() => auth.user, (newUser) => {
-  console.log('User changed:', newUser); // Log the new user object for debugging
   if (newUser) {
     fetchUserData(); // Fetch user data when the user logs in
   }
 });
 
 // Initial fetch when the component is mounted
-onMounted(() => {
-  fetchUserData();
-});
+
 </script>
 
 <style scoped>
