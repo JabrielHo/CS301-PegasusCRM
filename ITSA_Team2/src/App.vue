@@ -4,21 +4,26 @@
       <div id="app">
         <div class="user-header">
           <h2>Hello {{ displayName }}!</h2>
+          <h2>{{ roleName }}</h2>
           <button @click="signOut">Sign Out</button>
         </div>
         
         <!-- Navigation links -->
         <nav>
           <!-- Admin Links -->
+           <div v-if="isAdmin">
           <router-link to="/admin-dashboard">Dashboard</router-link> |
           <router-link to="/admin-create-account">Create New Account</router-link> |
           <router-link to="/admin-manage-account">Manage Account</router-link> |
-          <router-link to="/admin-agent-activities">Agent Activities</router-link> |
+          <router-link to="/admin-agent-activities">Agent Activities</router-link>
+           </div>
           <!-- Agent links -->
+           <div v-if="isAgent">
           <router-link to="/agent-dashboard">Dashboard</router-link> |
           <router-link to="/agent-create-client-profile">Create Client Profile</router-link> |
           <router-link to="/agent-view-transactions">View Transactions</router-link> |
-          <router-link to="/agent-manage-profiles">Manage Profiles</router-link> |
+          <router-link to="/agent-manage-profiles">Manage Profiles</router-link>
+           </div>
         </nav>
         
         <!-- This is where your route components will be rendered -->
@@ -33,18 +38,31 @@ import { Authenticator } from "@aws-amplify/ui-vue";
 import "@aws-amplify/ui-vue/styles.css";
 import { ref, onMounted } from 'vue';
 import { Amplify } from 'aws-amplify';
-import { fetchUserAttributes } from 'aws-amplify/auth';
+import { fetchUserAttributes, fetchAuthSession } from 'aws-amplify/auth';
 import outputs from '../amplify_outputs.json';
 
 Amplify.configure(outputs);
 
 const displayName = ref('');
+const roleName = ref('');
+const isAdmin = ref(false);
+const isAgent = ref(false);
+
 
 onMounted(async () => {
   try {
     const userAttributes = await fetchUserAttributes();
     // Use preferred_username if available, otherwise fall back to username or email
     displayName.value = `${userAttributes.given_name} ${userAttributes.family_name}` || userAttributes.email || 'User';
+
+    const session = await fetchAuthSession();
+    const userGroups = session.tokens.accessToken.payload["cognito:groups"] || [];
+
+    roleName.value = userGroups.join(', '); // Join groups for display
+
+    console.log(userGroups); // Log user groups for debugging
+    isAdmin.value = userGroups.includes('ADMINS') || userGroups.includes('ROOT_ADMIN');
+    isAgent.value = userGroups.includes('AGENTS');
   } catch (error) {
     console.error('Error fetching user attributes:', error);
     displayName.value = 'User';
