@@ -22,7 +22,6 @@ EXPIRATION = 60 # URL expires in 1 minute
 ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
 
 # Securely retrieve the database connection details from environment variables
-# IM SO CLOSE
 db_host = os.getenv("DB_HOST")
 db_user = os.getenv("DB_USER")
 db_password = os.getenv("DB_PASSWORD")
