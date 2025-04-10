@@ -9,6 +9,7 @@ import boto3
 from botocore.exceptions import ClientError
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 app = Flask(__name__)
 
@@ -28,7 +29,8 @@ db_password = os.getenv("DB_PASSWORD")
 db_name = os.getenv("DB_NAME")
 
 # Set the SQLAlchemy URI using environment variables
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:3306/{db_name}'
+# Added Port 3306 to my db_host
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
