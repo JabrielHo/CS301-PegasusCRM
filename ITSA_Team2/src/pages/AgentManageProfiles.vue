@@ -283,6 +283,9 @@
         <li v-for="account in selectedAccountsList" :key="account.id">
           {{ account.clientName }} (ID: {{ account.id }})
         </li>
+        <li v-for="account in selectedAccountsList" :key="account.id">
+          {{ account.clientName }} (ID: {{ account.id }})
+        </li>
       </ul>
       <button @click="deleteAccounts">Yes</button>
       <button @click="closePopup">No</button>
@@ -303,6 +306,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 import axios from "axios";
 
 export default {
@@ -1454,3 +1459,4 @@ input, select, textarea {
 =======
 </style>
 >>>>>>> Stashed changes
+

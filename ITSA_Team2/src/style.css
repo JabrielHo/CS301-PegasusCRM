@@ -61,13 +61,10 @@ button:focus-visible {
   width: 100%;
   text-align: center;
 }
-<<<<<<< Updated upstream
 /* 
 @media (prefers-color-scheme: light) {
-=======
 
 @media (prefers-color-scheme: dark) {
->>>>>>> Stashed changes
   :root {
     color: #213547;
     background-color: #ffffff;
