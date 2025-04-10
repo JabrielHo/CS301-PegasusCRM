@@ -11,6 +11,7 @@
   "dependencies": {
     "@aws-amplify/ui-vue": "^4.2.30",
     "aws-amplify": "^6.13.4",
+    "axios": "^1.8.4",
     "i18n-iso-countries": "^7.14.0",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
