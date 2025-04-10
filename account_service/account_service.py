@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from account_model import db, Account
+from account_model import db, Account, Branch
 from sqlalchemy import select
 import os
 from dotenv import load_dotenv
@@ -33,7 +33,7 @@ def get_account(accountId):
     account = db.session.get(Account, accountId)
 
     if not account or account.is_deleted:
-        return jsonify({"message": "Account not found"}), 404
+        return jsonify({"message": "Account not found or has been deleted"}), 404
 
     return jsonify(account.to_dict()), 200
 
@@ -128,48 +128,68 @@ def create_account():
             jsonify({"message": "Failed to create account due to database error"}),
             500,
         )
-    
+
+
 # Update Account Status by accountId
 @app.route("/api/accounts/<string:accountId>", methods=["PUT"])
 def update_account_status(accountId):
     data = request.json
-    
+
     if not data or "accountStatus" not in data:
         return jsonify({"message": "accountStatus field is required"}), 400
-    
+
     account_status = data["accountStatus"]
-    
+
     allowed_statuses = ["Active", "Inactive", "Pending"]
     if account_status not in allowed_statuses:
         return (
-            jsonify({
-                "message": f"Invalid account status. Allowed values: {', '.join(allowed_statuses)}"
-            }),
-            400
+            jsonify(
+                {
+                    "message": f"Invalid account status. Allowed values: {', '.join(allowed_statuses)}"
+                }
+            ),
+            400,
         )
-    
+
     try:
-        stmt = select(Account).where(Account.accountId == accountId, Account.deleted_at == None)
+        stmt = select(Account).where(
+            Account.accountId == accountId, Account.deleted_at == None
+        )
         account = db.session.execute(stmt).scalar_one_or_none()
-        
+
         if not account:
-            return jsonify({"message": "Account not found"}), 404
-        
+            return jsonify({"message": "Account not found or has been deleted"}), 404
+
         if account.accountStatus == account_status:
-            return jsonify({
-                "message": f"Account status is already '{account_status}', no changes made",
-            }), 200
-            
+            return (
+                jsonify(
+                    {
+                        "message": f"Account status is already '{account_status}', no changes made",
+                    }
+                ),
+                200,
+            )
+
         account.accountStatus = account_status
         db.session.commit()
-        
-        return jsonify({
-            "message": "Account status updated successfully",
-            "account": account.to_dict()
-        }), 200
+
+        return (
+            jsonify(
+                {
+                    "message": "Account status updated successfully",
+                    "account": account.to_dict(),
+                }
+            ),
+            200,
+        )
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": "Failed to update account status due to database error"}), 500
+        return (
+            jsonify(
+                {"message": "Failed to update account status due to database error"}
+            ),
+            500,
+        )
 
 
 # Delete Account by accountId
@@ -180,27 +200,62 @@ def delete_account_by_accountId(accountId):
         account_check = db.session.execute(
             select(Account).where(Account.accountId == accountId)
         ).scalar_one_or_none()
-        
+
         if not account_check:
             return jsonify({"message": "Account not found"}), 404
-            
+
         if account_check.deleted_at is not None:
-            return jsonify({
-                "message": "Account was already deleted",
-                "deleted_at": account_check.deleted_at.isoformat()
-            }), 409
-        
+            return (
+                jsonify(
+                    {
+                        "message": "Account was already deleted",
+                        "deleted_at": account_check.deleted_at.isoformat(),
+                    }
+                ),
+                409,
+            )
+
         account_check.deleted_at = datetime.datetime.now(timezone.utc)
         account_check.accountStatus = "Inactive"
         db.session.commit()
 
-        return jsonify({
-            "message": "Account deleted successfully",
-            "deleted_at": account_check.deleted_at.isoformat(),
-        }), 200
+        return (
+            jsonify(
+                {
+                    "message": "Account deleted successfully",
+                    "deleted_at": account_check.deleted_at.isoformat(),
+                }
+            ),
+            200,
+        )
     except Exception as e:
         db.session.rollback()
-        return jsonify({"message": "Failed to delete account due to database error"}), 500
+        return (
+            jsonify({"message": "Failed to delete account due to database error"}),
+            500,
+        )
+
+
+@app.route("/api/branches", methods=["GET"])
+def get_all_branches():
+    try:
+        stmt = select(Branch).where(Branch.deleted_at == None)
+        branches = db.session.execute(stmt).scalars().all()
+
+        return (
+            jsonify(
+                {
+                    "branches": [branch.to_dict() for branch in branches],
+                    "count": len(branches),
+                }
+            ),
+            200,
+        )
+    except Exception as e:
+        return (
+            jsonify({"message": "Failed to retrieve branches due to database error"}),
+            500,
+        )
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5003)

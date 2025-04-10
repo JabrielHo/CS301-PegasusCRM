@@ -33,3 +33,21 @@ class Account(db.Model):
     @property
     def is_deleted(self):
         return self.deleted_at is not None
+
+class Branch(db.Model):
+    __tablename__ = 'Branch'
+    
+    branchId = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    branchName = db.Column(db.String(100), nullable=False)
+    deleted_at = db.Column(db.DateTime, nullable=True, default=None)
+    
+    def to_dict(self):
+        return {
+            'branchId': self.branchId,
+            'branchName': self.branchName,
+            'deleted_at': self.deleted_at.isoformat() if self.deleted_at else None
+        }
+    
+    @property
+    def is_deleted(self):
+        return self.deleted_at is not None
