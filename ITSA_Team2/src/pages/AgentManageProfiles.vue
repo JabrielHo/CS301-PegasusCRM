@@ -29,6 +29,7 @@
           </button>
         </div>
       </div>
+      </div>
 
       <div class="client-table">
         <table>
@@ -104,7 +105,6 @@
       </div>
     </div>
 
-<<<<<<< Updated upstream
     <!-- Edit Modal -->
     <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
       <div class="modal">
@@ -171,56 +171,6 @@
         <div class="loading-spinner"></div>
         <p>Searching all accounts...</p>
       </div>
-=======
-    <div class="client-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Select</th>
-            <th>Account ID</th>
-            <th>Client Name</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="account in paginatedAccounts" :key="account.id">
-            <td>
-              <input
-                type="checkbox"
-                :value="account.clientID"
-                v-model="selectedAccounts"
-              />
-            </td>
-            <td>{{ account.clientID }}</td>
-            <td>{{ account.FirstName + " " + account.LastName }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination controls -->
-    <div class="pagination">
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === 1"
-        @click="currentPage--"
-      >
-        Previous
-      </button>
-      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button
-        class="pagination-btn"
-        :disabled="currentPage === totalPages"
-        @click="currentPage++"
-      >
-        Next
-      </button>
-    </div>
-
-    <!-- Buttons for Edit and Delete -->
-    <div class="button-container">
-      <button class="btn" @click="editSelectedAccounts">Edit</button>
-      <button class="btn" @click="deleteSelectedAccounts">Delete</button>
->>>>>>> Stashed changes
     </div>
 
     <!-- No selection popup -->
@@ -238,7 +188,6 @@
     </div>
 
     <!-- Deletion confirmation popup -->
-<<<<<<< Updated upstream
     <div v-if="showDeleteConfirmationPopup" class="popup-overlay" @click.self="closePopup">
       <div class="popup">
         <div class="popup-header">
@@ -276,31 +225,6 @@
           <button class="btn-primary" @click="closePopup">Close</button>
         </div>
       </div>
-=======
-    <div v-if="showDeleteConfirmationPopup" class="popup">
-      <p>Are you sure you want to delete the following account(s)?</p>
-      <ul>
-        <li v-for="account in selectedAccountsList" :key="account.id">
-          {{ account.clientName }} (ID: {{ account.id }})
-        </li>
-        <li v-for="account in selectedAccountsList" :key="account.id">
-          {{ account.clientName }} (ID: {{ account.id }})
-        </li>
-      </ul>
-      <button @click="deleteAccounts">Yes</button>
-      <button @click="closePopup">No</button>
-    </div>
-
-    <!-- Deleted accounts confirmation -->
-    <div v-if="showDeletedPopup" class="popup">
-      <p>These accounts have been deleted:</p>
-      <ul>
-        <li v-for="account in deletedAccounts" :key="account.id">
-          {{ account.clientName }} (ID: {{ account.id }})
-        </li>
-      </ul>
-      <button @click="closePopup">Close</button>
->>>>>>> Stashed changes
     </div>
   </div>
 </template>
@@ -313,7 +237,6 @@ import axios from "axios";
 export default {
   data() {
     return {
-<<<<<<< Updated upstream
       searchQuery: '',
       accounts: [
         { 
@@ -392,10 +315,6 @@ export default {
           ]
         },
       ],
-=======
-      searchQuery: "",
-      accounts: [],
->>>>>>> Stashed changes
       selectedAccounts: [], // Array to store selected account IDs
       deletedAccounts: [], // Array to store deleted accounts for confirmation message
       showNoSelectionPopup: false, // Flag to show no selection popup
@@ -404,16 +323,12 @@ export default {
       showEditModal: false,
       editAccount: {},
       currentPage: 1,
-<<<<<<< Updated upstream
       itemsPerPage: 5,
       
       // Search mode properties
       isSearching: false,
       isSearchMode: false,
       allSearchResults: [],
-=======
-      itemsPerPage: 50,
->>>>>>> Stashed changes,
     };
   },
   computed: {
@@ -444,7 +359,6 @@ export default {
       return Math.ceil(this.filteredAccounts.length / this.itemsPerPage);
     },
     paginatedAccounts() {
-<<<<<<< Updated upstream
       if (this.isSearchMode) {
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
@@ -520,30 +434,6 @@ export default {
       this.showDeleteConfirmationPopup = true;
     },
     
-=======
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = start + this.itemsPerPage;
-      return this.filteredAccounts.slice(start, end);
-    },
-  },
-  methods: {
-    fetchClients() {
-      axios
-        .get("http://localhost:5001/clients/all/A123")
-        .then((response) => {
-          console.log(response.data); // Log the response to check its structure
-          if (Array.isArray(response.data.clients)) {
-            this.accounts = response.data.clients;
-          } else {
-            console.error('Expected "clients" to be an array');
-            this.accounts = []; // Ensure we have an empty array if the structure is not correct
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching clients:", error);
-        });
-    },
->>>>>>> Stashed changes
     fetchClients() {
       axios
         .get("http://localhost:5001/clients/all/A123")
@@ -565,7 +455,6 @@ export default {
         this.showNoSelectionPopup = true;
         return;
       }
-<<<<<<< Updated upstream
       
       if (this.selectedAccounts.length === 1) {
         // Find the account and open the edit modal
@@ -579,13 +468,6 @@ export default {
         console.log('Editing multiple accounts:', this.selectedAccounts);
         this.$router?.push({ name: 'EditAccount', params: { ids: this.selectedAccounts } });
       }
-=======
-      // Navigate to edit page (example: using Vue Router)
-      this.$router.push({
-        name: "EditAccount",
-        params: { ids: this.selectedAccounts },
-      });
->>>>>>> Stashed changes
     },
     
     deleteSelectedAccounts() {
@@ -599,7 +481,6 @@ export default {
     deleteAccounts() {
       // Store deleted accounts for confirmation message
       this.deletedAccounts = this.selectedAccountsList;
-<<<<<<< Updated upstream
       
       // Delete selected accounts from the data
       this.accounts = this.accounts.filter(
@@ -613,11 +494,6 @@ export default {
         );
       }
       
-=======
-      this.accounts = this.accounts.filter(
-        (account) => !this.selectedAccounts.includes(account.id)
-      );
->>>>>>> Stashed changes
       this.selectedAccounts = []; // Reset selected accounts
       this.showDeleteConfirmationPopup = false;
       this.showDeletedPopup = true;
@@ -844,7 +720,6 @@ export default {
   border-spacing: 0;
 }
 
-<<<<<<< Updated upstream
 .client-table th {
 
   padding: 1rem;
@@ -856,12 +731,6 @@ export default {
   position: sticky;
   top: 0;
   z-index: 10;
-=======
-.client-table th,
-td {
-  padding: 10px;
-  border: 1px solid #ccc;
->>>>>>> Stashed changes
 }
 
 .client-table td {
@@ -1383,7 +1252,6 @@ body.modal-open {
   background-color: #f8fafc;
   border-bottom: 1px solid #e2e8f0;
 }
-<<<<<<< Updated upstream
 
 .popup-header svg {
   color: #3b82f6;
@@ -1456,7 +1324,4 @@ input, select, textarea {
 }
 
 </style>
-=======
-</style>
->>>>>>> Stashed changes
 
