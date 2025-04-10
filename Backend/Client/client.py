@@ -7,31 +7,34 @@ import re
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
-import os
-from dotenv import load_dotenv
-from urllib.parse import quote_plus
 
 app = Flask(__name__)
 
-load_dotenv()
+# Helper Function
+# Get Secret from AWS Secrets Manager
+def get_secret():
 
-# Initialize a session using Amazon S3
-# AHHHHHHH
-s3 = boto3.client("s3")
-BUCKET_NAME = "ubs-agents"
-EXPIRATION = 60 # URL expires in 1 minute
-ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
+    secret_name = "githubactions"
+    region_name = "ap-southeast-1"
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+    # Retrieve the secret value
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except Exception as e:
+        print(f"Error retrieving secret: {e}")
+        return None
+    
+    secret = get_secret_value_response['SecretString']
+    return json.loads(secret)
 
-# Securely retrieve the database connection details from environment variables
-# db_host = os.getenv("DB_HOST")
-# db_user = os.getenv("DB_USER")
-# db_password = os.getenv("DB_PASSWORD")
-# db_name = os.getenv("DB_NAME")
-# port = os.getenv("PORT")
-
-secrets_client = boto3.client('secretsmanager')
-response = secrets_client.get_secret_value(SecretId="githubactions")
-secrets = json.loads(response["SecretString"])
+secrets = get_secret()
 db_host = secrets["DB_HOST"]
 db_user = secrets["DB_USER"]
 db_password = secrets["DB_PASSWORD"]
@@ -43,13 +46,18 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_p
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
+# Initialize a session using Amazon S3
+s3 = boto3.client("s3")
+BUCKET_NAME = "ubs-agents"
+EXPIRATION = 60 # URL expires in 1 minute
+ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
+
 db = SQLAlchemy(app)
 
 CORS(app)
 
 client_blueprint = Blueprint("client",__name__)
 
-# Helper Function
 # Send Email
 def send_email(recipient, clientId, user_name):
 
