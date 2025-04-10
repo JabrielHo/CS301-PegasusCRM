@@ -163,7 +163,7 @@ router.beforeEach(async (to, from, next) => {
     }
   } catch (error) {
     console.error("Error checking user roles:", error);
-    next("/login"); // Redirect to login if there's an error
+    next("/"); // Redirect to login if there's an error
   }
 });
 
