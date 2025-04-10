@@ -4,8 +4,13 @@
       <div id="app">
         <header class="app-header">
           <div class="logo-container">
-            <img src="../src/assets/pegasus.png" alt="">
-            <h1 class="logo">Pegasus</h1>
+            <router-link
+              :to="isAdmin ? '/admin-dashboard' : isAgent ? '/agent-dashboard' : '/'"
+              class="logo-link"
+            >
+              <img src="../src/assets/pegasus.png" alt="">
+              <h1 class="logo">Pegasus</h1>
+            </router-link>
           </div>
           <div class="user-info">
             <div class="user-details">
@@ -74,6 +79,7 @@
 <script setup>
 import { Authenticator, useAuthenticator } from "@aws-amplify/ui-vue";
 import "@aws-amplify/ui-vue/styles.css";
+import { useRouter } from 'vue-router'; // Import useRouter from vue-router
 import { ref, onMounted, watch } from 'vue';
 import { Amplify } from 'aws-amplify';
 import { fetchUserAttributes, fetchAuthSession } from 'aws-amplify/auth';
@@ -86,12 +92,12 @@ const roleName = ref('');
 const isAdmin = ref(false);
 const isAgent = ref(false);
 const auth = useAuthenticator();
+const router = useRouter(); // Use the router instance
 
 // Function to fetch user data
 const fetchUserData = async () => {
   try {
     const userAttributes = await fetchUserAttributes();
-    console.log(userAttributes.sub)
 
     // Use preferred_username if available, otherwise fall back to username or email
     displayName.value = `${userAttributes.given_name} ${userAttributes.family_name}` || userAttributes.email || 'User';
@@ -103,6 +109,14 @@ const fetchUserData = async () => {
 
     isAdmin.value = userGroups.includes('ADMINS') || userGroups.includes('ROOT_ADMIN');
     isAgent.value = userGroups.includes('AGENTS');
+
+    if(isAdmin.value) {
+      router.push('/admin-dashboard'); // Redirect to admin dashboard
+    } else if (isAgent.value) {
+      router.push('/agent-dashboard'); // Redirect to agent dashboard
+    } else {
+      router.push('/unauthorized'); // Redirect to home page for other users
+    }
   } catch (error) {
     console.error('Error fetching user attributes:', error);
     displayName.value = 'User';
@@ -117,7 +131,11 @@ watch(() => auth.user, (newUser) => {
 });
 
 // Initial fetch when the component is mounted
-
+onMounted(() => {
+  if (auth.user) {
+    fetchUserData();
+  }
+});
 </script>
 
 <style scoped>
@@ -144,12 +162,19 @@ watch(() => auth.user, (newUser) => {
 .logo-container {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .logo-container img {
   width: 35px; /* Adjust the width as needed */
   height: auto; /* Maintain aspect ratio */
-  margin-right: 10px; /* Space between logo and text */
+  margin-right: 10px; /* Space between image and text */
+}
+
+.logo-link {
+  display: flex;
+  align-items: center; /* Vertically align the image and text */
+  text-decoration: none; /* Remove underline from the link */
 }
 
 

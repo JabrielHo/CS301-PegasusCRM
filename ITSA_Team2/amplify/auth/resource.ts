@@ -51,7 +51,8 @@ export const auth = defineAuth(
       "addUserToGroup"
     ]),
     allow.resource(createUserToGroup).to([
-      "createUser"
+      "createUser",
+      "getUser"
     ]),
     allow.resource(removeUserFromGroup).to([
       "removeUserFromGroup"
