@@ -408,7 +408,7 @@ export default {
       allSearchResults: [],
 =======
       itemsPerPage: 50,
->>>>>>> Stashed changes
+>>>>>>> Stashed changes,
     };
   },
   computed: {
@@ -539,6 +539,22 @@ export default {
         });
     },
 >>>>>>> Stashed changes
+    fetchClients() {
+      axios
+        .get("http://localhost:5001/clients/all/A123")
+        .then((response) => {
+          console.log(response.data); // Log the response to check its structure
+          if (Array.isArray(response.data.clients)) {
+            this.accounts = response.data.clients;
+          } else {
+            console.error('Expected "clients" to be an array');
+            this.accounts = []; // Ensure we have an empty array if the structure is not correct
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching clients:", error);
+        });
+    },
     editSelectedAccounts() {
       if (this.selectedAccounts.length === 0) {
         this.showNoSelectionPopup = true;
@@ -581,7 +597,9 @@ export default {
 <<<<<<< Updated upstream
       
       // Delete selected accounts from the data
-      this.accounts = this.accounts.filter(account => !this.selectedAccounts.includes(account.id));
+      this.accounts = this.accounts.filter(
+        (account) => !this.selectedAccounts.includes(account.id)
+      );
       
       // If in search mode, update search results
       if (this.isSearchMode) {
