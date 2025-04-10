@@ -22,11 +22,20 @@ EXPIRATION = 60 # URL expires in 1 minute
 ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
 
 # Securely retrieve the database connection details from environment variables
-db_host = os.getenv("DB_HOST")
-db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
-db_name = os.getenv("DB_NAME")
-port = os.getenv("PORT")
+# db_host = os.getenv("DB_HOST")
+# db_user = os.getenv("DB_USER")
+# db_password = os.getenv("DB_PASSWORD")
+# db_name = os.getenv("DB_NAME")
+# port = os.getenv("PORT")
+
+secrets_client = boto3.client('secretsmanager')
+response = secrets_client.get_secret_value(SecretId="githubactions")
+secrets = json.loads(response["SecretString"])
+db_host = secrets["DB_HOST"]
+db_user = secrets["DB_USER"]
+db_password = secrets["DB_PASSWORD"]
+db_name = secrets["DB_NAME"]
+port = secrets.get("PORT", "3306")
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{port}/{db_name}'
