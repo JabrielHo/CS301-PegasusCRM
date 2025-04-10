@@ -16,6 +16,7 @@ load_dotenv()
 
 # Initialize a session using Amazon S3
 s3 = boto3.client("s3")
+# S3 Bucket Name
 BUCKET_NAME = "ubs-agents"
 EXPIRATION = 60 # URL expires in 1 minute
 ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
