@@ -7,37 +7,17 @@ import re
 from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
+import os
 
 app = Flask(__name__)
 
-# Helper Function
-# Last Chance
-# Get Secret from AWS Secrets Manager
-def get_secret(secret_name, region_name="ap-southeast-1"):
-    # Create a Secrets Manager client
-    client = boto3.client("secretsmanager", region_name=region_name)
-    
-    try:
-        # Retrieve the secret value
-        response = client.get_secret_value(SecretId=secret_name)
-        secret = response.get("SecretString")
-        if secret:
-            return json.loads(secret)
-        else:
-            print("Secret is empty or invalid.")
-            return None
-    except Exception as e:
-        print(f"Error retrieving secret: {e}")
-        return None
+load_dotenv()
 
-secrets = get_secret('githubactions')
-db_host = secrets["DB_HOST"]
-db_user = secrets["DB_USER"]
-db_password = secrets["DB_PASSWORD"]
-db_name = secrets["DB_NAME"]
-port = secrets.get("PORT", "3306")
-
-print(f"Connecting to database at {db_host} with user {db_user}")
+db_user = os.getenv("DB_USER")
+db_password = os.getenv("DB_PASSWORD")
+db_host = os.getenv("DB_HOST")
+db_name = os.getenv("DB_NAME")
+port = os.getenv("DB_PORT")     
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{port}/{db_name}'
@@ -56,6 +36,7 @@ CORS(app)
 
 client_blueprint = Blueprint("client",__name__)
 
+# Helper Function
 # Send Email
 def send_email(recipient, clientId, user_name):
 
