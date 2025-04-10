@@ -14,14 +14,24 @@ app = Flask(__name__)
 
 load_dotenv()
 
-db_user = os.getenv("DB_USER")
-db_password = os.getenv("DB_PASSWORD")
-db_host = os.getenv("DB_HOST")
-db_name = os.getenv("DB_NAME")
-port = os.getenv("DB_PORT")
+secret_string = os.getenv("SECRET_STRING")
+
+secrets = json.loads(secret_string)
+
+AWS_REGION = secrets.get("AWS_REGION")
+print(f"AWS_REGION: {AWS_REGION}")
+AWS_ACCESS_KEY_ID = secrets.get("AWS_ACCESS_KEY_ID")
+print(f"AWS_ACCESS_KEY_ID: {AWS_ACCESS_KEY_ID}")
+DB_USER = secrets.get("DB_USER")
+print(f"DB_USER: {DB_USER}")
+DB_PASSWORD = secrets.get("DB_PASSWORD")
+DB_HOST = secrets.get("DB_HOST")
+DB_NAME = secrets.get("DB_NAME")
+DB_PORT = secrets.get("DB_PORT")
+print(f"DB_PORT: {DB_PORT}")
 
 # Set the SQLAlchemy URI using environment variables
-app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{port}/{db_name}'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
