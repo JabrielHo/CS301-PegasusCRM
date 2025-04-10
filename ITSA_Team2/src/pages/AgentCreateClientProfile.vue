@@ -95,11 +95,14 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
+// Get AgentID
+import { fetchUserAttributes } from 'aws-amplify/auth'
 
 export default {
   data() {
     return {
       client: {
+        AgentID: '',
         FirstName: '',
         LastName: '',
         DateOfBirth: '',
@@ -139,9 +142,15 @@ export default {
     this.countries.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
+    async getUserAttributes() {
+      const user = await fetchUserAttributes();
+      this.client.AgentID = user.sub;
+    },
     submitForm() {
       // Remove spaces from the phone number before submitting
       this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, '');
+      // Get AgentID
+      this.getUserAttributes();
 
       console.log('Saving client profile:', this.client);
 
@@ -154,7 +163,6 @@ export default {
             type: 'success',
             autoClose: 3000
           });
-          // Handle success (e.g., show a success message, redirect, etc.)
         })
         .catch(error => {
           // Handle error response
@@ -247,7 +255,7 @@ input, select {
   padding: 12px !important;
   border-radius: 4px !important;
   font-size: 1rem !important;
-  background-color: black !important;
+  background-color: #fff !important;
 }
 
 /* Make the dropdown button and flag container match the height */

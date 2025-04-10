@@ -212,7 +212,7 @@ def create_client():
             }
         ), 409
     
-    client = Client("A123", **data)
+    client = Client(**data)
 
     try:
         db.session.add(client)
