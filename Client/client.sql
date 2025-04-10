@@ -1,7 +1,7 @@
 CREATE SCHEMA UBS;
 USE UBS;
 
-CREATE TABLE CLIENT (
+CREATE TABLE client (
 	ClientID CHAR(36) NOT NULL PRIMARY KEY UNIQUE,
 	AgentID CHAR(36) NOT NULL,
     FirstName VARCHAR(50) NOT NULL,
@@ -17,5 +17,5 @@ CREATE TABLE CLIENT (
     Gender ENUM('Male', 'Female', 'Non-binary', 'Prefer not to say') NOT NULL,
     Verified BOOLEAN DEFAULT FALSE NOT NULL,
     deleted_at DATETIME DEFAULT NULL,
-    attempted_uploads INT DEFAULT 0 NOT NULL,
+    attempted_uploads INT DEFAULT 0 NOT NULL
 );
