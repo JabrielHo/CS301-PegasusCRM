@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 
 app = Flask(__name__)
 
-# Load env file
 load_dotenv()
 
 # Initialize a session using Amazon S3
