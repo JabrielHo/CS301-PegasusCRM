@@ -1,8 +1,8 @@
-requests
 flask
-flask_cors
-dotenv
-Flask-SQLAlchemy
-mysql-connector-python
+flask-cors
+python-dotenv
 boto3
+aiohttp
+asyncio
 requests
+werkzeug
