@@ -33,7 +33,6 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
 db = SQLAlchemy(app)
 
-# Set CORS
 CORS(app)
 
 client_blueprint = Blueprint("client",__name__)
