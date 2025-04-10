@@ -29,6 +29,7 @@
           </button>
         </div>
       </div>
+      </div>
 
       <div class="client-table">
         <table>
@@ -229,6 +230,10 @@
 </template>
 
 <script>
+import axios from "axios";
+
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -333,15 +338,22 @@ export default {
       }
       
       const query = this.searchQuery.toLowerCase();
-      return this.accounts.filter(account => {
+      return this.accounts.filter((account) => {
+        const fullName = (
+          account.FirstName +
+          " " +
+          account.LastName
+        ).toLowerCase();
         return (
-          (account.clientName && account.clientName.toLowerCase().includes(query)) ||
-          (account.id && account.id.includes(query))
+          fullName.includes(query) || // Search in full name
+          (account.clientID && account.clientID.includes(query)) // Search in client ID
         );
       });
     },
     selectedAccountsList() {
-      return this.accounts.filter(account => this.selectedAccounts.includes(account.id));
+      return this.accounts.filter((account) =>
+        this.selectedAccounts.includes(account.clientID)
+      );
     },
     totalPages() {
       return Math.ceil(this.filteredAccounts.length / this.itemsPerPage);
@@ -426,6 +438,22 @@ export default {
       this.showDeleteConfirmationPopup = true;
     },
     
+    fetchClients() {
+      axios
+        .get("http://localhost:5001/clients/all/A123")
+        .then((response) => {
+          console.log(response.data); // Log the response to check its structure
+          if (Array.isArray(response.data.clients)) {
+            this.accounts = response.data.clients;
+          } else {
+            console.error('Expected "clients" to be an array');
+            this.accounts = []; // Ensure we have an empty array if the structure is not correct
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching clients:", error);
+        });
+    },
     editSelectedAccounts() {
       if (this.selectedAccounts.length === 0) {
         this.showNoSelectionPopup = true;
@@ -459,7 +487,9 @@ export default {
       this.deletedAccounts = this.selectedAccountsList;
       
       // Delete selected accounts from the data
-      this.accounts = this.accounts.filter(account => !this.selectedAccounts.includes(account.id));
+      this.accounts = this.accounts.filter(
+        (account) => !this.selectedAccounts.includes(account.id)
+      );
       
       // If in search mode, update search results
       if (this.isSearchMode) {
@@ -533,8 +563,11 @@ export default {
       this.showNoSelectionPopup = false;
       this.showDeleteConfirmationPopup = false;
       this.showDeletedPopup = false;
-    }
-  }
+    },
+  },
+  mounted() {
+    this.fetchClients();
+  },
 };
 </script>
 
@@ -1295,3 +1328,4 @@ input, select, textarea {
 }
 
 </style>
+

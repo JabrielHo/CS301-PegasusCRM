@@ -57,7 +57,7 @@
             </router-link>
             <router-link to="/agent-manage-profiles" class="nav-link">
               <span class="nav-icon">📁</span>
-              Manage Profiles
+              Manage Clients
             </router-link>
           </div>
         </nav>

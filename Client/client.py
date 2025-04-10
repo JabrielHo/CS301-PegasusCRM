@@ -364,6 +364,25 @@ def get_client(clientId):
         }
     ), 404
 
+@client_blueprint.route('/all/<string:agentId>', methods=['GET'])
+def get_client_by_id(agentId):
+    # Get all clients for a specific agent
+    clients = db.session.scalars(db.select(Client).filter_by(AgentID=agentId, deleted_at=None)).all()
+
+    if clients:
+        return jsonify(
+            {
+                "status": "success",
+                "clients": [client.json() for client in clients]
+            }
+        ), 200
+    return jsonify(
+        {
+            "status": "error",
+            "message": "No clients found"
+        }
+    ), 404
+
 # Delete Client
 @client_blueprint.route('/<string:clientId>', methods=["DELETE"])
 def delete_client(clientId):
