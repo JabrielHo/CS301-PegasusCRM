@@ -14,5 +14,8 @@ CREATE TABLE CLIENT (
     State VARCHAR(50) NOT NULL,
     Country VARCHAR(50) NOT NULL,
     PostalCode VARCHAR(10) NOT NULL,
-    Gender ENUM('Male', 'Female', 'Non-binary', 'Prefer not to say') NOT NULL
+    Gender ENUM('Male', 'Female', 'Non-binary', 'Prefer not to say') NOT NULL,
+    Verified BOOLEAN DEFAULT FALSE NOT NULL,
+    deleted_at DATETIME DEFAULT NULL,
+    attempted_uploads INT DEFAULT 0 NOT NULL,
 );
