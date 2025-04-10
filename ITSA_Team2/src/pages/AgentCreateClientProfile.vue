@@ -30,17 +30,25 @@
         </div>
 
         <div class="form-group">
-          <label for="email">Client Email</label>
+          <label for="email">Email</label>
           <input v-model="client.email" type="email" placeholder="Email" required />
         </div>
 
         <div class="form-group">
-          <label for="phone">Client Phone Number</label>
-          <input v-model="client.phone" type="text" placeholder="Phone" required />
+          <label for="phone">Phone Number</label>
+          <vue-tel-input
+            v-model="client.phone"
+            :inputOptions="telInputOptions"
+            :dropdownOptions="telDropdownOptions"
+            @input="onPhoneInput"
+            mode="international"
+            required
+            class="tel-input-container"
+          ></vue-tel-input>
         </div>
 
         <div class="form-group">
-          <label for="address">Client Address</label>
+          <label for="address">Address</label>
           <input v-model="client.address" type="text" placeholder="Address" required />
         </div>
 
@@ -56,7 +64,7 @@
 
         <div class="form-group">
           <label for="country">Country</label>
-          <select v-model="client.country" id="country" required>
+          <select v-model="client.country" id="country" required @change="updatePhoneCountry">
             <option value="" disabled selected>Select Country</option>
             <option v-for="country in countries" :key="country.code" :value="country.code">
               {{ country.name }}
@@ -66,7 +74,14 @@
 
         <div class="form-group">
           <label for="postalCode">Postal Code</label>
-          <input v-model="client.postalCode" type="text" placeholder="Postal Code" required />
+          <input 
+            v-model="client.postalCode" 
+            type="text" 
+            inputmode="numeric"
+            pattern="[0-9]*"
+            placeholder="Postal Code" 
+            @input="validatePostalCode"
+            required />
         </div>
 
         <button type="submit">Save</button>
@@ -86,13 +101,25 @@ export default {
         gender: '',
         email: '',
         phone: '',
+        phoneCountry: '',
+        phoneNumber: '',
         address: '',
         city: '',
         state: '',
         country: '',
         postalCode: ''
       },
-      countries: []
+      countries: [],
+      telInputOptions: {
+        placeholder: 'Phone Number',
+        type: 'tel',
+        inputClass: 'tel-input'
+      },
+      telDropdownOptions: {
+        showDialCodeInSelection: true,
+        showFlags: true,
+        showSearchBox: true
+      }
     };
   },
   created() {
@@ -109,6 +136,23 @@ export default {
     this.countries.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
+    validatePostalCode(event) {
+      // Remove any non-numeric characters
+      this.client.postalCode = this.client.postalCode.replace(/\D/g, '');
+    },
+    onPhoneInput(formattedNumber, { number, isValid, country }) {
+      if (isValid) {
+        this.client.phone = number.international;
+        this.client.phoneCountry = country.iso2;
+        this.client.phoneNumber = number.significant;
+      }
+    },
+    updatePhoneCountry() {
+      // If user selects a country from the main country dropdown, 
+      // we can optionally sync that with the phone country dropdown
+      // This would require accessing the vue-tel-input component via refs
+      // and is more complex, so we'll leave this as a placeholder
+    },
     submitForm() {
       console.log('Saving client profile:', this.client);
       // Implement save logic here
@@ -159,6 +203,55 @@ input, select {
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.3s;
+}
+
+/* Phone input container styling */
+.tel-input-container {
+  width: 100%;
+}
+
+/* Fix the height and style of the phone input to match other inputs */
+:deep(.vti__dropdown),
+:deep(.vti__input) {
+  height: 45px !important;
+  min-height: 45px !important;
+  padding: 12px !important;
+  border-radius: 4px !important;
+  font-size: 1rem !important;
+  background-color: white !important;
+}
+
+/* Make the dropdown button and flag container match the height */
+:deep(.vti__dropdown) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+}
+
+/* Make the input field match styling */
+:deep(.vti__input) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  flex: 1 !important;
+}
+
+/* Adjust flag container size */
+:deep(.vti__flag) {
+  margin-top: 0 !important;
+}
+
+/* Focus styles for phone input components */
+:deep(.vti__dropdown:focus),
+:deep(.vti__input:focus) {
+  outline: none !important;
+  border-color: #4a90e2 !important;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2) !important;
+}
+
+/* Make sure the phone input components stay next to each other */
+:deep(.vti__dropdown), 
+:deep(.vti__input) {
+  display: inline-flex !important;
 }
 
 input:focus, select:focus {
