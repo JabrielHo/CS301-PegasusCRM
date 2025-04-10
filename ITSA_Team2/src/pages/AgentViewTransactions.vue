@@ -6,7 +6,7 @@
         <span class="refresh-icon">↻</span> Refresh
       </button>
     </div>
-    
+
     <table>
       <thead>
         <tr>
@@ -20,11 +20,7 @@
         <template v-for="(transaction, index) in paginatedTransactions" :key="transaction.id">
           <tr class="transaction-row" @click="toggleExpand(transaction.id)">
             <td @click.stop>
-              <input
-                type="checkbox"
-                :value="transaction.id"
-                v-model="selectedTransactions"
-              />
+              <input type="checkbox" :value="transaction.id" v-model="selectedTransactions" />
             </td>
             <td>{{ transaction.id }}</td>
             <td>{{ transaction.amount }}</td>
@@ -35,7 +31,7 @@
               <div class="transaction-details">
                 <h3>Transaction Details</h3>
                 <div class="details-grid">
-                  <div class="detail-item">
+                  <!-- <div class="detail-item">
                     <span class="label">Date:</span>
                     <span>{{ transaction.date || '05/04/2025' }}</span>
                   </div>
@@ -54,6 +50,34 @@
                   <div class="detail-item">
                     <span class="label">Description:</span>
                     <span>{{ transaction.description || 'Standard transaction' }}</span>
+                  </div> -->
+                  <div class="detail-item">
+                    <span class="label">Transaction ID:</span>
+                    <span>{{ transaction.id ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Amount:</span>
+                    <span>{{ transaction.amount ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Client Account ID:</span>
+                    <span>{{ transaction.client_account_id ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Client ID:</span>
+                    <span>{{ transaction.client_id ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Status:</span>
+                    <span>{{ transaction.status ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Transaction Date:</span>
+                    <span>{{ transaction.transaction_date ?? 'undefined' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Transaction Type:</span>
+                    <span>{{ transaction.transaction_type ?? 'undefined' }}</span>
                   </div>
                 </div>
               </div>
@@ -62,22 +86,14 @@
         </template>
       </tbody>
     </table>
-    
+
     <!-- Pagination controls -->
     <div class="pagination">
-      <button 
-        class="pagination-btn" 
-        :disabled="currentPage === 1" 
-        @click="currentPage--"
-      >
+      <button class="pagination-btn" :disabled="currentPage === 1" @click="currentPage--">
         Previous
       </button>
       <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button 
-        class="pagination-btn" 
-        :disabled="currentPage === totalPages" 
-        @click="currentPage++"
-      >
+      <button class="pagination-btn" :disabled="currentPage === totalPages" @click="currentPage++">
         Next
       </button>
     </div>
@@ -85,13 +101,15 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
       transactions: [
-        { 
-          id: '1234', 
-          amount: '$500', 
+        {
+          id: '1234',
+          amount: '$500',
           status: 'Confirmed',
           date: '04/04/2025',
           customer: 'John Smith',
@@ -99,9 +117,9 @@ export default {
           reference: 'REF-1234',
           description: 'Monthly subscription'
         },
-        { 
-          id: '1235', 
-          amount: '$400', 
+        {
+          id: '1235',
+          amount: '$400',
           status: 'Pending',
           date: '03/04/2025',
           customer: 'Alice Johnson',
@@ -109,9 +127,9 @@ export default {
           reference: 'REF-1235',
           description: 'Product purchase'
         },
-        { 
-          id: '1236', 
-          amount: '$300', 
+        {
+          id: '1236',
+          amount: '$300',
           status: 'Failed',
           date: '02/04/2025',
           customer: 'Robert Brown',
@@ -150,7 +168,7 @@ export default {
     },
     refreshTransactions() {
       this.isLoading = true;
-      
+
       // Simulating an API call with setTimeout
       setTimeout(() => {
         // In a real application, you would fetch data from an API
@@ -165,11 +183,20 @@ export default {
           reference: 'REF-NEW',
           description: 'New transaction'
         };
-        
+
         this.transactions.unshift(newTransaction);
         this.isLoading = false;
       }, 500);
+    },
+    async loadTransactions(client_id) {
+      // axios get transactions
+      const data = await axios.get(`https://s0fw7nip70.execute-api.ap-southeast-1.amazonaws.com/1/api/transactions/client/${client_id ?? "ce139e65-be8a-4506-8c5a-bf45fd58d41f"}`);
+      console.log(data);
+      this.transactions = data.data;
     }
+  },
+  created() {
+    this.loadTransactions();
   }
 };
 </script>
@@ -217,7 +244,8 @@ h1 {
   border-collapse: collapse;
 }
 
-.transaction-table th, td {
+.transaction-table th,
+td {
   padding: 10px;
   border: 1px solid #ccc;
 }
