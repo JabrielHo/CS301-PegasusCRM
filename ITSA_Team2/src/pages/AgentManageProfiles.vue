@@ -2,8 +2,8 @@
   <div class="admin-dashboard">
     <!-- Header with Title -->
     <div class="dashboard-header">
-      <h1>Profile Management Dashboard</h1>
-      <p class="dashboard-subtitle">Manage client profiles with ease</p>
+      <h1>Client Profile Management</h1>
+      <p class="dashboard-subtitle">Manage client profile information</p>
     </div>
 
     <!-- Search and Account Table -->
@@ -11,17 +11,17 @@
       <div class="card-header">
         <div class="search-container">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..." @keyup.enter="performGlobalSearch" />
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search by Client Name or ID..." @keyup.enter="performGlobalSearch" />
           <button class="btn-search" @click="performGlobalSearch" title="Search">
             Search
           </button>
         </div>
         <div class="table-info">
           <span v-if="isSearchMode">
-            {{ filteredAccounts.length }} of {{ allSearchResults.length }} users found
+            {{ filteredAccounts.length }} of {{ allSearchResults.length }} accounts found
           </span>
           <span v-else>
-            {{ filteredAccounts.length }} users found
+            {{ filteredAccounts.length }} accounts found
           </span>
           <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
@@ -34,44 +34,39 @@
         <table>
           <thead>
             <tr>
-              <th>Email</th>
-              <th>Given Name</th>
-              <th>Family Name</th>
+              <th>Account ID</th>
+              <th>Client Name</th>
               <th>Status</th>
-              <th>Enabled</th>
-              <th>Date Of Birth</th>
-              <th>Date Created</th>
-              <th>Actions</th>
+              <th>Accounts</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="account in displayedAccounts" :key="account.sub" :class="{ 'disabled-row': !account.enabled }">
-              <td>{{ account.email }}</td>
-              <td>{{ account.given_name }}</td>
-              <td>{{ account.family_name }}</td>
+            <tr 
+              v-for="account in paginatedAccounts" 
+              :key="account.id"
+              @click="navigateToProfile(account.id)"
+              class="account-row"
+            >
+              <td>{{ account.id }}</td>
+              <td>{{ account.clientName }}</td>
               <td>
-                <span :class="'status-badge ' + account.UserStatus.toLowerCase()">
-                  {{ account.UserStatus }}
+                <span :class="[
+                  'status-badge', 
+                  account.active ? 'confirmed' : 'pending'
+                ]">
+                  {{ account.active ? 'Active' : 'Inactive' }}
                 </span>
               </td>
               <td>
-                <span :class="'enabled-badge ' + (account.enabled ? 'enabled' : 'disabled')">
-                  {{ account.enabled ? 'Active' : 'Inactive' }}
-                </span>
-              </td>
-              <td>{{ account.UserDateOfBirth }}</td>
-              <td>{{ formatDate(account.UserCreateDate) }}</td>
-              <td>
-                <button class="btn-edit" @click="openEditModal(account)" title="Edit User">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                </button>
+                <!-- Placeholder for number of bank accounts -->
+                {{ account.bankAccounts ? account.bankAccounts.length : 0 }}
               </td>
             </tr>
-            <tr v-if="displayedAccounts.length === 0">
-              <td colspan="8" class="no-results">
+            <tr v-if="paginatedAccounts.length === 0">
+              <td colspan="5" class="no-results">
                 <div class="empty-state">
                   <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                  <p>No users found matching your search criteria</p>
+                  <p>No accounts found matching your search criteria</p>
                 </div>
               </td>
             </tr>
@@ -79,7 +74,7 @@
         </table>
       </div>
 
-      <!-- Pagination Buttons -->
+      <!-- Pagination controls -->
       <div class="pagination">
         <!-- Show page numbers for search mode -->
         <div v-if="isSearchMode" class="pagination-pages">
@@ -91,12 +86,19 @@
             {{ page }}
           </button>
         </div>
-        <button class="btn-pagination" @click="previousPage" :disabled="isPreviousDisabled">
+        <button 
+          class="btn-pagination" 
+          :disabled="isPreviousDisabled" 
+          @click="previousPage"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          Previous
         </button>
-        <button class="btn-pagination" @click="nextPage" :disabled="isNextDisabled">
-          Next
+        <span class="page-info" v-if="!isSearchMode">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button 
+          class="btn-pagination" 
+          :disabled="isNextDisabled" 
+          @click="nextPage"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
         </button>
       </div>
@@ -106,57 +108,35 @@
     <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
       <div class="modal">
         <div class="modal-header">
-          <h3>Edit User</h3>
+          <h3>Edit Client Account</h3>
           <button class="btn-close" @click="closeEditModal">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
         
         <div class="modal-content">
-          <div class="user-email">
-            <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>{{ editUser.email }}</span>
+          <div class="account-id">
+            <svg class="account-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>Account ID: {{ editAccount.id }}</span>
           </div>
           
           <div class="form-group">
-            <label for="givenName">Given Name</label>
-            <input id="givenName" v-model="editUser.given_name" type="text" />
+            <label for="clientName">Client Name</label>
+            <input id="clientName" v-model="editAccount.clientName" type="text" />
           </div>
 
           <div class="form-group">
-            <label for="familyName">Family Name</label>
-            <input id="familyName" v-model="editUser.family_name" type="text" />
-          </div>
-
-          <div class="form-group">
-            <label for="birthDate">Birth Date</label>
-            <input id="birthDate" v-model="editUser.UserDateOfBirth" type="date" />
+            <label for="dateCreated">Date Created</label>
+            <input id="dateCreated" v-model="editAccount.dateCreated" type="date" disabled />
           </div>
 
           <div class="form-section">
             <h4>Account Status</h4>
             <div class="status-toggle">
-              <button v-if="editUser.enabled" @click="disableUser" class="btn-disable">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                Disable User
-              </button>
-              <button v-if="!editUser.enabled" @click="enableUser" class="btn-enable">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                Enable User
-              </button>
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h4>User Role</h4>
-            <div class="role-buttons">
-              <button v-if="selectedGroup === 'AGENTS'" @click="promoteToAdmin" class="btn-promote">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
-                Promote to Admin
-              </button>
-              <button v-if="selectedGroup === 'ADMINS'" @click="demoteToAgent" class="btn-demote">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
-                Demote to Agent
+              <button @click="toggleAccountStatus" :class="editAccount.active ? 'btn-disable' : 'btn-enable'">
+                <svg v-if="editAccount.active" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                {{ editAccount.active ? 'Deactivate Account' : 'Activate Account' }}
               </button>
             </div>
           </div>
@@ -168,16 +148,16 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
               Cancel
             </button>
-            <button class="btn-save" @click="saveUserChanges">
+            <button class="btn-save" @click="saveAccountChanges">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
               Save Changes
             </button>
           </div>
           
           <div class="danger-zone">
-            <button class="btn-delete" @click="deleteUser">
+            <button class="btn-delete" @click="deleteAccount">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              Delete User
+              Delete Account
             </button>
           </div>
         </div>
@@ -188,7 +168,7 @@
     <div v-if="isSearching" class="modal-overlay">
       <div class="loading-container">
         <div class="loading-spinner"></div>
-        <p>Searching all users...</p>
+        <p>Searching all accounts...</p>
       </div>
     </div>
 
@@ -205,44 +185,148 @@
         </div>
       </div>
     </div>
+
+    <!-- Deletion confirmation popup -->
+    <div v-if="showDeleteConfirmationPopup" class="popup-overlay" @click.self="closePopup">
+      <div class="popup">
+        <div class="popup-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <h4>Confirm Deletion</h4>
+        </div>
+        <div class="popup-content">
+          <p>Are you sure you want to delete the following account(s)?</p>
+          <ul class="delete-list">
+            <li v-for="account in selectedAccountsList" :key="account.id">{{ account.clientName }} (ID: {{ account.id }})</li>
+          </ul>
+          <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        <div class="popup-footer">
+          <button class="btn-cancel" @click="closePopup">Cancel</button>
+          <button class="btn-delete" @click="deleteAccounts">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deleted accounts confirmation -->
+    <div v-if="showDeletedPopup" class="popup-overlay" @click.self="closePopup">
+      <div class="popup">
+        <div class="popup-header">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
+          <h4>Deletion Successful</h4>
+        </div>
+        <div class="popup-content">
+          <p>The following accounts have been deleted:</p>
+          <ul class="delete-list">
+            <li v-for="account in deletedAccounts" :key="account.id">{{ account.clientName }} (ID: {{ account.id }})</li>
+          </ul>
+        </div>
+        <div class="popup-footer">
+          <button class="btn-primary" @click="closePopup">Close</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, onMounted, computed } from 'vue';
-import {
-  getListOfUsersFromGroups,
-  updateUserAttribute,
-  deleteUserFromGroup,
-  addUserToGroup,
-  removeUserFromGroup,
-  disableUserInGroup,
-  enableUserInGroup,
-} from '../services/client.ts'; // Adjust the import path as needed
-
 export default {
   data() {
     return {
       searchQuery: '',
-      accounts: [], // Fetched user accounts
-      showEditModal: false, // Flag to show edit modal
+      accounts: [
+        { 
+          id: '1234', 
+          clientName: 'John Haaland', 
+          dateCreated: '2021-03-20', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA001', type: 'Checking', balance: 5420.75 },
+            { id: 'BA002', type: 'Savings', balance: 12500.00 }
+          ]
+        },
+        { 
+          id: '1235', 
+          clientName: 'John Wick', 
+          dateCreated: '2021-03-21', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA003', type: 'Checking', balance: 2340.50 }
+          ]
+        },
+        { 
+          id: '1236', 
+          clientName: 'Jane Smith', 
+          dateCreated: '2021-03-22', 
+          active: false,
+          bankAccounts: [
+            { id: 'BA004', type: 'Savings', balance: 8750.25 },
+            { id: 'BA005', type: 'Investment', balance: 45000.00 },
+            { id: 'BA006', type: 'Checking', balance: 1250.75 }
+          ]
+        },
+        { 
+          id: '1237', 
+          clientName: 'Alan Turing', 
+          dateCreated: '2021-03-23', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA007', type: 'Checking', balance: 3700.00 }
+          ]
+        },
+        { 
+          id: '1238', 
+          clientName: 'Ada Lovelace', 
+          dateCreated: '2021-03-24', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA008', type: 'Savings', balance: 15800.50 },
+            { id: 'BA009', type: 'Investment', balance: 75000.00 }
+          ]
+        },
+        { 
+          id: '1239', 
+          clientName: 'Grace Hopper', 
+          dateCreated: '2021-03-25', 
+          active: false,
+          bankAccounts: []
+        },
+        { 
+          id: '1240', 
+          clientName: 'Dennis Ritchie', 
+          dateCreated: '2021-03-26', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA010', type: 'Checking', balance: 4250.75 }
+          ]
+        },
+        { 
+          id: '1241', 
+          clientName: 'Linus Torvalds', 
+          dateCreated: '2021-03-27', 
+          active: true,
+          bankAccounts: [
+            { id: 'BA011', type: 'Checking', balance: 8300.25 },
+            { id: 'BA012', type: 'Savings', balance: 27500.00 }
+          ]
+        },
+      ],
+      selectedAccounts: [], // Array to store selected account IDs
+      deletedAccounts: [], // Array to store deleted accounts for confirmation message
       showNoSelectionPopup: false, // Flag to show no selection popup
-      editUser: {}, // User data for editing
-      paginationToken: null, // Current pagination token
-      paginationHistory: [], // History of pagination tokens for "Previous Page"
-      hasMoreUsers: true, // Flag to indicate if there are more users to fetch
-      selectedGroup: 'ADMINS', // Default group to display
+      showDeleteConfirmationPopup: false, // Flag to show delete confirmation popup
+      showDeletedPopup: false, // Flag to show deleted accounts confirmation popup
+      showEditModal: false,
+      editAccount: {},
+      currentPage: 1,
+      itemsPerPage: 5,
       
-      // New properties for enhanced search
-      isSearching: false, // Flag to show loading state during global search
-      isSearchMode: false, // Flag to indicate if we're in search mode
-      allSearchResults: [], // All users from search across pages
-      currentPage: 1, // Current page in search results pagination
-      usersPerPage: 5, // Number of users to display per page in search results
+      // Search mode properties
+      isSearching: false,
+      isSearchMode: false,
+      allSearchResults: [],
     };
   },
   computed: {
-    // Filter accounts based on the search query (only for standard mode)
     filteredAccounts() {
       if (this.isSearchMode) {
         return this.allSearchResults;
@@ -251,127 +335,166 @@ export default {
       const query = this.searchQuery.toLowerCase();
       return this.accounts.filter(account => {
         return (
-          (account.email && account.email.toLowerCase().includes(query)) ||
-          (account.given_name && account.given_name.toLowerCase().includes(query)) ||
-          (account.family_name && account.family_name.toLowerCase().includes(query))
+          (account.clientName && account.clientName.toLowerCase().includes(query)) ||
+          (account.id && account.id.includes(query))
         );
       });
     },
-    
-    // Get accounts to display based on current pagination or search mode
-    displayedAccounts() {
-      if (this.isSearchMode) {
-        const start = (this.currentPage - 1) * this.usersPerPage;
-        const end = start + this.usersPerPage;
-        return this.allSearchResults.slice(start, end);
-      }
-      return this.filteredAccounts;
+    selectedAccountsList() {
+      return this.accounts.filter(account => this.selectedAccounts.includes(account.id));
     },
-    
-    // Total pages for search pagination
     totalPages() {
-      return Math.ceil(this.allSearchResults.length / this.usersPerPage);
+      return Math.ceil(this.filteredAccounts.length / this.itemsPerPage);
     },
-    
+    paginatedAccounts() {
+      if (this.isSearchMode) {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.allSearchResults.slice(start, end);
+      } else {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        return this.filteredAccounts.slice(start, end);
+      }
+    },
     // Check if Previous button should be disabled
     isPreviousDisabled() {
-      if (this.isSearchMode) {
-        return this.currentPage <= 1;
-      }
-      return !this.paginationHistory.length;
+      return this.currentPage <= 1;
     },
     
     // Check if Next button should be disabled
     isNextDisabled() {
-      if (this.isSearchMode) {
-        return this.currentPage >= this.totalPages;
-      }
-      return !this.hasMoreUsers;
+      return this.currentPage >= this.totalPages;
     }
   },
   methods: {
-    async fetchUsers(groupName, token = null) {
-      try {
-        const result = await getListOfUsersFromGroups(token, groupName);
-        const parsedResult = JSON.parse(result.data) || [];
-        console.log('Fetched users:', parsedResult);
-
-        // Update accounts with the new data
-        this.accounts = parsedResult.Users.map(user => ({
-          email: user.Attributes.find(attr => attr.Name === 'email')?.Value || '',
-          given_name: user.Attributes.find(attr => attr.Name === 'given_name')?.Value || '',
-          family_name: user.Attributes.find(attr => attr.Name === 'family_name')?.Value || '',
-          sub: user.Attributes.find(attr => attr.Name === 'sub')?.Value || '',
-          UserDateOfBirth: user.Attributes.find(attr => attr.Name === 'birthdate')?.Value || '',
-          UserStatus: user.UserStatus,
-          UserCreateDate: user.UserCreateDate,
-          enabled: user.Enabled,
-        }));
-
-        // Update pagination token and state
-        this.paginationToken = parsedResult.NextToken || null;
-        this.hasMoreUsers = !!this.paginationToken;
-        console.log('Updated accounts:', this.accounts);
-      } catch (error) {
-        console.error('Error fetching users:', error);
+    // Navigate to profile detail page
+    navigateToProfile(accountId) {
+      // Use router to navigate
+      if (this.$router) {
+        this.$router.push({ name: 'ClientProfile', params: { id: accountId } });
+      } else {
+        // Fallback if router is not defined (for demo purposes)
+        console.log(`Navigating to client profile with ID: ${accountId}`);
+        alert(`Navigating to client profile for ID: ${accountId}`);
       }
     },
     
-    // New method to perform global search across all pages
+    openEditModal(account) {
+      this.editAccount = { ...account }; // Clone the selected account
+      console.log('Editing account:', this.editAccount);
+      this.showEditModal = true;
+      document.body.classList.add('modal-open'); // Add class to body
+    },
+    
+    closeEditModal() {
+      this.showEditModal = false;
+      this.editAccount = {};
+      document.body.classList.remove('modal-open'); // Remove class from body
+    },
+    
+    toggleAccountStatus() {
+      this.editAccount.active = !this.editAccount.active;
+    },
+    
+    saveAccountChanges() {
+      // Find the account in the array and update it
+      const index = this.accounts.findIndex(account => account.id === this.editAccount.id);
+      if (index !== -1) {
+        this.accounts[index] = { ...this.editAccount };
+      }
+      
+      // If in search mode, update the search results as well
+      if (this.isSearchMode) {
+        const searchIndex = this.allSearchResults.findIndex(account => account.id === this.editAccount.id);
+        if (searchIndex !== -1) {
+          this.allSearchResults[searchIndex] = { ...this.editAccount };
+        }
+      }
+      
+      this.closeEditModal();
+    },
+    
+    deleteAccount() {
+      // Set up for deletion confirmation
+      this.selectedAccounts = [this.editAccount.id];
+      this.closeEditModal();
+      this.showDeleteConfirmationPopup = true;
+    },
+    
+    editSelectedAccounts() {
+      if (this.selectedAccounts.length === 0) {
+        this.showNoSelectionPopup = true;
+        return;
+      }
+      
+      if (this.selectedAccounts.length === 1) {
+        // Find the account and open the edit modal
+        const accountToEdit = this.accounts.find(account => account.id === this.selectedAccounts[0]);
+        if (accountToEdit) {
+          this.openEditModal(accountToEdit);
+        }
+      } else {
+        // Navigate to edit page for multiple accounts (example: using Vue Router)
+        // This would be implemented in a real application
+        console.log('Editing multiple accounts:', this.selectedAccounts);
+        this.$router?.push({ name: 'EditAccount', params: { ids: this.selectedAccounts } });
+      }
+    },
+    
+    deleteSelectedAccounts() {
+      if (this.selectedAccounts.length === 0) {
+        this.showNoSelectionPopup = true;
+        return;
+      }
+      this.showDeleteConfirmationPopup = true;
+    },
+    
+    deleteAccounts() {
+      // Store deleted accounts for confirmation message
+      this.deletedAccounts = this.selectedAccountsList;
+      
+      // Delete selected accounts from the data
+      this.accounts = this.accounts.filter(account => !this.selectedAccounts.includes(account.id));
+      
+      // If in search mode, update search results
+      if (this.isSearchMode) {
+        this.allSearchResults = this.allSearchResults.filter(
+          account => !this.selectedAccounts.includes(account.id)
+        );
+      }
+      
+      this.selectedAccounts = []; // Reset selected accounts
+      this.showDeleteConfirmationPopup = false;
+      this.showDeletedPopup = true;
+    },
+    
+    // Global search across all accounts
     async performGlobalSearch() {
       if (!this.searchQuery.trim()) {
         // If search query is empty, switch back to normal mode
-        this.isSearchMode = false;
-        this.allSearchResults = [];
-        this.currentPage = 1;
+        this.clearSearch();
         return;
       }
       
       this.isSearching = true;
-      this.allSearchResults = [];
-      let allUsers = [];
-      let token = null;
-      let hasMorePages = true;
       
       try {
-        // Fetch all pages of users
-        while (hasMorePages) {
-          const result = await getListOfUsersFromGroups(token, this.selectedGroup);
-          const parsedResult = JSON.parse(result.data) || [];
-          
-          const users = parsedResult.Users.map(user => ({
-            email: user.Attributes.find(attr => attr.Name === 'email')?.Value || '',
-            given_name: user.Attributes.find(attr => attr.Name === 'given_name')?.Value || '',
-            family_name: user.Attributes.find(attr => attr.Name === 'family_name')?.Value || '',
-            sub: user.Attributes.find(attr => attr.Name === 'sub')?.Value || '',
-            UserDateOfBirth: user.Attributes.find(attr => attr.Name === 'birthdate')?.Value || '',
-            UserStatus: user.UserStatus,
-            UserCreateDate: user.UserCreateDate,
-            enabled: user.Enabled,
-          }));
-          
-          allUsers = [...allUsers, ...users];
-          
-          // Check if there are more pages
-          token = parsedResult.NextToken || null;
-          hasMorePages = !!token;
-        }
+        // Simulate API search delay
+        await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Apply search filter to all users
+        // Apply search filter to all accounts
         const query = this.searchQuery.toLowerCase();
-        this.allSearchResults = allUsers.filter(user => {
+        this.allSearchResults = this.accounts.filter(account => {
           return (
-            (user.email && user.email.toLowerCase().includes(query)) ||
-            (user.given_name && user.given_name.toLowerCase().includes(query)) ||
-            (user.family_name && user.family_name.toLowerCase().includes(query))
+            (account.clientName && account.clientName.toLowerCase().includes(query)) ||
+            (account.id && account.id.includes(query))
           );
         });
         
         // Switch to search mode and reset to first page
         this.isSearchMode = true;
         this.currentPage = 1;
-        
-        console.log('Global search results:', this.allSearchResults);
       } catch (error) {
         console.error('Error performing global search:', error);
       } finally {
@@ -379,229 +502,38 @@ export default {
       }
     },
     
-    // Navigation methods for search pagination
-    goToPage(page) {
-      this.currentPage = page;
-    },
-    
-    nextPage() {
-      if (this.isSearchMode) {
-        if (this.currentPage < this.totalPages) {
-          this.currentPage++;
-        }
-      } else {
-        if (this.hasMoreUsers) {
-          if (this.paginationToken) {
-            this.paginationHistory.push(this.paginationToken);
-          }
-          this.fetchUsers(this.selectedGroup, this.paginationToken);
-        }
-      }
-    },
-    
-    previousPage() {
-      if (this.isSearchMode) {
-        if (this.currentPage > 1) {
-          this.currentPage--;
-        }
-      } else {
-        if (this.paginationHistory.length > 0) {
-          const previousToken = this.paginationHistory.length > 1
-            ? this.paginationHistory[this.paginationHistory.length - 2]
-            : null;
-
-          this.paginationHistory.pop();
-          this.fetchUsers(this.selectedGroup, previousToken);
-        } else {
-          this.fetchUsers(this.selectedGroup);
-        }
-      }
-    },
-    
-    // Reset search and go back to normal mode
+    // Clear search and go back to normal mode
     clearSearch() {
       this.searchQuery = '';
       this.isSearchMode = false;
       this.allSearchResults = [];
       this.currentPage = 1;
-      this.fetchUsers(this.selectedGroup);
     },
     
-    switchGroup(groupName) {
-      this.selectedGroup = groupName;
-      this.paginationToken = null;
-      this.paginationHistory = [];
-      
-      // Reset search state when switching groups
-      this.isSearchMode = false;
-      this.allSearchResults = [];
-      this.currentPage = 1;
-      this.searchQuery = '';
-      
-      this.fetchUsers(groupName);
-    },
-
-    async disableUser() {
-      try {
-        const confirmation = confirm('Are you sure you want to disable this user?');
-        if (!confirmation) return;
-
-        await disableUserInGroup(this.editUser.email);
-        console.log('User disabled successfully');
-        this.editUser.enabled = false; // Update the enabled property locally
-        
-        // Update the user in search results if in search mode
-        if (this.isSearchMode) {
-          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
-          if (index !== -1) {
-            this.allSearchResults[index].enabled = false;
-          }
-        }
-        
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error disabling user:', error);
+    // Pagination methods
+    nextPage() {
+      if (this.currentPage < this.totalPages) {
+        this.currentPage++;
       }
     },
-    
-    async enableUser() {
-      try {
-        const confirmation = confirm('Are you sure you want to enable this user?');
-        if (!confirmation) return;
-
-        await enableUserInGroup(this.editUser.email);
-        console.log('User enabled successfully');
-        this.editUser.enabled = true; // Update the enabled property locally
-        
-        // Update the user in search results if in search mode
-        if (this.isSearchMode) {
-          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
-          if (index !== -1) {
-            this.allSearchResults[index].enabled = true;
-          }
-        }
-        
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error enabling user:', error);
+    previousPage() {
+      if (this.currentPage > 1) {
+        this.currentPage--;
       }
     },
-    
-    openEditModal(account) {
-      this.editUser = { ...account }; // Clone the selected user
-      console.log('Editing user:', this.editUser);
-      this.showEditModal = true;
-      document.body.classList.add('modal-open'); // Add class to body
-    },
-    
-    closeEditModal() {
-      this.showEditModal = false;
-      this.editUser = {};
-      document.body.classList.remove('modal-open'); // Remove class from body
-    },
-    
-    async saveUserChanges() {
-      try {
-        await updateUserAttribute(
-          this.editUser.email,
-          this.editUser.given_name,
-          this.editUser.family_name,
-          this.editUser.UserDateOfBirth
-        );
-        console.log('User updated successfully');
-        
-        // Update the user in search results if in search mode
-        if (this.isSearchMode) {
-          const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
-          if (index !== -1) {
-            this.allSearchResults[index] = {...this.editUser};
-          }
-        }
-        
-        this.closeEditModal();
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error updating user:', error);
-      }
-    },
-    
-    async deleteUser() {
-      try {
-        const confirmation = confirm('Are you sure you want to delete this user?');
-        if (!confirmation) return;
-
-        await deleteUserFromGroup(this.editUser.email);
-        console.log('User deleted successfully');
-        
-        // Remove user from search results if in search mode
-        if (this.isSearchMode) {
-          this.allSearchResults = this.allSearchResults.filter(
-            user => user.email !== this.editUser.email
-          );
-        }
-        
-        this.closeEditModal();
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error deleting user:', error);
-      }
-    },
-    
-    async promoteToAdmin() {
-      try {
-        await removeUserFromGroup(this.editUser.email, 'AGENTS');
-        await addUserToGroup(this.editUser.email, 'ADMINS');
-        console.log('User promoted to Admin successfully');
-        
-        // If in search mode and viewing agents, remove this user from results
-        if (this.isSearchMode && this.selectedGroup === 'AGENTS') {
-          this.allSearchResults = this.allSearchResults.filter(
-            user => user.email !== this.editUser.email
-          );
-        }
-        
-        this.closeEditModal();
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error promoting user to Admin:', error);
-      }
-    },
-    
-    async demoteToAgent() {
-      try {
-        await removeUserFromGroup(this.editUser.email, 'ADMINS');
-        await addUserToGroup(this.editUser.email, 'AGENTS');
-        console.log('User demoted to Agent successfully');
-        
-        // If in search mode and viewing admins, remove this user from results
-        if (this.isSearchMode && this.selectedGroup === 'ADMINS') {
-          this.allSearchResults = this.allSearchResults.filter(
-            user => user.email !== this.editUser.email
-          );
-        }
-        
-        this.closeEditModal();
-        this.fetchUsers(this.selectedGroup); // Refresh the user list
-      } catch (error) {
-        console.error('Error demoting user to Agent:', error);
-      }
-    },
-    
-    formatDate(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      return date.toLocaleString();
+    goToPage(page) {
+      this.currentPage = page;
     },
     
     closePopup() {
       this.showNoSelectionPopup = false;
+      this.showDeleteConfirmationPopup = false;
+      this.showDeletedPopup = false;
     }
-  },
-  mounted() {
-    this.fetchUsers(this.selectedGroup);
-  },
+  }
 };
 </script>
+
 
 <style scoped>
 :root {
@@ -656,28 +588,6 @@ export default {
   letter-spacing: 0.5px;
 }
 
-/* Toggle Buttons */
-.toggle-container {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.toggle-container button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  background-color: #e2e8f0;
-  color: #475569;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -699,17 +609,6 @@ export default {
   margin-bottom: 1rem;
 }
 
-.toggle-container button:hover {
-  background-color: #cbd5e1;
-  transform: translateY(-1px);
-}
-
-.toggle-container button.active {
-  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
-  color: white;
-  border-color: #2563eb;
-  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
-}
 
 /* Card Styles */
 .card {
@@ -789,7 +688,7 @@ export default {
 }
 
 .client-table th {
-  text-align: left;
+
   padding: 1rem;
   background-color: #f1f5f9;
   color: #334155;
@@ -900,7 +799,7 @@ export default {
 /* Pagination Styles */
 .pagination {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   padding: 1.25rem;
   border-top: 1px solid #e2e8f0;
   gap: 0.75rem;
