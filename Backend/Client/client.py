@@ -12,34 +12,31 @@ app = Flask(__name__)
 
 # Helper Function
 # Get Secret from AWS Secrets Manager
-def get_secret():
-
-    secret_name = "githubactions"
-    region_name = "ap-southeast-1"
+def get_secret(secret_name, region_name="ap-southeast-1"):
     # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
-    # Retrieve the secret value
+    client = boto3.client("secretsmanager", region_name=region_name)
+    
     try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
+        # Retrieve the secret value
+        response = client.get_secret_value(SecretId=secret_name)
+        secret = response.get("SecretString")
+        if secret:
+            return json.loads(secret)
+        else:
+            print("Secret is empty or invalid.")
+            return None
     except Exception as e:
         print(f"Error retrieving secret: {e}")
         return None
-    
-    secret = get_secret_value_response['SecretString']
-    return json.loads(secret)
 
-secrets = get_secret()
+secrets = get_secret('githubactions')
 db_host = secrets["DB_HOST"]
 db_user = secrets["DB_USER"]
 db_password = secrets["DB_PASSWORD"]
 db_name = secrets["DB_NAME"]
 port = secrets.get("PORT", "3306")
+
+print(f"Connecting to database at {db_host} with user {db_user}")
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{db_user}:{db_password}@{db_host}:{port}/{db_name}'
