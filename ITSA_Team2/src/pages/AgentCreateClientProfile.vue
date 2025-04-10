@@ -5,42 +5,42 @@
       <form @submit.prevent="submitForm">
         <div class="form-group">
           <label for="firstName">First Name</label>
-          <input v-model="client.firstName" type="text" placeholder="First Name" required />
+          <input v-model="client.FirstName" type="text" placeholder="First Name" required />
         </div>
         
         <div class="form-group">
           <label for="lastName">Last Name</label>
-          <input v-model="client.lastName" type="text" placeholder="Last Name" required />
+          <input v-model="client.LastName" type="text" placeholder="Last Name" required />
         </div>
 
         <div class="form-group">
           <label for="dateOfBirth">Date Of Birth</label>
-          <input v-model="client.dateOfBirth" type="date" placeholder="Date of Birth" required />
+          <input v-model="client.DateOfBirth" type="date" placeholder="Date of Birth" required />
         </div>
 
         <div class="form-group">
           <label for="gender">Gender</label>
-          <select v-model="client.gender" id="gender" required>
+          <select v-model="client.Gender" id="gender" required>
             <option value="" disabled selected>Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
             <option value="Other">Other</option>
-            <option value="PNTS">Prefer Not To Say</option>
+            <option value="Prefer not to say">Prefer Not To Say</option>
           </select>
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input v-model="client.email" type="email" placeholder="Email" required />
+          <input v-model="client.EmailAddress" type="email" placeholder="Email" required />
         </div>
 
         <div class="form-group">
           <label for="phone">Phone Number</label>
           <vue-tel-input
-            v-model="client.phone"
+            ref="phoneInput"
+            v-model="client.PhoneNumber"
             :inputOptions="telInputOptions"
             :dropdownOptions="telDropdownOptions"
-            @input="onPhoneInput"
             mode="international"
             required
             class="tel-input-container"
@@ -49,24 +49,24 @@
 
         <div class="form-group">
           <label for="address">Address</label>
-          <input v-model="client.address" type="text" placeholder="Address" required />
+          <input v-model="client.Address" type="text" placeholder="Address" required />
         </div>
 
         <div class="form-group">
           <label for="city">City</label>
-          <input v-model="client.city" type="text" placeholder="City" required />
+          <input v-model="client.City" type="text" placeholder="City" required />
         </div>
 
         <div class="form-group">
           <label for="state">State</label>
-          <input v-model="client.state" type="text" placeholder="State" required />
+          <input v-model="client.State" type="text" placeholder="State" required />
         </div>
 
         <div class="form-group">
           <label for="country">Country</label>
-          <select v-model="client.country" id="country" required @change="updatePhoneCountry">
+          <select v-model="client.Country" id="country" required @change="updatePhoneCountry">
             <option value="" disabled selected>Select Country</option>
-            <option v-for="country in countries" :key="country.code" :value="country.code">
+            <option v-for="country in countries" :key="country.name" :value="country.name">
               {{ country.name }}
             </option>
           </select>
@@ -75,10 +75,11 @@
         <div class="form-group">
           <label for="postalCode">Postal Code</label>
           <input 
-            v-model="client.postalCode" 
+            v-model="client.PostalCode" 
             type="text" 
             inputmode="numeric"
             pattern="[0-9]*"
+            maxlength="6"
             placeholder="Postal Code" 
             @input="validatePostalCode"
             required />
@@ -91,23 +92,25 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 export default {
   data() {
     return {
       client: {
-        firstName: '',
-        lastName: '',
-        dateOfBirth: '',
-        gender: '',
-        email: '',
-        phone: '',
-        phoneCountry: '',
-        phoneNumber: '',
-        address: '',
-        city: '',
-        state: '',
-        country: '',
-        postalCode: ''
+        FirstName: '',
+        LastName: '',
+        DateOfBirth: '',
+        EmailAddress: '',
+        PhoneNumber: '',
+        Address: '',
+        City: '',
+        State: '',
+        Country: '',
+        PostalCode: '',
+        Gender: ''
       },
       countries: [],
       telInputOptions: {
@@ -136,26 +139,52 @@ export default {
     this.countries.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
-    validatePostalCode(event) {
-      // Remove any non-numeric characters
-      this.client.postalCode = this.client.postalCode.replace(/\D/g, '');
-    },
-    onPhoneInput(formattedNumber, { number, isValid, country }) {
-      if (isValid) {
-        this.client.phone = number.international;
-        this.client.phoneCountry = country.iso2;
-        this.client.phoneNumber = number.significant;
-      }
-    },
-    updatePhoneCountry() {
-      // If user selects a country from the main country dropdown, 
-      // we can optionally sync that with the phone country dropdown
-      // This would require accessing the vue-tel-input component via refs
-      // and is more complex, so we'll leave this as a placeholder
-    },
     submitForm() {
+      // Remove spaces from the phone number before submitting
+      this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, '');
+
       console.log('Saving client profile:', this.client);
-      // Implement save logic here
+
+      // Call the save function to handle the data
+      // TODO: Replace with actual API endpoint
+      axios.post('http://127.0.0.1:5001/clients', this.client)
+        .then(response => {
+          console.log('Client profile saved successfully:', response.data);
+          toast("Client profile saved successfully!", {
+            type: 'success',
+            autoClose: 3000
+          });
+          // Handle success (e.g., show a success message, redirect, etc.)
+        })
+        .catch(error => {
+          // Handle error response
+          // If the error response contains validation errors
+          if(error.status == 400){
+            const errors = error.response.data.errors;
+            // Display error messages 
+            for (const error of errors) {
+              toast(error, {
+                type: 'error',
+                autoClose: 3000
+              });
+            }
+          }
+          // If the error response indicates a conflict (e.g., duplicate email)
+          else if(error.status == 409){
+            toast(error.response.data.error, {
+              type: 'error',
+              autoClose: 3000
+            });
+          }
+          else {
+            toast("An unexpected error occurred. Please try again.", {
+              type: 'error',
+              autoClose: 3000
+            });
+          }
+          console.error('Error saving client profile:', error);
+        });
+      // Implement save logic here (API call, store data, etc.)
     }
   }
 };
@@ -218,7 +247,7 @@ input, select {
   padding: 12px !important;
   border-radius: 4px !important;
   font-size: 1rem !important;
-  background-color: white !important;
+  background-color: black !important;
 }
 
 /* Make the dropdown button and flag container match the height */

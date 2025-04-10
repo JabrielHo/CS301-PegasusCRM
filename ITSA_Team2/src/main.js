@@ -11,7 +11,6 @@ import enLocale from 'i18n-iso-countries/langs/en.json'
 
 // Register the locale
 countries.registerLocale(enLocale)
-
 const app = createApp(App)
 app.config.globalProperties.$countries = countries
 app.use(router)
