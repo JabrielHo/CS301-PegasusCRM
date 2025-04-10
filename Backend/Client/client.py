@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 app = Flask(__name__)
 
 # Helper Function
+# Last Chance
 # Get Secret from AWS Secrets Manager
 def get_secret(secret_name, region_name="ap-southeast-1"):
     # Create a Secrets Manager client
