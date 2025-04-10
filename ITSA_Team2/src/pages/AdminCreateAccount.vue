@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { createUserToGroup, addUserToGroup } from '../services/client'; // Adjust the import based on your project structure
+import { createUserToGroup, addUserToGroup, getUser} from '../services/client'; // Adjust the import based on your project structure
 
 export default {
   data() {
