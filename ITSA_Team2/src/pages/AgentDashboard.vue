@@ -1,10 +1,5 @@
 <template>
   <div class="agent-dashboard">
-    <header>
-      <h1>Scrooge Global Bank</h1>
-      <p>Agent - {{ agentName }}</p>
-    </header>
-
     <div class="search-actions">
       <div class="search-bar">
         <input type="text" v-model="searchQuery" placeholder="Search"/>
@@ -123,7 +118,6 @@ export default {
 <style scoped>
 .agent-dashboard {
   padding: 20px;
-  background-color: #f0f8ff;
 }
 
 header {

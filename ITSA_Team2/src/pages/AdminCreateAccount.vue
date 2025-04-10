@@ -1,8 +1,8 @@
 <template>
-  <div class="create-client-profile">
+  <div class="create-agent-profile">
     <header>
       <h1>Create  Profile</h1>
-      <p class="subtitle">Please fill in the details below to create a new client account</p>
+      <p class="subtitle">Please fill in the details below to create a new Agent/Admin account</p>
     </header>
     
     <div class="form-container">
@@ -139,7 +139,7 @@ export default {
 </script>
 
 <style scoped>
-.create-client-profile {
+.create-agent-profile {
   padding: 30px;
   max-width: 600px;
   margin: 0 auto;
