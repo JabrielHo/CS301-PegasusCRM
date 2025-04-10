@@ -364,6 +364,7 @@ def get_client(clientId):
         }
     ), 404
 
+# Get All Clients for Agent
 @client_blueprint.route('/all/<string:agentId>', methods=['GET'])
 def get_client_by_id(agentId):
     # Get all clients for a specific agent
@@ -390,6 +391,22 @@ def delete_client(clientId):
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
     # NOTE: 
     # Set up Cron Job to hard delete periodically?
+    # Check if client exists
+    if not client:
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Client not found"
+            }
+        ), 404
+    # Check if client is already deleted
+    if client.deleted_at:
+        return jsonify(
+            {
+                "status": "error",
+                "message": "Client already deleted"
+            }
+        ), 400
     if client:
         try:
             # Soft Delete by setting datetime to datetime.now()
@@ -463,6 +480,72 @@ def generate_presigned_url(clientId, expiration=EXPIRATION):
         print(f"Error generating presigned URL: {e}")
         return jsonify({"error": "Error generating presigned URL"}), 500
 
+# Verify User
+@client_blueprint.route('/<string:clientId>/verify_user', methods=['PUT'])
+def verify_user(clientId):
+    data = request.get_json()
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+
+    if not client:
+        return jsonify({"error": "Client not found"}), 404
+    
+    client.Verified = data.get('Verified')
+    db.session.commit()
+    return jsonify({
+        "status": "success",
+        "message": f"{client.FirstName} {client.LastName} verified!"
+    }), 200
+
+# Get Client Documents
+@client_blueprint.route('/<string:clientId>/documents', methods=['GET'])
+def view_client_documents(clientId):
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+
+    if not client:
+        return jsonify({"error": "Client not found"}), 404
+
+    # List all objects in the S3 bucket directory for the client
+    s3_directory = f"{client.ClientID}/"
+    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=s3_directory)
+
+    documents = []
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            documents.append(obj['Key'])
+
+    return jsonify({
+        "documents": documents
+    }), 200
+
+# View Client Documents
+@client_blueprint.route('/<string:clientId>/documents/presign/<string:documentName>', methods=['GET'])
+def view_client_document(clientId, documentName):
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+
+    if not client:
+        return jsonify({"error": "Client not found"}), 404
+
+    # Generate a presigned URL for the specified document
+    object_key = f"{client.ClientID}/{documentName}"
+    
+    try:
+        url = s3.generate_presigned_url(
+            'get_object',
+            Params={
+                "Bucket": BUCKET_NAME,
+                "Key": object_key
+            },
+            ExpiresIn=EXPIRATION
+        )
+        return jsonify({
+            "link": url
+        }), 200
+
+    except ClientError as e:
+        print(f"Error generating presigned URL: {e}")
+        return jsonify({"error": "Error generating presigned URL"}), 500
+
+# Validate Input
 def validate_input(data):
     errors = []
 

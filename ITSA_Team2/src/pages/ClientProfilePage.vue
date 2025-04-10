@@ -1,88 +1,161 @@
 <template>
-    <div class="admin-dashboard">
-      <!-- Header with Profile Summary -->
-      <div class="dashboard-header">
-        <h1>Client Profile</h1>
-        <p class="dashboard-subtitle">Complete client account information</p>
+  <div class="admin-dashboard">
+    <!-- Header with Profile Summary -->
+    <div class="dashboard-header">
+      <h1>Client Profile</h1>
+      <p class="dashboard-subtitle">Complete client account information</p>
+    </div>
+
+    <!-- Client Profile Details -->
+    <div class="card profile-card">
+      <div class="card-header">
+        <h2>Profile Details</h2>
+        <button class="btn-edit-profile" @click="openEditModal">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+            ></path>
+            <path
+              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+            ></path>
+          </svg>
+          Edit Profile
+        </button>
       </div>
-  
-      <!-- Client Profile Details -->
-      <div class="card profile-card">
-        <div class="card-header">
-          <h2>Profile Details</h2>
-          <button class="btn-edit-profile" @click="openEditModal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-            Edit Profile
-          </button>
-        </div>
-        <div class="profile-content">
-          <div class="profile-info">
-            <div class="info-group">
-              <div class="info-label">Client ID</div>
-              <div class="info-value">{{ client.ClientID }}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Client Name</div>
-              <div class="info-value">{{ client.FirstName + " " + client.LastName }}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Address</div>
-              <div class="info-value">{{ client.Address || 'Not provided' }}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">City</div>
-              <div class="info-value">{{ client.City || 'Not provided' }}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">State</div>
-              <div class="info-value">{{ client.State || 'Not provided' }}</div>
-            </div>
-            <div class="info-group">
-              <div class="info-label">Postal Code</div>
-              <div class="info-value">{{ client.PostalCode || 'Not provided' }}</div>
+      <div class="profile-content">
+        <div class="profile-info">
+          <div class="info-group">
+            <div class="info-label">Client ID</div>
+            <div class="info-value">{{ client.ClientID }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Client Name</div>
+            <div class="info-value">
+              {{ client.FirstName + " " + client.LastName }}
             </div>
           </div>
-          <div class="profile-info">
-            <div class="info-group">
-              <div class="info-label">Gender</div>
-              <div class="info-value">{{ client.Gender || 'Not provided' }}</div>
+          <div class="info-group">
+            <div class="info-label">Address</div>
+            <div class="info-value">{{ client.Address || "Not provided" }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">City</div>
+            <div class="info-value">{{ client.City || "Not provided" }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">State</div>
+            <div class="info-value">{{ client.State || "Not provided" }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Postal Code</div>
+            <div class="info-value">
+              {{ client.PostalCode || "Not provided" }}
             </div>
-            <div class="info-group">
-              <div class="info-label">Email</div>
-              <div class="info-value">{{ client.EmailAddress || 'Not provided' }}</div>
+          </div>
+        </div>
+        <div class="profile-info">
+          <div class="info-group">
+            <div class="info-label">Gender</div>
+            <div class="info-value">{{ client.Gender || "Not provided" }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Email</div>
+            <div class="info-value">
+              {{ client.EmailAddress || "Not provided" }}
             </div>
-            <div class="info-group">
-              <div class="info-label">Phone</div>
-              <div class="info-value">{{ client.PhoneNumber || 'Not provided' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Phone</div>
+            <div class="info-value">
+              {{ client.PhoneNumber || "Not provided" }}
             </div>
-            <div class="info-group">
-              <div class="info-label">Date of Birth</div>
-              <div class="info-value">{{ formatDate(client.DateOfBirth) || 'Not provided' }}</div>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Date of Birth</div>
+            <div class="info-value">
+              {{ formatDate(client.DateOfBirth) || "Not provided" }}
             </div>
-            <div class="info-group">
-              <div class="info-label">Status</div>
-              <div class="info-value">
-                <span :class="['status-badge', client.Verified ? 'confirmed' : 'pending']">
-                  {{ client.Verified ? 'Verified' : 'Not Verified' }}
-                </span>
+          </div>
+          <div class="info-group">
+            <div class="info-label">Status</div>
+            <div class="info-value">
+              <span
+                :class="[
+                  'status-badge',
+                  client.Verified ? 'confirmed' : 'pending',
+                ]"
+              >
+                {{ client.Verified ? "Verified" : "Not Verified" }}
+              </span>
+            </div>
+          </div>
+          <div
+            class="info-group"
+            style="display: flex; gap: 10px; margin: 10px 0"
+          >
+            <!-- Button to view verification documents -->
+            <button
+              class="btn-view"
+              @click="fetchVerificationDocuments(client.ClientID)"
+            >
+              View Documents
+            </button>
+            <!-- Display list of documents if available -->
+            <div v-if="documents.length > 0">
+              <div v-for="(doc, index) in documents" :key="index">
+                <button class="btn-view" @click="getPresignedUrl(doc)">
+                  View {{ doc.split("/").pop() }}
+                </button>
               </div>
             </div>
+
+            <!-- Button to verify user -->
+            <button
+              class="btn-verify"
+              v-if="!client.Verified"
+              @click="verifyUser(client.ClientID)"
+            >
+              Verify User
+            </button>
           </div>
         </div>
       </div>
-  
-      <!-- Bank Accounts Section -->
-      <div class="card accounts-card">
-        <div class="card-header">
-          <h2>Bank Accounts</h2>
-          <button class="btn-add" @click="openAddAccountModal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
-            Add New Account
-          </button>
-        </div>
-        
-        <!-- Account Search and Filter -->
-        <!-- <div class="accounts-filter">
+    </div>
+
+    <!-- Bank Accounts Section -->
+    <div class="card accounts-card">
+      <div class="card-header">
+        <h2>Bank Accounts</h2>
+        <button class="btn-add" @click="openAddAccountModal">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          Add New Account
+        </button>
+      </div>
+
+      <!-- Account Search and Filter -->
+      <!-- <div class="accounts-filter">
           <div class="search-container">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input id="accountSearch" v-model="accountSearchQuery" type="text" placeholder="Search accounts..." />
@@ -97,9 +170,9 @@
             </select>
           </div>
         </div> -->
-  
-        <!-- Accounts Table -->
-        <!-- <div class="accounts-table">
+
+      <!-- Accounts Table -->
+      <!-- <div class="accounts-table">
           <table>
             <thead>
               <tr>
@@ -152,9 +225,9 @@
             </tbody>
           </table>
         </div> -->
-  
-        <!-- Account Summary Footer -->
-        <!-- <div class="account-summary">
+
+      <!-- Account Summary Footer -->
+      <!-- <div class="account-summary">
           <div class="summary-item">
             <div class="summary-label">Total Accounts</div>
             <div class="summary-value">{{ client.bankAccounts.length }}</div>
@@ -168,411 +241,757 @@
             <div class="summary-value">{{ formatCurrency(totalBalance, 'USD') }}</div>
           </div>
         </div> -->
-      </div>
-  
-      <!-- Edit Profile Modal -->
-      <div v-if="showEditProfileModal" class="modal-overlay" @click.self="closeEditModal">
-        <div class="modal">
-          <div class="modal-header">
-            <h3>Edit Client Profile</h3>
-            <button class="btn-close" @click="closeEditModal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div
+      v-if="showEditProfileModal"
+      class="modal-overlay"
+      @click.self="closeEditModal"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3>Edit Client Profile</h3>
+          <button class="btn-close" @click="closeEditModal">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="form-group">
+            <label for="editFirstName">First Name</label>
+            <input
+              id="editFirstName"
+              v-model="editedClient.FirstName"
+              type="text"
+            />
           </div>
-          
-          <div class="modal-content">
-            <div class="form-group">
-              <label for="editClientName">Client Name</label>
-              <input id="editClientName" v-model="client.clientName" type="text" />
-            </div>
-            
-            <div class="form-group">
-              <label for="editEmail">Email</label>
-              <input id="editEmail" v-model="editedClient.email" type="email" />
-            </div>
-            
-            <div class="form-group">
-              <label for="editPhone">Phone</label>
-              <input id="editPhone" v-model="editedClient.phone" type="tel" />
-            </div>
-            
-            <div class="form-group">
-              <label for="editAddress">Address</label>
-              <textarea id="editAddress" v-model="editedClient.address" rows="3"></textarea>
-            </div>
-            
-            <div class="form-section">
-              <h4>Account Status</h4>
-              <div class="status-toggle">
-                <button @click="toggleClientStatus" :class="editedClient.active ? 'btn-disable' : 'btn-enable'">
-                  <svg v-if="editedClient.active" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                  {{ editedClient.active ? 'Deactivate Account' : 'Activate Account' }}
-                </button>
-              </div>
-            </div>
+
+          <div class="form-group">
+            <label for="editLastName">Last Name</label>
+            <input
+              id="editLastName"
+              v-model="editedClient.LastName"
+              type="text"
+            />
           </div>
-          
-          <div class="modal-footer">
-            <div class="action-buttons">
-              <button class="btn-cancel" @click="closeEditModal">Cancel</button>
-              <button class="btn-save" @click="saveProfileChanges">Save Changes</button>
-            </div>
+
+          <div class="form-group">
+            <label for="editDateOfBirth">Date of Birth</label>
+            <input
+              id="editDateOfBirth"
+              v-model="editedClient.DateOfBirth"
+              type="date"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="editEmailAddress">Email Address</label>
+            <input
+              id="editEmailAddress"
+              v-model="editedClient.EmailAddress"
+              type="email"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <vue-tel-input
+              v-model="editedClient.PhoneNumber"
+              :inputOptions="telInputOptions"
+              :dropdownOptions="telDropdownOptions"
+              mode="international"
+              required
+              class="tel-input-container"
+            ></vue-tel-input>
+          </div>
+
+          <div class="form-group">
+            <label for="editAddress">Address</label>
+            <input id="editAddress" v-model="editedClient.Address" />
+          </div>
+
+          <div class="form-group">
+            <label for="editCity">City</label>
+            <input id="editCity" v-model="editedClient.City" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label for="editState">State</label>
+            <input id="editState" v-model="editedClient.State" type="text" />
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country</label>
+            <select
+              v-model="client.Country"
+              id="country"
+              required
+              @change="updatePhoneCountry"
+            >
+              <option value="" disabled selected>Select Country</option>
+              <option
+                v-for="country in countries"
+                :key="country.name"
+                :value="country.name"
+              >
+                {{ country.name }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="editPostalCode">Postal Code</label>
+            <input
+              id="editPostalCode"
+              v-model="editedClient.PostalCode"
+              type="text"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="editGender">Gender</label>
+            <select id="editGender" v-model="editedClient.Gender">
+              <option disabled value="">Select Gender</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+              <option>Prefer not to say</option>
+            </select>
           </div>
         </div>
-      </div>
-  
-      <!-- Edit Bank Account Modal -->
-      <div v-if="showEditAccountModal" class="modal-overlay" @click.self="closeAccountModal">
-        <div class="modal">
-          <div class="modal-header">
-            <h3>{{ isAddingAccount ? 'Add New Bank Account' : 'Edit Bank Account' }}</h3>
-            <button class="btn-close" @click="closeAccountModal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+
+        <div class="modal-footer">
+          <div class="action-buttons">
+            <button class="btn-cancel" @click="closeEditModal">Cancel</button>
+            <button class="btn-save" @click="saveProfileChanges">
+              Save Changes
             </button>
-          </div>
-          
-          <div class="modal-content">
-            <div class="account-id" v-if="!isAddingAccount">
-              <svg class="account-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
-              <span>Account ID: {{ editedAccount.id }}</span>
-            </div>
-            
-            <div class="form-group">
-              <label for="accountType">Account Type</label>
-              <select id="accountType" v-model="editedAccount.type">
-                <option value="Checking">Checking</option>
-                <option value="Savings">Savings</option>
-                <option value="Investment">Investment</option>
-                <option value="Credit">Credit</option>
-              </select>
-            </div>
-            
-            <div class="form-group" v-if="isAddingAccount">
-              <label for="initialDeposit">Initial Deposit</label>
-              <input id="initialDeposit" v-model="editedAccount.initialDeposit" type="number" min="0" step="0.01" />
-            </div>
-            
-            <div class="form-group">
-              <label for="accountCurrency">Currency</label>
-              <select id="accountCurrency" v-model="editedAccount.currency">
-                <option value="USD">USD - US Dollar</option>
-                <option value="EUR">EUR - Euro</option>
-                <option value="GBP">GBP - British Pound</option>
-                <option value="JPY">JPY - Japanese Yen</option>
-                <option value="CAD">CAD - Canadian Dollar</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="branchId">Branch ID</label>
-              <select id="branchId" v-model="editedAccount.branchId">
-                <option value="BR001">BR001 - Main Branch</option>
-                <option value="BR002">BR002 - Downtown Branch</option>
-                <option value="BR003">BR003 - West Side Branch</option>
-                <option value="BR004">BR004 - East Side Branch</option>
-                <option value="BR005">BR005 - North Branch</option>
-              </select>
-            </div>
-            
-            <div class="form-section" v-if="!isAddingAccount">
-              <h4>Account Status</h4>
-              <div class="status-toggle">
-                <button @click="toggleEditedAccountStatus" :class="editedAccount.active ? 'btn-disable' : 'btn-enable'">
-                  <svg v-if="editedAccount.active" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                  {{ editedAccount.active ? 'Deactivate Account' : 'Activate Account' }}
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="modal-footer">
-            <div class="action-buttons">
-              <button class="btn-cancel" @click="closeAccountModal">Cancel</button>
-              <button class="btn-save" @click="saveAccountChanges">
-                {{ isAddingAccount ? 'Create Account' : 'Save Changes' }}
-              </button>
-            </div>
-            
-            <div class="danger-zone" v-if="!isAddingAccount">
-              <button class="btn-delete" @click="confirmDeleteAccount">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                Delete Account
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-  
-      <!-- Delete Confirmation Popup -->
-      <div v-if="showDeleteConfirmation" class="popup-overlay" @click.self="closePopup">
-        <div class="popup">
-          <div class="popup-header">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-            <h4>Confirm Deletion</h4>
-          </div>
-          <div class="popup-content">
-            <p>Are you sure you want to delete this bank account?</p>
-            <p><strong>Account ID:</strong> {{ accountToDelete.id }}</p>
-            <p><strong>Type:</strong> {{ accountToDelete.type }}</p>
-            <p class="warning-text">This action cannot be undone.</p>
-          </div>
-          <div class="popup-footer">
-            <button class="btn-cancel" @click="closePopup">Cancel</button>
-            <button class="btn-delete" @click="deleteAccount">Delete</button>
+            <button
+              class="btn-delete"
+              @click="openDeletePopup('client', client)"
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  export default {
-    name: 'ClientProfilePage',
-    data() {
-      return {
-        // Client data
-        clientID: null,
-        client: {},
-        // client: {
-        //   id: '1234',
-        //   clientName: 'John Haaland',
-        //   dateCreated: '2021-03-20',
-        //   active: true,
-        //   email: 'john.haaland@example.com',
-        //   phone: '+1 (555) 123-4567',
-        //   address: '123 Main Street, New York, NY 10001',
-        //   kycVerified: true,
-        //   bankAccounts: [
-        //     { 
-        //       id: 'BA001', 
-        //       type: 'Checking', 
-        //       balance: 5420.75,
-        //       active: true, 
-        //       openingDate: '2021-03-25',
-        //       initialDeposit: 5000,
-        //       currency: 'USD',
-        //       branchId: 'BR001'
-        //     },
-        //     { 
-        //       id: 'BA002', 
-        //       type: 'Savings', 
-        //       balance: 12500.00,
-        //       active: true,
-        //       openingDate: '2021-04-12',
-        //       initialDeposit: 10000,
-        //       currency: 'USD',
-        //       branchId: 'BR001'
-        //     },
-        //     { 
-        //       id: 'BA003', 
-        //       type: 'Investment', 
-        //       balance: 35000.00,
-        //       active: false,
-        //       openingDate: '2021-06-18',
-        //       initialDeposit: 25000,
-        //       currency: 'EUR',
-        //       branchId: 'BR003'
-        //     }
-        //   ]
-        // },
-        
-        // UI state variables
-        showEditProfileModal: false,
-        showEditAccountModal: false,
-        isAddingAccount: false,
-        editedClient: {},
-        editedAccount: {},
-        accountSearchQuery: '',
-        accountTypeFilter: '',
-        showDeleteConfirmation: false,
-        accountToDelete: {}
-      };
-    },
-    computed: {
-      // Filter bank accounts based on search and type filter
-      // filteredBankAccounts() {
-      //   return this.client.bankAccounts.filter(account => {
-      //     // Search by account ID
-      //     const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
-          
-      //     // Filter by account type
-      //     const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
-          
-      //     return matchesSearch && matchesType;
-      //   });
-      // },
-      
-      // Calculate total balance across all accounts
-      totalBalance() {
-        return this.client.bankAccounts.reduce((total, account) => {
-          // Simple conversion rates for demonstration - in a real app these would be fetched from an API
-          let conversionRate = 1;
-          if (account.currency === 'EUR') conversionRate = 1.1;
-          if (account.currency === 'GBP') conversionRate = 1.3;
-          if (account.currency === 'JPY') conversionRate = 0.0091;
-          if (account.currency === 'CAD') conversionRate = 0.75;
-          
-          return total + (account.balance * conversionRate);
-        }, 0);
-      }
-    },
-    mounted() {
-      // Retrieve the clientID from the URL params
-      this.clientID = this.$route.params.clientID;
-      this.loadClient();  // Call the method to load client data using the clientID
-    },
-    methods: {
-      loadClient() {
-        // Assuming your API is set to retrieve client by ID
-        axios.get(`http://127.0.0.1:5001/clients/${this.clientID}`)
-          .then(response => {
-            this.client = response.data.client;
-            console.log('Client data loaded:', this.client);
-          })
-          .catch(error => {
-            console.error('Error fetching client data:', error);
-          });
+
+    <!-- Edit Bank Account Modal -->
+    <div
+      v-if="showEditAccountModal"
+      class="modal-overlay"
+      @click.self="closeAccountModal"
+    >
+      <div class="modal">
+        <div class="modal-header">
+          <h3>
+            {{ isAddingAccount ? "Add New Bank Account" : "Edit Bank Account" }}
+          </h3>
+          <button class="btn-close" @click="closeAccountModal">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-content">
+          <div class="account-id" v-if="!isAddingAccount">
+            <svg
+              class="account-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+              <line x1="2" y1="10" x2="22" y2="10"></line>
+            </svg>
+            <span>Account ID: {{ editedAccount.id }}</span>
+          </div>
+
+          <div class="form-group">
+            <label for="accountType">Account Type</label>
+            <select id="accountType" v-model="editedAccount.type">
+              <option value="Checking">Checking</option>
+              <option value="Savings">Savings</option>
+              <option value="Investment">Investment</option>
+              <option value="Credit">Credit</option>
+            </select>
+          </div>
+
+          <div class="form-group" v-if="isAddingAccount">
+            <label for="initialDeposit">Initial Deposit</label>
+            <input
+              id="initialDeposit"
+              v-model="editedAccount.initialDeposit"
+              type="number"
+              min="0"
+              step="0.01"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="accountCurrency">Currency</label>
+            <select id="accountCurrency" v-model="editedAccount.currency">
+              <option value="USD">USD - US Dollar</option>
+              <option value="EUR">EUR - Euro</option>
+              <option value="GBP">GBP - British Pound</option>
+              <option value="JPY">JPY - Japanese Yen</option>
+              <option value="CAD">CAD - Canadian Dollar</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="branchId">Branch ID</label>
+            <select id="branchId" v-model="editedAccount.branchId">
+              <option value="BR001">BR001 - Main Branch</option>
+              <option value="BR002">BR002 - Downtown Branch</option>
+              <option value="BR003">BR003 - West Side Branch</option>
+              <option value="BR004">BR004 - East Side Branch</option>
+              <option value="BR005">BR005 - North Branch</option>
+            </select>
+          </div>
+
+          <div class="form-section" v-if="!isAddingAccount">
+            <h4>Account Status</h4>
+            <div class="status-toggle">
+              <button
+                @click="toggleEditedAccountStatus"
+                :class="editedAccount.active ? 'btn-disable' : 'btn-enable'"
+              >
+                <svg
+                  v-if="editedAccount.active"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                  <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
+                <svg
+                  v-else
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5v14"></path>
+                </svg>
+                {{
+                  editedAccount.active
+                    ? "Deactivate Account"
+                    : "Activate Account"
+                }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <div class="action-buttons">
+            <button class="btn-cancel" @click="closeAccountModal">
+              Cancel
+            </button>
+            <button class="btn-save" @click="saveAccountChanges">
+              {{ isAddingAccount ? "Create Account" : "Save Changes" }}
+            </button>
+          </div>
+
+          <div class="danger-zone" v-if="!isAddingAccount">
+            <button class="btn-delete" @click="confirmDeleteAccount">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
+              </svg>
+              Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Client/Account Delete Confirmation Popup -->
+    <div
+      v-if="showDeleteConfirmation"
+      class="popup-overlay"
+      @click.self="closePopup"
+    >
+      <div class="popup">
+        <div class="popup-header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <h4>Confirm Deletion</h4>
+        </div>
+        <div class="popup-content">
+          <p>Are you sure you want to delete this {{ itemType }}?</p>
+          <!-- If Deleting Client -->
+          <p v-if="itemToDelete.ClientID">
+            <strong>Client ID:</strong> {{ itemToDelete.ClientID }}
+          </p>
+          <p v-if="itemToDelete.FirstName || itemToDelete.LastName">
+            <strong>Name:</strong>
+            {{ itemToDelete.FirstName + " " + itemToDelete.LastName }}
+          </p>
+          <!-- If Deleting Account -->
+          <p v-if="itemToDelete.accountID">
+            <strong>ID:</strong> {{ itemToDelete.clientID }}
+          </p>
+          <p v-if="itemToDelete.type">
+            <strong>Type:</strong> {{ itemToDelete.type }}
+          </p>
+          <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        <div class="popup-footer">
+          <button class="btn-cancel" @click="closePopup">Cancel</button>
+          <button class="btn-delete" @click="deleteItem">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
+
+export default {
+  name: "ClientProfilePage",
+  data() {
+    return {
+      // Client data
+      clientID: null,
+      client: {},
+
+      // Country + Telephone
+      countries: [],
+      telInputOptions: {
+        placeholder: "Phone Number",
+        type: "tel",
+        inputClass: "tel-input",
       },
-      // Format date to a readable format
-      formatDate(dateString) {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
+      telDropdownOptions: {
+        showDialCodeInSelection: true,
+        showFlags: true,
+        showSearchBox: true,
+      },
+
+      // Delete Pop Up
+      showDeleteConfirmation: false,
+      itemToDelete: {},
+      itemType: "",
+
+      // Documents from S3
+      documents: [],
+      imageUrl: "",
+
+      // UI state variables
+      showEditProfileModal: false,
+      showEditAccountModal: false,
+      isAddingAccount: false,
+      editedClient: {},
+      editedAccount: {},
+      accountSearchQuery: "",
+      accountTypeFilter: "",
+    };
+  },
+  created() {
+    // Access countries from global properties
+    const countryNames = this.$countries.getNames("en");
+    const countryCodes = this.$countries.getAlpha3Codes();
+
+    this.countries = Object.keys(countryNames).map((code) => ({
+      code: countryCodes[code] || code,
+      name: countryNames[code],
+    }));
+
+    // Sort countries alphabetically by name
+    this.countries.sort((a, b) => a.name.localeCompare(b.name));
+  },
+  computed: {
+    // Filter bank accounts based on search and type filter
+    // filteredBankAccounts() {
+    //   return this.client.bankAccounts.filter(account => {
+    //     // Search by account ID
+    //     const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
+
+    //     // Filter by account type
+    //     const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
+
+    //     return matchesSearch && matchesType;
+    //   });
+    // },
+
+    // Calculate total balance across all accounts
+    totalBalance() {
+      return this.client.bankAccounts.reduce((total, account) => {
+        // Simple conversion rates for demonstration - in a real app these would be fetched from an API
+        let conversionRate = 1;
+        if (account.currency === "EUR") conversionRate = 1.1;
+        if (account.currency === "GBP") conversionRate = 1.3;
+        if (account.currency === "JPY") conversionRate = 0.0091;
+        if (account.currency === "CAD") conversionRate = 0.75;
+
+        return total + account.balance * conversionRate;
+      }, 0);
+    },
+  },
+  mounted() {
+    // Retrieve the clientID from the URL params
+    this.clientID = this.$route.params.clientID;
+    this.loadClient(); // Call the method to load client data using the clientID
+  },
+  methods: {
+    // Format date to a readable format
+    formatDate(dateString) {
+      if (!dateString) return "N/A";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+    // Format currency for display
+    formatCurrency(amount, currency = "USD") {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency,
+      }).format(amount);
+    },
+    // Open edit profile modal
+    openEditModal() {
+      this.editedClient = { ...this.client };
+      this.showEditProfileModal = true;
+    },
+    // Close edit profile modal
+    closeEditModal() {
+      this.showEditProfileModal = false;
+      this.editedClient = {};
+    },
+    // Toggle client status
+    toggleClientStatus() {
+      this.editedClient.active = !this.editedClient.active;
+    },
+    loadClient() {
+      // Assuming your API is set to retrieve client by ID
+      axios
+        .get(`http://127.0.0.1:5001/clients/${this.clientID}`)
+        .then((response) => {
+          this.client = response.data.client;
+          console.log("Client data loaded:", this.client);
+        })
+        .catch((error) => {
+          console.error("Error fetching client data:", error);
         });
-      },
-      // Format currency for display
-      formatCurrency(amount, currency = 'USD') {
-        return new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: currency
-        }).format(amount);
-      },
-      // Open edit profile modal
-      openEditModal() {
-        this.editedClient = { ...this.client };
-        this.showEditProfileModal = true;
-      },     
-      // Close edit profile modal
-      closeEditModal() {
-        this.showEditProfileModal = false;
-        this.editedClient = {};
-      },      
-      // Toggle client status
-      toggleClientStatus() {
-        this.editedClient.active = !this.editedClient.active;
-      },   
-      // Save profile changes
-      saveProfileChanges() {
-        this.client = { ...this.editedClient };
-        console.log(this.editedClient)
-        this.closeEditModal();
-        // In a real app, this would send an API request to update the client data
-      },
-      
-      // Open add/edit account modal
-      openAddAccountModal() {
-        this.isAddingAccount = true;
-        this.editedAccount = {
-          type: 'Checking',
-          active: true,
-          initialDeposit: 0,
-          currency: 'USD',
-          branchId: 'BR001',
-          openingDate: new Date().toISOString().split('T')[0]
-        };
-        this.showEditAccountModal = true;
-      },
-      
-      // Edit existing account
-      editAccount(accountId) {
-        const account = this.client.bankAccounts.find(a => a.id === accountId);
-        if (account) {
-          this.isAddingAccount = false;
-          this.editedAccount = { ...account };
-          this.showEditAccountModal = true;
-        }
-      },
-      
-      // Close account modal
-      closeAccountModal() {
-        this.showEditAccountModal = false;
-        this.editedAccount = {};
-      },
-      
-      // Toggle edited account status
-      toggleEditedAccountStatus() {
-        this.editedAccount.active = !this.editedAccount.active;
-      },
-      
-      // Save account changes
-      saveAccountChanges() {
-        if (this.isAddingAccount) {
-          // Generate a new account ID (in real app this would come from the server)
-          const newId = `BA${String(this.client.bankAccounts.length + 1).padStart(3, '0')}`;
-          const newAccount = {
-            ...this.editedAccount,
-            id: newId,
-            balance: this.editedAccount.initialDeposit,
-            active: true
-          };
-          this.client.bankAccounts.push(newAccount);
-        } else {
-          // Update existing account
-          const index = this.client.bankAccounts.findIndex(a => a.id === this.editedAccount.id);
-          if (index !== -1) {
-            this.client.bankAccounts[index] = { ...this.editedAccount };
+    },
+    // Save profile changes
+    saveProfileChanges() {
+      this.editedClient.PhoneNumber = this.editedClient.PhoneNumber.replace(
+        /\s+/g,
+        ""
+      );
+      this.client = { ...this.editedClient };
+
+      // TODO: Remove with Actual Endpoint
+      axios
+        .put(
+          `http://127.0.0.1:5001/clients/${this.clientID}`,
+          this.editedClient
+        )
+        .then((response) => {
+          console.log("Client profile saved successfully:", response.data);
+          toast("Client profile saved successfully!", {
+            type: "success",
+            autoClose: 3000,
+          });
+          this.closeEditModal();
+        })
+        .catch((error) => {
+          // Handle error response
+          // If the error response contains validation errors
+          if (error.status == 400) {
+            const errors = error.response.data.errors;
+            // Display error messages
+            for (const error of errors) {
+              toast(error, {
+                type: "error",
+                autoClose: 3000,
+              });
+            }
           }
-        }
-        this.closeAccountModal();
-        // In a real app, this would send an API request to create/update the account
-      },
-      
-      // Toggle account status
-      toggleAccountStatus(accountId) {
-        const index = this.client.bankAccounts.findIndex(a => a.id === accountId);
-        if (index !== -1) {
-          this.client.bankAccounts[index].active = !this.client.bankAccounts[index].active;
-          // In a real app, this would send an API request to update the status
-        }
-      },
-      
-      // Confirm account deletion
-      confirmDeleteAccount() {
-        this.accountToDelete = { ...this.editedAccount };
-        this.closeAccountModal();
-        this.showDeleteConfirmation = true;
-      },
-      
-      // Delete account
-      deleteAccount() {
-        this.client.bankAccounts = this.client.bankAccounts.filter(
-          account => account.id !== this.accountToDelete.id
-        );
-        this.closePopup();
-        // In a real app, this would send an API request to delete the account
-      },
-      
-      // View transactions (placeholder function - would navigate to transactions page)
-      viewTransactions(accountId) {
-        console.log(`View transactions for account ${accountId}`);
-        // In a real app, this would navigate to a transactions page
-        // this.$router.push(`/transactions/${accountId}`);
-      },
-      
-      // Close popup
-      closePopup() {
-        this.showDeleteConfirmation = false;
-        this.accountToDelete = {};
+          // If the error response indicates a conflict (e.g., duplicate email)
+          else if (error.status == 409) {
+            toast(error.response.data.error, {
+              type: "error",
+              autoClose: 3000,
+            });
+          } else {
+            toast("An unexpected error occurred. Please try again.", {
+              type: "error",
+              autoClose: 3000,
+            });
+          }
+          console.error("Error saving client profile:", error);
+        });
+    },
+    // Fetch Documents from S3
+    fetchVerificationDocuments(clientID) {
+      axios
+        .get(`http://127.0.0.1:5001/clients/${clientID}/documents`)
+        .then((response) => {
+          this.documents = response.data.documents.map((doc) => {
+            // Extract the file name by splitting at '/' and returning the last part
+            return doc.split("/").pop();
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching documents:", error);
+        });
+    },
+    // Verify user
+    verifyUser(clientID) {
+      axios
+        .put(`http://127.0.0.1:5001/clients/${clientID}/verify_user`, {
+          Verified: true,
+        })
+        .then(() => {
+          toast("User verified successfully!", {
+            type: "success",
+            autoClose: 3000,
+          });
+          this.loadClient();
+        })
+        .catch((error) => {
+          console.error("Error verifying user:", error);
+          toast("Error verifying user. Please try again.", {
+            type: "error",
+            autoClose: 3000,
+          });
+        });
+    },
+    // Get pre-signed URL for document
+    getPresignedUrl(doc) {
+      axios
+        .get(
+          `http://127.0.0.1:5001/clients/${this.clientID}/documents/presign/${doc}`
+        )
+        .then((response) => {
+          console.log("Pre-signed URL fetched successfully:", response.data);
+          this.imageUrl = response.data.link; // Store the pre-signed URL
+
+          window.open(
+            response.data.link,
+            "_blank"
+          ); // Open the pre-signed URL in a new tab
+
+        });
+    },
+    openDeletePopup(itemType, item) {
+      this.itemType = itemType;
+      this.itemToDelete = item;
+      this.showDeleteConfirmation = true;
+    },
+    closePopup() {
+      this.showDeleteConfirmation = false;
+      this.itemToDelete = {};
+    },
+    deleteItem() {
+      if (this.itemType === "client") {
+        this.deleteClient(this.itemToDelete.ClientID);
+      } else if (this.itemType === "bank account") {
+        this.deleteAccount(this.itemToDelete.AccountID);
       }
-    }
-  };
-  </script>
+    },
+    deleteClient(clientID) {
+      // Your logic to delete client
+      console.log("Deleting client:", clientID);
+      axios
+        .delete(`http://127.0.0.1:5001/clients/${clientID}`)
+        .then(() => {
+          toast("Client deleted successfully!", {
+            type: "success",
+            autoClose: 3000,
+          });
+        })
+        .catch((error) => {
+          console.error("Error deleting client:", error);
+          toast("Error deleting client. Please try again.", {
+            type: "error",
+            autoClose: 3000,
+          });
+        });
+      // Redirect to the agent manage profiles page
+      this.$router.push("/agent-manage-profiles");
+    },
+    deleteAccount(accountID) {
+      // Your logic to delete account
+      console.log("Deleting account:", accountID);
+    },
+    // Open add/edit account modal
+    openAddAccountModal() {
+      this.isAddingAccount = true;
+      this.editedAccount = {
+        type: "Checking",
+        active: true,
+        initialDeposit: 0,
+        currency: "USD",
+        branchId: "BR001",
+        openingDate: new Date().toISOString().split("T")[0],
+      };
+      this.showEditAccountModal = true;
+    },
+    // Edit existing account
+    editAccount(accountId) {
+      const account = this.client.bankAccounts.find((a) => a.id === accountId);
+      if (account) {
+        this.isAddingAccount = false;
+        this.editedAccount = { ...account };
+        this.showEditAccountModal = true;
+      }
+    },
+
+    // Close account modal
+    closeAccountModal() {
+      this.showEditAccountModal = false;
+      this.editedAccount = {};
+    },
+
+    // Toggle edited account status
+    toggleEditedAccountStatus() {
+      this.editedAccount.active = !this.editedAccount.active;
+    },
+
+    // Save account changes
+    saveAccountChanges() {
+      if (this.isAddingAccount) {
+        // Generate a new account ID (in real app this would come from the server)
+        const newId = `BA${String(this.client.bankAccounts.length + 1).padStart(3, "0")}`;
+        const newAccount = {
+          ...this.editedAccount,
+          id: newId,
+          balance: this.editedAccount.initialDeposit,
+          active: true,
+        };
+        this.client.bankAccounts.push(newAccount);
+      } else {
+        // Update existing account
+        const index = this.client.bankAccounts.findIndex(
+          (a) => a.id === this.editedAccount.id
+        );
+        if (index !== -1) {
+          this.client.bankAccounts[index] = { ...this.editedAccount };
+        }
+      }
+      this.closeAccountModal();
+      // In a real app, this would send an API request to create/update the account
+    },
+
+    // Toggle account status
+    toggleAccountStatus(accountId) {
+      const index = this.client.bankAccounts.findIndex(
+        (a) => a.id === accountId
+      );
+      if (index !== -1) {
+        this.client.bankAccounts[index].active =
+          !this.client.bankAccounts[index].active;
+        // In a real app, this would send an API request to update the status
+      }
+    },
+
+    // Confirm account deletion
+    confirmDeleteAccount() {
+      this.accountToDelete = { ...this.editedAccount };
+      this.closeAccountModal();
+      this.showDeleteConfirmation = true;
+    },
+
+    // Delete account
+    deleteAccount() {
+      this.client.bankAccounts = this.client.bankAccounts.filter(
+        (account) => account.id !== this.accountToDelete.id
+      );
+      this.closePopup();
+      // In a real app, this would send an API request to delete the account
+    },
+
+    // View transactions (placeholder function - would navigate to transactions page)
+    viewTransactions(accountId) {
+      console.log(`View transactions for account ${accountId}`);
+      // In a real app, this would navigate to a transactions page
+      // this.$router.push(`/transactions/${accountId}`);
+    },
+  },
+};
+</script>
 
 <style scoped>
 :root {
@@ -604,7 +1023,11 @@
 }
 
 .admin-dashboard {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
   padding: 2rem;
@@ -614,7 +1037,7 @@
 /* Header Styles */
 .dashboard-header {
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
   color: white;
   padding: 1.75rem;
   border-radius: 1rem;
@@ -641,7 +1064,9 @@
   box-shadow: 0 4px 20px var(--shadow-color);
   overflow: hidden;
   border: 1px solid var(--border-color);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
   margin-bottom: 2rem;
 }
 
@@ -985,8 +1410,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .modal {
@@ -1294,39 +1723,42 @@
   .admin-dashboard {
     padding: 1rem;
   }
-  
+
   .profile-content {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .accounts-filter {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .search-container {
     max-width: 100%;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
     gap: 1rem;
   }
-  
-  .action-buttons, .danger-zone {
+
+  .action-buttons,
+  .danger-zone {
     width: 100%;
   }
-  
+
   .action-buttons {
     justify-content: flex-end;
   }
-  
-  .btn-delete, .btn-save, .btn-cancel {
+
+  .btn-delete,
+  .btn-save,
+  .btn-cancel {
     flex: 1;
     justify-content: center;
   }
-  
+
   .modal {
     width: 90%;
     max-height: 80vh;
@@ -1334,8 +1766,8 @@
 }
 
 /* Button animations */
-.btn-save:active, 
-.btn-add:active, 
+.btn-save:active,
+.btn-add:active,
 .btn-delete:active {
   transform: scale(0.98);
 }
@@ -1347,5 +1779,100 @@ select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Phone input container styling */
+.tel-input-container {
+  width: 100%;
+}
+
+/* Fix the height and style of the phone input to match other inputs */
+:deep(.vti__dropdown),
+:deep(.vti__input) {
+  height: 45px !important;
+  min-height: 45px !important;
+  padding: 12px !important;
+  border-radius: 4px !important;
+  font-size: 1rem !important;
+  background-color: #fff !important;
+}
+
+/* Make the dropdown button and flag container match the height */
+:deep(.vti__dropdown) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-right: none !important;
+}
+
+/* Make the input field match styling */
+:deep(.vti__input) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  flex: 1 !important;
+}
+
+/* Adjust flag container size */
+:deep(.vti__flag) {
+  margin-top: 0 !important;
+}
+
+/* Focus styles for phone input components */
+:deep(.vti__dropdown:focus),
+:deep(.vti__input:focus) {
+  outline: none !important;
+  border-color: #4a90e2 !important;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2) !important;
+}
+
+/* Make sure the phone input components stay next to each other */
+:deep(.vti__dropdown),
+:deep(.vti__input) {
+  display: inline-flex !important;
+}
+
+/* Base button styles */
+.info-group button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
+  flex: 1; /* Make buttons take equal space */
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* View Documents button - blue style */
+.btn-view {
+  background-color: #3498db;
+  color: white;
+}
+
+.btn-view:hover {
+  background-color: #2980b9;
+}
+
+.btn-view:active {
+  transform: scale(0.98);
+}
+
+/* Verify User button - green style */
+.btn-verify {
+  background-color: #2ecc71;
+  color: white;
+}
+
+.btn-verify:hover {
+  background-color: #27ae60;
+}
+
+.btn-verify:active {
+  transform: scale(0.98);
 }
 </style>

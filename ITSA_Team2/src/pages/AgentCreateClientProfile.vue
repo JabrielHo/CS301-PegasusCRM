@@ -155,7 +155,7 @@ export default {
       console.log('Saving client profile:', this.client);
 
       // Call the save function to handle the data
-      // TODO: Replace with actual API endpoint
+      // TODO: Replace with Actual Endpoint
       axios.post('http://127.0.0.1:5001/clients', this.client)
         .then(response => {
           console.log('Client profile saved successfully:', response.data);
@@ -192,7 +192,6 @@ export default {
           }
           console.error('Error saving client profile:', error);
         });
-      // Implement save logic here (API call, store data, etc.)
     }
   }
 };
