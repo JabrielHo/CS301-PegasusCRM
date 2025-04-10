@@ -1,57 +1,52 @@
 <template>
   <div class="create-agent-profile">
     <header>
-      <h1>Create  Profile</h1>
+      <h1>Create Profile</h1>
       <p class="subtitle">Please fill in the details below to create a new Agent/Admin account</p>
     </header>
-    
+
     <div class="form-container">
       <form @submit.prevent="submitForm">
         <div class="form-group">
           <label for="firstName">First Name</label>
           <input id="firstName" v-model="client.firstName" placeholder="Enter first name" required />
         </div>
-        
+
         <div class="form-group">
           <label for="lastName">Last Name</label>
           <input id="lastName" v-model="client.lastName" placeholder="Enter last name" required />
         </div>
-        
+
         <div class="form-group">
           <label for="dateOfBirth">Date of Birth</label>
           <input id="dateOfBirth" type="date" v-model="client.dateOfBirth" required />
         </div>
-        
+
         <div class="form-group">
           <label for="email">Email</label>
           <input id="email" type="email" v-model="client.email" placeholder="Enter email address" required />
         </div>
-        
+
         <div class="form-group">
           <label for="temporaryPassword">Temporary Password</label>
-          <input id="temporaryPassword" type="tel" v-model="client.temporaryPassword" placeholder="Enter temporary password" required />
+          <input id="temporaryPassword" type="tel" v-model="client.temporaryPassword"
+            placeholder="Enter temporary password" required />
         </div>
-        
+
         <div class="form-group">
           <label>Role</label>
           <div class="role-selector">
-            <button 
-              type="button" 
-              class="role-button" 
-              :class="{ active: client.role === 'AGENTS' }"
+            <button type="button" class="role-button" :class="{ active: client.role === 'AGENTS' }"
               @click="selectRole('Agent')">
               Agent
             </button>
-            <button 
-              type="button" 
-              class="role-button" 
-              :class="{ active: client.role === 'ADMINS' }"
+            <button type="button" class="role-button" :class="{ active: client.role === 'ADMINS' }"
               @click="selectRole('Admin')">
               Admin
             </button>
           </div>
         </div>
-        
+
         <div class="actions">
           <button type="button" class="cancel-button" @click="resetForm">Clear</button>
           <button type="submit" class="submit-button">Create Account</button>
@@ -62,7 +57,9 @@
 </template>
 
 <script>
-import { createUserToGroup, addUserToGroup, getUser} from '../services/client'; // Adjust the import based on your project structure
+import { createUserToGroup, addUserToGroup, getUser } from '../services/client'; // Adjust the import based on your project structure
+import { toast } from 'vue3-toastify'; // Adjust the import based on your project structure
+import 'vue3-toastify/dist/index.css';
 
 export default {
   data() {
@@ -80,41 +77,76 @@ export default {
   },
   methods: {
     async submitForm() {
-      try{
-      console.log('Saving client profile:', this.client);
+      try {
+        if (new Date(this.client.dateOfBirth) > new Date()) {
+          toast('Date of Birth cannot be in the future.', {
+            type: 'error',
+            autoClose: 3000
+          });
+          return;
+        }
 
-      if (new Date(this.client.dateOfBirth) > new Date()) {
-        alert('Date of Birth cannot be in the future.');
-        return;
+        const existingUser = await getUser(this.client.email);
+        console.log('Existing user:', existingUser);
+        if (existingUser.data) {
+          toast('Email already exists. Please use a different email.', {
+            type: 'error',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        const createStatus = await createUserToGroup(
+          this.client.email,
+          this.client.firstName,
+          this.client.lastName,
+          this.client.temporaryPassword,
+          this.client.dateOfBirth
+        );
+        console.log('Create status:', createStatus);
+        const passwordErrorMessage = createStatus?.errors?.[0]?.message
+        if (passwordErrorMessage) {
+          if (passwordErrorMessage.includes('Password did not conform with password policy')) {
+
+            toast(`${passwordErrorMessage}`, {
+              type: 'error',
+              autoClose: 3000
+            });
+            return;
+          }
+        }
+
+        if (!createStatus) {
+          toast('Failed to create account. Please try again.', {
+            type: 'error',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        const addStatus = await addUserToGroup(this.client.email, this.client.role);
+
+        console.log('Add status:', addStatus);
+        if (!addStatus) {
+          toast('Failed to add user to group. Please try again.', {
+            type: 'error',
+            autoClose: 3000
+          });
+          return;
+        }
+
+        toast('Account created successfully!', {
+          type: 'success',
+          autoClose: 3000
+        });
+        this.resetForm(); // Reset the form after successful submission
+      } catch (error) {
+        console.error('Error creating account:', error);
+        toast('An error occurred while creating the account. Please try again later.', {
+          type: 'error',
+          autoClose: 3000
+        });
       }
-      console.log(this.client.dateOfBirth);
-      const createStatus = await createUserToGroup(
-        this.client.email,
-        this.client.firstName,
-        this.client.lastName,
-        this.client.temporaryPassword,
-        this.client.dateOfBirth
-      );
-      console.log('Create status:', createStatus);
-
-      if (!createStatus) {
-        alert('Failed to create account. Please try again.');
-        return;
-      }
-
-      const addStatus = await addUserToGroup(this.client.email, this.client.role);
-
-      if (!addStatus) {
-        alert('Failed to add user to group. Please try again.');
-        return;
-      }
-
-      alert(`Account created successfully as ${this.client.role}`);
-      this.resetForm(); // Reset the form after successful submission
-    } catch (error) {
-      console.error('Error creating account:', error);
-      alert('An error occurred while creating the account. Please try again later.');
-    }
     },
     selectRole(role) {
       // Map UI roles to backend roles
@@ -262,17 +294,18 @@ input:focus {
   .create-client-profile {
     padding: 15px;
   }
-  
+
   .form-container {
     padding: 15px;
   }
-  
+
   .actions {
     flex-direction: column;
     gap: 10px;
   }
-  
-  .cancel-button, .submit-button {
+
+  .cancel-button,
+  .submit-button {
     width: 100%;
   }
 }
