@@ -11,7 +11,6 @@ from botocore.exceptions import ClientError
 app = Flask(__name__)
 
 # Helper Function
-# Lets Go
 # Get Secret from AWS Secrets Manager
 def get_secret():
 
@@ -650,3 +649,5 @@ app.register_blueprint(client_blueprint, url_prefix="/clients")
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port = 5001)
 #endregion
+
+
