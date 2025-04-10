@@ -370,9 +370,13 @@ export default {
   methods: {
     // Navigate to profile detail page
     navigateToProfile(accountId) {
+      if (!accountId){ 
+        console.error('Account Id missing')
+        return;
+      }
       // Use router to navigate
       if (this.$router) {
-        this.$router.push({ name: 'ClientProfile', params: { id: accountId } });
+        this.$router.push({ name: 'Client Profile Page', params: { id: accountId } });
       } else {
         // Fallback if router is not defined (for demo purposes)
         console.log(`Navigating to client profile with ID: ${accountId}`);

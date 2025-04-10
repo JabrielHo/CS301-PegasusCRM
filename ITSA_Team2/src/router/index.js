@@ -11,6 +11,8 @@ import AgentCreateClientProfile from "../pages/AgentCreateClientProfile.vue";
 import AgentViewTransactions from "../pages/AgentViewTransactions.vue";
 import AgentManageProfiles from "../pages/AgentManageProfiles.vue";
 import AgentBankAccountCreation from "../pages/AgentBankAccountCreation.vue";
+import ClientProfilePage from "../pages/ClientProfilePage.vue";
+
 
 // Components
 import addUserToGroup from "../components/addUserToGroup.vue";
@@ -81,6 +83,13 @@ const routes = [
     path: "/agent-bank-account-creation",
     name: "Agent Bank Account Creation",
     component: AgentBankAccountCreation,
+    meta: { roles: ["AGENTS"] },
+  },
+  {
+    path: "/client-profile-page/:id",
+    name: "Client Profile Page",
+    component: ClientProfilePage,
+    props: true,
     meta: { roles: ["AGENTS"] },
   },
 
