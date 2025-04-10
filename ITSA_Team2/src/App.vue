@@ -1,4 +1,5 @@
 <template>
+  <div :class="isLoggedIn ? 'app-container' : 'auth-container'">
   <authenticator :hide-sign-up="true">
     <template v-slot="{ user, signOut }">
       <div id="app">
@@ -74,6 +75,7 @@
       </div>
     </template>
   </authenticator>
+  </div>
 </template>
 
 <script setup>
@@ -93,6 +95,7 @@ const isAdmin = ref(false);
 const isAgent = ref(false);
 const auth = useAuthenticator();
 const router = useRouter(); // Use the router instance
+const isLoggedIn = ref(false);
 
 // Function to fetch user data
 const fetchUserData = async () => {
@@ -126,19 +129,39 @@ const fetchUserData = async () => {
 // Watch for changes in the user object
 watch(() => auth.user, (newUser) => {
   if (newUser) {
+    isLoggedIn.value = true; // Set logged-in state to true
     fetchUserData(); // Fetch user data when the user logs in
+  } else {
+    isLoggedIn.value = false; // Set logged-in state to false
+    displayName.value = ''; // Clear display name
+    roleName.value = ''; // Clear role name
   }
 });
 
 // Initial fetch when the component is mounted
 onMounted(() => {
   if (auth.user) {
+    isLoggedIn.value = true; // Set logged-in state to true
     fetchUserData();
+  } else {
+    isLoggedIn.value = false; // Set logged-in state to false
   }
 });
 </script>
 
 <style scoped>
+.app-container {
+  display: block; /* Default layout for logged-in state */
+}
+
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5; /* Optional background for the login page */
+}
+
 #app {
   font-family: 'Roboto', Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

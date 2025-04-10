@@ -9,11 +9,21 @@
     <!-- Toggle Buttons -->
     <div class="toggle-container">
       <button :class="{ active: selectedGroup === 'ADMINS' }" @click="switchGroup('ADMINS')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
         Administrators
       </button>
       <button :class="{ active: selectedGroup === 'AGENTS' }" @click="switchGroup('AGENTS')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
         Agents
       </button>
     </div>
@@ -22,8 +32,13 @@
     <div class="card">
       <div class="card-header">
         <div class="search-container">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..." @keyup.enter="performGlobalSearch" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..."
+            @keyup.enter="performGlobalSearch" />
           <button class="btn-search" @click="performGlobalSearch" title="Search">
             Search
           </button>
@@ -36,7 +51,12 @@
             {{ filteredAccounts.length }} users found
           </span>
           <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
             Clear Search
           </button>
         </div>
@@ -75,14 +95,23 @@
               <td>{{ formatDate(account.UserCreateDate) }}</td>
               <td>
                 <button class="btn-edit" @click="openEditModal(account)" title="Edit User">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
                 </button>
               </td>
             </tr>
             <tr v-if="displayedAccounts.length === 0">
               <td colspan="8" class="no-results">
                 <div class="empty-state">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
                   <p>No users found matching your search criteria</p>
                 </div>
               </td>
@@ -95,21 +124,24 @@
       <div class="pagination">
         <!-- Show page numbers for search mode -->
         <div v-if="isSearchMode" class="pagination-pages">
-          <button 
-            v-for="page in totalPages" 
-            :key="page" 
-            @click="goToPage(page)"
+          <button v-for="page in totalPages" :key="page" @click="goToPage(page)"
             :class="['page-number', { active: currentPage === page }]">
             {{ page }}
           </button>
         </div>
         <button class="btn-pagination" @click="previousPage" :disabled="isPreviousDisabled">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
           Previous
         </button>
         <button class="btn-pagination" @click="nextPage" :disabled="isNextDisabled">
           Next
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         </button>
       </div>
     </div>
@@ -120,16 +152,24 @@
         <div class="modal-header">
           <h3>Edit User</h3>
           <button class="btn-close" @click="closeEditModal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
           </button>
         </div>
-        
+
         <div class="modal-content">
           <div class="user-email">
-            <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
             <span>{{ editUser.email }}</span>
           </div>
-          
+
           <div class="form-group">
             <label for="givenName">Given Name</label>
             <input id="givenName" v-model="editUser.given_name" type="text" />
@@ -149,12 +189,28 @@
             <h4>Account Status</h4>
             <div class="status-toggle">
               <button v-if="editUser.enabled" @click="disableUser" class="btn-disable">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                  <line x1="12" y1="2" x2="12" y2="12"></line>
+                </svg>
                 Disable User
               </button>
               <button v-if="!editUser.enabled" @click="enableUser" class="btn-enable">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5v14"></path>
+                </svg>
                 Enable User
+              </button>
+              <button @click="resetPassword" class="btn-reset">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
+                  <path d="M12 6v6l4 2"></path>
+                </svg>
+                Reset Password
               </button>
             </div>
           </div>
@@ -163,11 +219,19 @@
             <h4>User Role</h4>
             <div class="role-buttons">
               <button v-if="selectedGroup === 'AGENTS'" @click="promoteToAdmin" class="btn-promote">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
                 Promote to Admin
               </button>
               <button v-if="selectedGroup === 'ADMINS'" @click="demoteToAgent" class="btn-demote">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="8" y1="12" x2="16" y2="12"></line>
+                </svg>
                 Demote to Agent
               </button>
             </div>
@@ -177,18 +241,32 @@
         <div class="modal-footer">
           <div class="action-buttons">
             <button class="btn-cancel" @click="closeEditModal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
               Cancel
             </button>
             <button class="btn-save" @click="saveUserChanges">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
               Save Changes
             </button>
           </div>
-          
+
           <div class="danger-zone">
             <button class="btn-delete" @click="deleteUser">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
               Delete User
             </button>
           </div>
@@ -208,7 +286,12 @@
     <div v-if="showNoSelectionPopup" class="popup-overlay" @click.self="closePopup">
       <div class="popup">
         <div class="popup-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
           <h4>No Selection</h4>
         </div>
         <p>No account is selected. Please select an account to continue.</p>
@@ -222,6 +305,8 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue';
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 import {
   getListOfUsersFromGroups,
   updateUserAttribute,
@@ -230,6 +315,7 @@ import {
   removeUserFromGroup,
   disableUserInGroup,
   enableUserInGroup,
+  resetUserPassword
 } from '../services/client.ts'; // Adjust the import path as needed
 
 export default {
@@ -244,7 +330,7 @@ export default {
       paginationHistory: [], // History of pagination tokens for "Previous Page"
       hasMoreUsers: true, // Flag to indicate if there are more users to fetch
       selectedGroup: 'ADMINS', // Default group to display
-      
+
       // New properties for enhanced search
       isSearching: false, // Flag to show loading state during global search
       isSearchMode: false, // Flag to indicate if we're in search mode
@@ -259,7 +345,7 @@ export default {
       if (this.isSearchMode) {
         return this.allSearchResults;
       }
-      
+
       const query = this.searchQuery.toLowerCase();
       return this.accounts.filter(account => {
         return (
@@ -269,7 +355,7 @@ export default {
         );
       });
     },
-    
+
     // Get accounts to display based on current pagination or search mode
     displayedAccounts() {
       if (this.isSearchMode) {
@@ -279,12 +365,12 @@ export default {
       }
       return this.filteredAccounts;
     },
-    
+
     // Total pages for search pagination
     totalPages() {
       return Math.ceil(this.allSearchResults.length / this.usersPerPage);
     },
-    
+
     // Check if Previous button should be disabled
     isPreviousDisabled() {
       if (this.isSearchMode) {
@@ -292,7 +378,7 @@ export default {
       }
       return !this.paginationHistory.length;
     },
-    
+
     // Check if Next button should be disabled
     isNextDisabled() {
       if (this.isSearchMode) {
@@ -328,7 +414,63 @@ export default {
         console.error('Error fetching users:', error);
       }
     },
-    
+    async resetPassword() {
+      try {
+        const confirmation = confirm('Are you sure you want to reset the password for this user?');
+        if (!confirmation) return;
+
+        const resetPasswordStatus = await resetUserPassword(this.editUser.email);
+        console.log('Reset password status:', resetPasswordStatus);
+        const resetPasswordErrorMessage = resetPasswordStatus?.errors?.[0]?.message;
+        if (resetPasswordErrorMessage) {
+          if (resetPasswordErrorMessage.includes("User password cannot be reset in the current state.")) {
+            toast(resetPasswordErrorMessage, {
+              type: 'error',
+              autoClose: 3000,
+            });
+            return;
+          }
+          else if (resetPasswordErrorMessage.includes("User is disabled.")) {
+            toast(resetPasswordErrorMessage, {
+              type: 'error',
+              autoClose: 3000,
+            });
+            return;
+          }
+          else if (resetPasswordErrorMessage.includes("Attempt limit exceeded, please try after some time.")) {
+            toast(resetPasswordErrorMessage, {
+              type: 'error',
+              autoClose: 3000,
+            });
+            return;
+          }
+        }
+
+        // Update the user status in the table
+        const userIndex = this.isSearchMode
+          ? this.allSearchResults.findIndex(user => user.email === this.editUser.email)
+          : this.accounts.findIndex(user => user.email === this.editUser.email);
+
+        if (userIndex !== -1) {
+          const targetArray = this.isSearchMode ? this.allSearchResults : this.accounts;
+          targetArray[userIndex] = {
+            ...targetArray[userIndex],
+            UserStatus: 'RESET_REQUIRED', // Update the status to reflect the reset
+          };
+        }
+
+        toast('Password reset successfully! The user will receive an email with further instructions.', {
+          type: 'success',
+          autoClose: 3000,
+        });
+      } catch (error) {
+        console.error('Error resetting user password:', error);
+        toast('Failed to reset the password. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
+      }
+    },
     // New method to perform global search across all pages
     async performGlobalSearch() {
       if (!this.searchQuery.trim()) {
@@ -338,19 +480,19 @@ export default {
         this.currentPage = 1;
         return;
       }
-      
+
       this.isSearching = true;
       this.allSearchResults = [];
       let allUsers = [];
       let token = null;
       let hasMorePages = true;
-      
+
       try {
         // Fetch all pages of users
         while (hasMorePages) {
           const result = await getListOfUsersFromGroups(token, this.selectedGroup);
           const parsedResult = JSON.parse(result.data) || [];
-          
+
           const users = parsedResult.Users.map(user => ({
             email: user.Attributes.find(attr => attr.Name === 'email')?.Value || '',
             given_name: user.Attributes.find(attr => attr.Name === 'given_name')?.Value || '',
@@ -361,14 +503,14 @@ export default {
             UserCreateDate: user.UserCreateDate,
             enabled: user.Enabled,
           }));
-          
+
           allUsers = [...allUsers, ...users];
-          
+
           // Check if there are more pages
           token = parsedResult.NextToken || null;
           hasMorePages = !!token;
         }
-        
+
         // Apply search filter to all users
         const query = this.searchQuery.toLowerCase();
         this.allSearchResults = allUsers.filter(user => {
@@ -378,11 +520,11 @@ export default {
             (user.family_name && user.family_name.toLowerCase().includes(query))
           );
         });
-        
+
         // Switch to search mode and reset to first page
         this.isSearchMode = true;
         this.currentPage = 1;
-        
+
         console.log('Global search results:', this.allSearchResults);
       } catch (error) {
         console.error('Error performing global search:', error);
@@ -390,12 +532,12 @@ export default {
         this.isSearching = false;
       }
     },
-    
+
     // Navigation methods for search pagination
     goToPage(page) {
       this.currentPage = page;
     },
-    
+
     nextPage() {
       if (this.isSearchMode) {
         if (this.currentPage < this.totalPages) {
@@ -410,7 +552,7 @@ export default {
         }
       }
     },
-    
+
     previousPage() {
       if (this.isSearchMode) {
         if (this.currentPage > 1) {
@@ -429,7 +571,7 @@ export default {
         }
       }
     },
-    
+
     // Reset search and go back to normal mode
     clearSearch() {
       this.searchQuery = '';
@@ -438,18 +580,18 @@ export default {
       this.currentPage = 1;
       this.fetchUsers(this.selectedGroup);
     },
-    
+
     switchGroup(groupName) {
       this.selectedGroup = groupName;
       this.paginationToken = null;
       this.paginationHistory = [];
-      
+
       // Reset search state when switching groups
       this.isSearchMode = false;
       this.allSearchResults = [];
       this.currentPage = 1;
       this.searchQuery = '';
-      
+
       this.fetchUsers(groupName);
     },
 
@@ -461,7 +603,7 @@ export default {
         await disableUserInGroup(this.editUser.email);
         console.log('User disabled successfully');
         this.editUser.enabled = false; // Update the enabled property locally
-        
+
         // Update the user in search results if in search mode
         if (this.isSearchMode) {
           const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
@@ -469,13 +611,13 @@ export default {
             this.allSearchResults[index].enabled = false;
           }
         }
-        
+
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error disabling user:', error);
       }
     },
-    
+
     async enableUser() {
       try {
         const confirmation = confirm('Are you sure you want to enable this user?');
@@ -484,7 +626,7 @@ export default {
         await enableUserInGroup(this.editUser.email);
         console.log('User enabled successfully');
         this.editUser.enabled = true; // Update the enabled property locally
-        
+
         // Update the user in search results if in search mode
         if (this.isSearchMode) {
           const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
@@ -492,26 +634,26 @@ export default {
             this.allSearchResults[index].enabled = true;
           }
         }
-        
+
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error enabling user:', error);
       }
     },
-    
+
     openEditModal(account) {
       this.editUser = { ...account }; // Clone the selected user
       console.log('Editing user:', this.editUser);
       this.showEditModal = true;
       document.body.classList.add('modal-open'); // Add class to body
     },
-    
+
     closeEditModal() {
       this.showEditModal = false;
       this.editUser = {};
       document.body.classList.remove('modal-open'); // Remove class from body
     },
-    
+
     async saveUserChanges() {
       try {
         await updateUserAttribute(
@@ -521,22 +663,22 @@ export default {
           this.editUser.UserDateOfBirth
         );
         console.log('User updated successfully');
-        
+
         // Update the user in search results if in search mode
         if (this.isSearchMode) {
           const index = this.allSearchResults.findIndex(user => user.email === this.editUser.email);
           if (index !== -1) {
-            this.allSearchResults[index] = {...this.editUser};
+            this.allSearchResults[index] = { ...this.editUser };
           }
         }
-        
+
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error updating user:', error);
       }
     },
-    
+
     async deleteUser() {
       try {
         const confirmation = confirm('Are you sure you want to delete this user?');
@@ -544,67 +686,67 @@ export default {
 
         await deleteUserFromGroup(this.editUser.email);
         console.log('User deleted successfully');
-        
+
         // Remove user from search results if in search mode
         if (this.isSearchMode) {
           this.allSearchResults = this.allSearchResults.filter(
             user => user.email !== this.editUser.email
           );
         }
-        
+
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error deleting user:', error);
       }
     },
-    
+
     async promoteToAdmin() {
       try {
         await removeUserFromGroup(this.editUser.email, 'AGENTS');
         await addUserToGroup(this.editUser.email, 'ADMINS');
         console.log('User promoted to Admin successfully');
-        
+
         // If in search mode and viewing agents, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'AGENTS') {
           this.allSearchResults = this.allSearchResults.filter(
             user => user.email !== this.editUser.email
           );
         }
-        
+
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error promoting user to Admin:', error);
       }
     },
-    
+
     async demoteToAgent() {
       try {
         await removeUserFromGroup(this.editUser.email, 'ADMINS');
         await addUserToGroup(this.editUser.email, 'AGENTS');
         console.log('User demoted to Agent successfully');
-        
+
         // If in search mode and viewing admins, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'ADMINS') {
           this.allSearchResults = this.allSearchResults.filter(
             user => user.email !== this.editUser.email
           );
         }
-        
+
         this.closeEditModal();
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error demoting user to Agent:', error);
       }
     },
-    
+
     formatDate(dateString) {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleString();
     },
-    
+
     closePopup() {
       this.showNoSelectionPopup = false;
     }
@@ -989,11 +1131,13 @@ export default {
   justify-content: center;
   z-index: 50;
   backdrop-filter: blur(3px);
-  overflow: hidden; /* Prevent scrolling of background */
+  overflow: hidden;
+  /* Prevent scrolling of background */
 }
 
 body.modal-open {
-  overflow: hidden; /* Add this class to body when modal is open */
+  overflow: hidden;
+  /* Add this class to body when modal is open */
 }
 
 .modal {
@@ -1014,6 +1158,7 @@ body.modal-open {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1115,7 +1260,8 @@ body.modal-open {
   margin-bottom: 1rem;
 }
 
-.status-toggle, .role-buttons {
+.status-toggle,
+.role-buttons {
   display: flex;
   gap: 1rem;
 }
@@ -1191,8 +1337,17 @@ body.modal-open {
 .btn-search svg {
   color: white;
 }
+
 /* Action Buttons */
-.btn-disable, .btn-enable, .btn-promote, .btn-demote, .btn-delete, .btn-cancel, .btn-save, .btn-primary {
+.btn-reset,
+.btn-disable,
+.btn-enable,
+.btn-promote,
+.btn-demote,
+.btn-delete,
+.btn-cancel,
+.btn-save,
+.btn-primary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1203,6 +1358,15 @@ body.modal-open {
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+}
+
+.btn-reset {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.btn-reset:hover {
+  background-color: #fde68a;
 }
 
 .btn-disable {
@@ -1362,45 +1526,51 @@ body.modal-open {
   .admin-dashboard {
     padding: 1rem;
   }
-  
+
   .toggle-container {
     flex-direction: column;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
     gap: 1rem;
   }
-  
-  .action-buttons, .danger-zone {
+
+  .action-buttons,
+  .danger-zone {
     width: 100%;
   }
-  
+
   .action-buttons {
     justify-content: flex-end;
   }
-  
-  .btn-delete, .btn-save, .btn-cancel {
+
+  .btn-delete,
+  .btn-save,
+  .btn-cancel {
     flex: 1;
     justify-content: center;
   }
-  
+
   .modal {
     width: 90%;
   }
 }
 
 /* Transitions */
-button, a {
+button,
+a {
   transition: all 0.2s ease;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn-save:active, .btn-primary:active {
+.btn-save:active,
+.btn-primary:active {
   transform: scale(0.98);
 }
-
 </style>
