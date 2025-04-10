@@ -8,6 +8,7 @@ from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 
