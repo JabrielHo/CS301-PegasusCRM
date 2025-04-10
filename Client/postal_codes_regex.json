@@ -10,7 +10,7 @@
       "postal":"(120|122)[0-9]{2}"
    },
    {
-      "abbrev":"DZ",
+      "abbrev":"DZ", 
       "name":"Algeria",
       "postal":"[0-9]{5}"
    },

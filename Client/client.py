@@ -17,7 +17,7 @@ load_dotenv()
 # Initialize a session using Amazon S3
 s3 = boto3.client("s3")
 BUCKET_NAME = "ubs-agents"
-EXPIRATION = 3600 # URL expires in 1 hour
+EXPIRATION = 60 # URL expires in 1 minute
 ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "application/pdf"]
 
 # Securely retrieve the database connection details from environment variables
@@ -50,7 +50,7 @@ def send_email(recipient, clientId, user_name):
 
     To facilitate the secure upload of your documents, please use the link below, which is unique to you and can only be used by you to upload your documents:
 
-    www.google.com?id={clientId}
+    http://scrooge-upload-website.s3-website-ap-southeast-1.amazonaws.com/?id={clientId}
 
     Instructions for Uploading Your Documents:
       1.  Click the Link: Open the link provided above in your web browser.
@@ -73,7 +73,7 @@ def send_email(recipient, clientId, user_name):
 
       <p>To facilitate the secure upload of your documents, please use the link below, which is unique to you and can only be used by you to upload your documents:</p>
 
-      <p><a href="www.google.com?id={clientId}">Upload Document</a></p>
+      <p><a href="http://scrooge-upload-website.s3-website-ap-southeast-1.amazonaws.com/?id={clientId}">Upload Document</a></p>
 
       <p><b>Instructions for Uploading Your Documents:</b></p>
       <ul>
@@ -139,6 +139,7 @@ class Client(db.Model):
     Gender = db.Column(db.Enum('Male', 'Female', 'Non-binary', 'Prefer not to say'), nullable=False)
     Verified = db.Column(db.Boolean, default=False, nullable=False)  # Added Verified field
     deleted_at = db.Column(db.DateTime, default=None, nullable=True)  # Added deleted_at field
+    attempted_uploads = db.Column(db.Integer, default=0, nullable=False)  # Added attempted_uploads field
 
     def __init__(self, AgentID, FirstName, LastName, DateOfBirth, EmailAddress, PhoneNumber, Address, City, State, Country, PostalCode, Gender, Verified=False, deleted_at=None):
         self.ClientID = str(uuid.uuid4())
@@ -156,7 +157,7 @@ class Client(db.Model):
         self.Gender = Gender
         self.Verified = Verified
         self.deleted_at = deleted_at
-        
+        self.attempted_uploads = 0  # Initialize attempted_uploads to 0
 
     def json(self):
         return {
@@ -174,8 +175,14 @@ class Client(db.Model):
             "PostalCode": self.PostalCode,
             "Gender": self.Gender,
             "Verified": self.Verified,
-            "deleted_at": self.deleted_at
+            "deleted_at": self.deleted_at,
+            "attempted_uploads": self.attempted_uploads # Added attempted_uploads field      
         }
+
+# Health Check
+@client_blueprint.route('/health', methods=['GET'])
+def home():
+    return "OK",200
 
 # Create Client
 @client_blueprint.route('', methods=['POST'])
@@ -235,6 +242,10 @@ def verify_client(clientId):
     # Check if client exists
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
 
+    # Set Attempts to 0
+    client.attempted_uploads = 0
+    db.session.commit()
+
     if not client:
         return jsonify(
             {
@@ -252,12 +263,6 @@ def verify_client(clientId):
             "message": f"Verification email sent to {client.EmailAddress}"
         }
     ), 200
-
-    # If First Time, send email to client with link to upload their credentials
-    
-    # If Second Time, bring agent to the page to check if credentials are correct
-
-    # Generate pre assigned link to S3 object for user to upload their credentials
 
 # Update Client
 @client_blueprint.route('<string:clientId>', methods=['PUT'])
@@ -343,7 +348,7 @@ def update_client(clientId):
 @client_blueprint.route('/<string:clientId>', methods=['GET'])
 def get_client(clientId):
 
-    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId, deleted_at=None))
 
     if client:
         return jsonify(
@@ -399,6 +404,10 @@ def generate_presigned_url(clientId, expiration=EXPIRATION):
     data = request.get_json()
     filename = data.get('filename')
     content_type = data.get('content_type')
+    client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
+
+    if not client:
+        return jsonify({"error": "Client not found"}), 404
 
     if not filename or not content_type:
         return jsonify({"error": "Filename and content type are required"}), 400
@@ -406,6 +415,9 @@ def generate_presigned_url(clientId, expiration=EXPIRATION):
     # Validate content type
     if content_type not in ALLOWED_CONTENT_TYPES:
         return jsonify({"error": "Invalid content type"}), 400
+    
+    if client.attempted_uploads >= 5:
+        return jsonify({"error": "Maximum upload attempts reached, please contact your Agent"}), 403
     
     try:
         # Construct the object key dynamically using the client ID and filename
@@ -421,7 +433,9 @@ def generate_presigned_url(clientId, expiration=EXPIRATION):
             },
             ExpiresIn=expiration
         )
-        
+        client.attempted_uploads += 1
+        db.session.commit()
+
         return jsonify({
             "link": url
         }), 200

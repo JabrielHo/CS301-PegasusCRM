@@ -16,5 +16,6 @@ CREATE TABLE CLIENT (
     PostalCode VARCHAR(10) NOT NULL,
     Gender ENUM('Male', 'Female', 'Non-binary', 'Prefer not to say') NOT NULL,
     Verified BOOLEAN DEFAULT FALSE NOT NULL,
-    deleted_at DATETIME DEFAULT NULL
+    deleted_at DATETIME DEFAULT NULL,
+    attempted_uploads INT DEFAULT 0 NOT NULL,
 );

@@ -359,22 +359,24 @@
         validateInputs();
       }
 
-      // Parse the presigned URL securely
       async function getPresignedUrl(file) {
         try {
           const url = new URL(window.location.href);
           const clientId = url.searchParams.get("id");
 
           if (!clientId) {
-            throw new Error("Client ID not found in URL");
+            return { 
+              success: false, 
+              message: "Client ID not found in URL" 
+            };
           }
 
-          // const filename = file.name;
           const fileType = file.type;
           const ext = getFileExtension(fileType);
           const filename = `${documentType.value}.${ext}`;
           console.log("File type:", fileType);
           console.log(documentType.value);
+          
           // Make POST request to the backend to generate presigned URL
           const response = await axios.post(
             `http://127.0.0.1:5001/clients/${clientId}/presigned_url`,
@@ -385,16 +387,21 @@
           );
 
           if (response.data && response.data.link) {
-            return response.data.link; // Return the presigned URL
+            return { success: true, url: response.data.link }; // Return the presigned URL
+          } else if (response.data.error) {
+            return { success: false, message: response.data.error }; // Return the error message
           } else {
-            throw new Error("Failed to get presigned URL");
+            return { success: false, message: "Failed to get presigned URL" };
           }
         } catch (error) {
           console.error(
             "Error fetching presigned URL:",
-            error.response ? error.response.data : error
+            error.response.data
           );
-          return null;
+          return { 
+            success: false, 
+            message: error.response.data.error || "Network error. Unable to get upload link." 
+          };
         }
       }
 
@@ -438,20 +445,24 @@
         const file = fileInput.files[0];
         const docType = documentType.value;
 
-        // Fetch the presigned URL asynchronously
-        const presignedUrl = await getPresignedUrl(file);
+        // Disable the button during upload
+        uploadBtn.disabled = true;
+        showStatus("Preparing upload...", "loading");
 
-        if (!presignedUrl) {
+        // Fetch the presigned URL asynchronously
+        const response = await getPresignedUrl(file);
+
+        if (!response.success) {
+          showStatus(response.message, "error");
+          uploadBtn.disabled = false;
           return;
         }
 
-        // Disable the button during upload
-        uploadBtn.disabled = true;
         showStatus("Uploading your document. Please wait...", "loading");
 
         try {
           // Add document type and security token as metadata
-          const res = await axios.put(presignedUrl, file, {
+          const res = await axios.put(response.url, file, {
             headers: {
               "Content-Type": file.type,
             },
@@ -488,8 +499,6 @@
           uploadBtn.disabled = false;
         }
       });
-    
     </script>
-    
   </body>
 </html>
