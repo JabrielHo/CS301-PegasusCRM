@@ -152,8 +152,7 @@ async def create_account():
                     "clientEmail": client_data["client"].get("EmailAddress"),
                 }
 
-                print(message)
-                # send_message_to_sqs(message)
+                send_message_to_sqs(message)
 
                 return jsonify(await response.json()), response.status
 
@@ -210,8 +209,7 @@ async def delete_account(account_id):
                     "clientEmail": client_data["client"].get("EmailAddress"),
                 }
 
-                print(message)
-                # send_message_to_sqs(message)
+                send_message_to_sqs(message)
 
                 return jsonify(await delete_response.json()), delete_response.status
 
@@ -274,8 +272,7 @@ async def update_account(account_id):
                     "clientEmail": client_data["client"].get("EmailAddress"),
                 }
 
-                print(message)
-                # send_message_to_sqs(message)
+                send_message_to_sqs(message)
 
                 return jsonify(await update_response.json()), update_response.status
 
@@ -319,8 +316,7 @@ async def retrieve_account(client_id):
                     "clientEmail": client_data["client"].get("EmailAddress"),
                 }
 
-                print(message)
-                # send_message_to_sqs(message)
+                send_message_to_sqs(message)
 
                 return jsonify(await accounts_response.json()), accounts_response.status
 
