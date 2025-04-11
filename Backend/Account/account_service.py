@@ -12,7 +12,7 @@ load_dotenv()
 
 secret_string = os.getenv("SECRET_STRING")
 
-secrets - json.loads(secret_string)
+secrets = json.loads(secret_string)
 
 DB_URL = secrets["DB_URL"]
 
