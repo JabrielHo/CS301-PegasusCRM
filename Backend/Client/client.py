@@ -27,6 +27,7 @@ DB_NAME = secrets.get("DB_NAME")
 QUEUE_URL = secrets.get("QUEUE_URL")
 DB_PORT = 3306
 
+# Set SQS
 sqs = boto3.client('sqs', region_name=AWS_REGION)
 
 # Set the SQLAlchemy URI using environment variables
@@ -133,6 +134,7 @@ def send_message_to_sqs(message_body):
         QueueUrl=QUEUE_URL,
         MessageBody=json.dumps(message_body)
     )
+    print(f"Message sent! Message ID: {response['MessageId']}")
 
 # Client Model
 class Client(db.Model):
@@ -285,6 +287,20 @@ def verify_client(clientId):
     
     # Send email to client with link to upload their credentials
     send_email(client.EmailAddress, client.ClientID, client.FirstName + " " + client.LastName)    
+    
+    transaction_id = str(uuid.uuid4())
+
+    send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Verify|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        }
+    )
 
     return jsonify(
         {
@@ -294,6 +310,7 @@ def verify_client(clientId):
     ), 200
 
 # Update Client
+# SQS Not Done
 @client_blueprint.route('<string:clientId>', methods=['PUT'])
 def update_client(clientId):
     
@@ -380,6 +397,20 @@ def get_client(clientId):
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId, deleted_at=None))
 
     if client:
+
+        transaction_id = str(uuid.uuid4())
+
+        send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Read|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        })
+
         return jsonify(
             {
                 "status": "success",
@@ -500,6 +531,19 @@ def generate_presigned_url(clientId, expiration=EXPIRATION):
         )
         client.attempted_uploads += 1
         db.session.commit()
+        
+        transaction_id = str(uuid.uuid4())
+
+        send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Generate Link|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        })
 
         return jsonify({
             "link": url
@@ -520,6 +564,23 @@ def verify_user(clientId):
     
     client.Verified = data.get('Verified')
     db.session.commit()
+
+    transaction_id = str(uuid.uuid4())
+
+    send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Verify|Client",
+            "attributeName": "Verified",
+            "beforeValue": str(not client.Verified),
+            "afterValue": str(client.Verified),
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        })
+    
     return jsonify({
         "status": "success",
         "message": f"{client.FirstName} {client.LastName} verified!"
@@ -542,6 +603,19 @@ def view_client_documents(clientId):
     if 'Contents' in response:
         for obj in response['Contents']:
             documents.append(obj['Key'])
+    
+    transaction_id = str(uuid.uuid4())
+
+    send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Get Documents|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        })
 
     return jsonify({
         "documents": documents
@@ -567,6 +641,19 @@ def view_client_document(clientId, documentName):
             },
             ExpiresIn=EXPIRATION
         )
+
+        transaction_id = str(uuid.uuid4())
+
+        send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "View Documents|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        })
         return jsonify({
             "link": url
         }), 200

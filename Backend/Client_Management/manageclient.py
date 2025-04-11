@@ -8,6 +8,7 @@ import datetime
 import asyncio
 import aiohttp
 from functools import wraps
+import uuid
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +17,7 @@ load_dotenv()
 # Service URLs
 CLIENT_SERVICE_URL = os.getenv("CLIENT_SERVICE_URL", "http://localhost:5001")
 ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:5003")
+QUEUE_URL = os.getenv("QUEUE_URL", "https://sqs.ap-southeast-1.amazonaws.com/123456789012/MyQueue")
 
 # Blueprints
 manage_client_blueprint = Blueprint("manage_client", __name__)
@@ -32,7 +34,6 @@ def send_message_to_sqs(message_body):
         QueueUrl=SQS_QUEUE_URL, MessageBody=json.dumps(message_body)
     )
     print(f"Message sent! Message ID: {response['MessageId']}")
-
 
 # Decorator to run async functions in Flask routes
 def async_route(f):
@@ -88,7 +89,9 @@ async def delete_client():
             async with session.delete(
                 f"{CLIENT_SERVICE_URL}/clients/{client_id}"
             ) as delete_response:
+                transaction_id = str(uuid.uuid4())
                 message = {
+                    "transactionID": transaction_id,
                     "action": "Delete|Client",
                     "agentID": client_data["client"].get("AgentID"),
                     "clientID": client_id,
@@ -97,7 +100,6 @@ async def delete_client():
                     "clientEmail": client_data["client"].get("EmailAddress"),
                 }
 
-                print(message)
                 send_message_to_sqs(message)
 
                 return jsonify(await delete_response.json()), delete_response.status
@@ -137,8 +139,10 @@ async def create_account():
                 if response.status != 201:
                     return jsonify(await response.json()), response.status
 
+                transaction_id = str(uuid.uuid4())
                 # Create SQS message
                 message = {
+                    "transactionID": transaction_id,
                     "action": "Create|Account",
                     "status": data["accountStatus"],
                     "agentID": client_data["client"].get("AgentID"),
@@ -193,7 +197,10 @@ async def delete_account(account_id):
                 if delete_response.status != 200:
                     return jsonify(await delete_response.json()), delete_response.status
 
+                transaction_id = str(uuid.uuid4())
+
                 message = {
+                    "transactionID": transaction_id,
                     "action": "Delete|Account",
                     "status": "Inactive",
                     "agentID": client_data["client"].get("AgentID"),
@@ -251,8 +258,11 @@ async def update_account(account_id):
             ) as update_response:
                 if update_response.status != 200:
                     return jsonify(await update_response.json()), update_response.status
+                
+                transaction_id = str(uuid.uuid4())
 
                 message = {
+                    "transactionID": transaction_id,
                     "action": "Update|Account",
                     "attributeName": "accountStatus",
                     "beforeValue": account_data.get("accountStatus"),
@@ -297,8 +307,10 @@ async def retrieve_account(client_id):
                         jsonify(await accounts_response.json()),
                         accounts_response.status,
                     )
-
+                
+                transaction_id = str(uuid.uuid4())
                 message = {
+                    "transactionID": transaction_id,
                     "action": "Read|Account",
                     "agentID": client_data["client"].get("AgentID"),
                     "clientID": client_data["client"].get("ClientID"),
