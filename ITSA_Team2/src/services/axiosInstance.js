@@ -17,7 +17,6 @@ axiosInstance.interceptors.request.use(
       
       // Get the ID token as a string (using toString() method)
       const idToken = session.tokens.idToken.toString();
-      console.log('idToken:', idToken); // Log the ID token for debugging
       
       // Add the token to the Authorization header
       if (idToken) {

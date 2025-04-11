@@ -10,8 +10,13 @@
     <div class="card">
       <div class="card-header">
         <div class="search-container">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by Transaction ID or Amount..." @keyup.enter="searchTransactions" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search by Transaction ID or Amount..."
+            @keyup.enter="searchTransactions" />
           <button class="btn-search" @click="searchTransactions" title="Search">
             Search
           </button>
@@ -24,11 +29,21 @@
             {{ transactions.length }} transactions found
           </span>
           <button class="btn-clear" @click="clearSearch" v-if="isSearchMode">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
             Clear Search
           </button>
-          <button class="refresh-btn" @click="refreshTransactions">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"></path><path d="M1 20v-6h6"></path><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <button class="refresh-btn" @click="refreshTransactions(client_id)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6"></path>
+              <path d="M1 20v-6h6"></path>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
             Refresh
           </button>
         </div>
@@ -38,9 +53,6 @@
         <table>
           <thead>
             <tr>
-              <th width="5%">
-                <input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
-              </th>
               <th>Transaction ID</th>
               <th>Amount</th>
               <th>Type</th>
@@ -50,17 +62,15 @@
           <tbody>
             <template v-for="transaction in paginatedTransactions" :key="transaction.id">
               <tr class="transaction-row" @click="toggleExpand(transaction.id)">
-                <td @click.stop>
-                  <input type="checkbox" :value="transaction.id" v-model="selectedTransactions" />
-                </td>
                 <td>{{ transaction.id }}</td>
                 <td>{{ transaction.amount }}</td>
-                <td>{{ transaction.transaction_type || 'Standard' }}</td>
+                <td>{{ transaction.transaction_type === 'D' ? 'Deposit' : transaction.transaction_type === 'W' ?
+                  'Withdraw' : 'Other' }}</td>
                 <td>
                   <span :class="[
-                    'status-badge', 
-                    transaction.status === 'Confirmed' ? 'confirmed' : 
-                    transaction.status === 'Pending' ? 'pending' : 'force_change_password'
+                    'status-badge',
+                    transaction.status === 'Completed' ? 'confirmed' :
+                      transaction.status === 'Pending' ? 'pending' : 'force_change_password'
                   ]">
                     {{ transaction.status }}
                   </span>
@@ -111,7 +121,12 @@
             <tr v-if="paginatedTransactions.length === 0">
               <td colspan="5" class="no-results">
                 <div class="empty-state">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
                   <p>No transactions found matching your search criteria</p>
                 </div>
               </td>
@@ -122,29 +137,34 @@
 
       <!-- Pagination controls -->
       <div class="pagination">
-        <div v-if="totalPages > 1" class="pagination-pages">
-          <button 
-            v-for="page in totalPages" 
-            :key="page" 
-            @click="goToPage(page)"
+        <button class="btn-pagination" :disabled="currentPage === 1" @click="previousPage">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+
+        <div class="pagination-pages">
+          <button v-if="currentPage > 3 && currentPage - 3 != 1 && currentPage - 4 != 1" @click="goToPage(1)" class="page-number">1</button>
+          <span v-if="currentPage > 4 && currentPage - 4 != 1" class="page-ellipsis">...</span>
+          <button v-for="page in visiblePageNumbers" :key="page" @click="goToPage(page)"
             :class="['page-number', { active: currentPage === page }]">
             {{ page }}
           </button>
+          <span v-if="currentPage < totalPages - 3 && currentPage + 4 != totalPages" class="page-ellipsis">...</span>
+          <button v-if="currentPage < totalPages - 2 && totalPages > 1 && currentPage + 3 != totalPages && currentPage + 4 != totalPages" @click="goToPage(totalPages)"
+            class="page-number">
+            {{ totalPages }}
+          </button>
         </div>
-        <button 
-          class="btn-pagination" 
-          :disabled="currentPage === 1" 
-          @click="previousPage">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          Previous
-        </button>
-        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button 
-          class="btn-pagination" 
-          :disabled="currentPage === totalPages" 
-          @click="nextPage">
+
+        <button class="btn-pagination" :disabled="currentPage === totalPages" @click="nextPage">
           Next
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         </button>
       </div>
     </div>
@@ -166,45 +186,13 @@ export default {
   data() {
     return {
       searchQuery: '',
-      transactions: [
-        {
-          id: '1234',
-          amount: '$500',
-          status: 'Confirmed',
-          date: '04/04/2025',
-          customer: 'John Smith',
-          paymentMethod: 'Credit Card',
-          reference: 'REF-1234',
-          description: 'Monthly subscription',
-          transaction_type: 'Payment'
-        },
-        {
-          id: '1235',
-          amount: '$400',
-          status: 'Pending',
-          date: '03/04/2025',
-          customer: 'Alice Johnson',
-          paymentMethod: 'Bank Transfer',
-          reference: 'REF-1235',
-          description: 'Product purchase',
-          transaction_type: 'Transfer'
-        },
-        {
-          id: '1236',
-          amount: '$300',
-          status: 'Failed',
-          date: '02/04/2025',
-          customer: 'Robert Brown',
-          paymentMethod: 'PayPal',
-          reference: 'REF-1236',
-          description: 'Service fee',
-          transaction_type: 'Withdrawal'
-        }
-      ],
-      selectedTransactions: [],
+      transactions: [],
       expandedTransactions: [],
+
+      //Pagination
       currentPage: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 5,
+
       isLoading: false,
       isSearchMode: false,
       selectAll: false,
@@ -212,16 +200,47 @@ export default {
     };
   },
   computed: {
+    visiblePageNumbers() {
+      let start = Math.max(1, this.currentPage - 2);
+      let end = Math.min(this.totalPages, this.currentPage + 2);
+
+      // Adjust the range to always show 5 pages if possible
+      if (end - start + 1 < 5) {
+        if (start === 1) {
+          end = Math.min(5, this.totalPages);
+        } else if (end === this.totalPages) {
+          start = Math.max(1, this.totalPages - 4);
+        }
+      }
+
+      // Generate array of page numbers
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    },
     totalPages() {
-      const count = this.isSearchMode ? this.filteredTransactions.length : this.transactions.length;
-      return Math.max(1, Math.ceil(count / this.itemsPerPage));
+      if (this.isSearchMode) {
+        return Math.ceil(this.filteredTransactions.length / this.itemsPerPage);
+      } else {
+        return Math.ceil(this.transactions.length / this.itemsPerPage);
+      }
     },
     paginatedTransactions() {
-      const source = this.isSearchMode ? this.filteredTransactions : this.transactions;
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return source.slice(start, end);
-    }
+      if (this.isSearchMode) {
+        return this.filteredTransactions.slice(start, end);
+      } else {
+        return this.transactions.slice(start, end);
+      }
+    },
+    // Check if Previous button should be disabled
+    isPreviousDisabled() {
+      return this.currentPage <= 1;
+    },
+
+    // Check if Next button should be disabled
+    isNextDisabled() {
+      return this.currentPage >= this.totalPages;
+    },
   },
   methods: {
     goBack() {
@@ -234,33 +253,18 @@ export default {
         this.expandedTransactions.push(transactionId);
       }
     },
-    refreshTransactions() {
+    async refreshTransactions(client_id) {
       this.isLoading = true;
-
-      // Simulating an API call with setTimeout
-      setTimeout(() => {
-        // In a real application, you would fetch data from an API
-        // For demo purposes, we'll just update the existing data
-        const newTransaction = {
-          id: Math.floor(1000 + Math.random() * 9000).toString(),
-          amount: '$' + Math.floor(100 + Math.random() * 900),
-          status: ['Confirmed', 'Pending', 'Failed'][Math.floor(Math.random() * 3)],
-          date: '05/04/2025',
-          customer: 'New Customer',
-          paymentMethod: 'Credit Card',
-          reference: 'REF-NEW',
-          description: 'New transaction',
-          transaction_type: ['Payment', 'Transfer', 'Withdrawal'][Math.floor(Math.random() * 3)]
-        };
-
-        this.transactions.unshift(newTransaction);
+      try {
+        // Reuse the loadTransactions method to fetch data
+        this.clearSearch();
+        await this.loadTransactions(client_id);
+        this.currentPage = 1;
+      } catch (error) {
+        console.error('Error refreshing transactions:', error);
+      } finally {
         this.isLoading = false;
-        
-        // Clear search if in search mode
-        if (this.isSearchMode) {
-          this.clearSearch();
-        }
-      }, 800);
+      }
     },
     async loadTransactions(client_id) {
       this.isLoading = true;
@@ -276,39 +280,36 @@ export default {
         this.isLoading = false;
       }
     },
-    toggleSelectAll() {
-      if (this.selectAll) {
-        // Select all transactions on the current page
-        this.selectedTransactions = this.paginatedTransactions.map(t => t.id);
-      } else {
-        // Deselect all
-        this.selectedTransactions = [];
-      }
-    },
     searchTransactions() {
       if (!this.searchQuery.trim()) {
         this.clearSearch();
         return;
       }
-      
+
       this.isLoading = true;
-      
+      this.currentPage = 1;
+
       // Simulate search delay
-      setTimeout(() => {
+      try {
         const query = this.searchQuery.toLowerCase();
         this.filteredTransactions = this.transactions.filter(transaction => {
           return (
-            (transaction.id && transaction.id.toLowerCase().includes(query)) ||
-            (transaction.amount && transaction.amount.toLowerCase().includes(query)) ||
+            (transaction.id && String(transaction.id).toLowerCase().includes(query)) ||
+            (transaction.amount && String(transaction.amount).toLowerCase().includes(query)) ||
             (transaction.status && transaction.status.toLowerCase().includes(query)) ||
             (transaction.transaction_type && transaction.transaction_type.toLowerCase().includes(query))
           );
         });
-        
         this.isSearchMode = true;
-        this.currentPage = 1;
         this.isLoading = false;
-      }, 500);
+
+      } catch (error) {
+        console.error("Error during search:", error);
+      }
+      finally {
+        this.isLoading = false;
+      }
+        
     },
     clearSearch() {
       this.searchQuery = '';
@@ -551,7 +552,6 @@ export default {
   position: sticky;
   top: 0;
   z-index: 10;
-  text-align: left;
 }
 
 .client-table td {
@@ -785,21 +785,21 @@ export default {
   .admin-dashboard {
     padding: 1rem;
   }
-  
+
   .details-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .card-header {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .table-info {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .search-container {
     max-width: 100%;
   }
