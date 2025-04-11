@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import axios from 'axios';
+import axiosInstance from "../services/axiosInstance";
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
 // Import the postal codes JSON file
@@ -177,7 +177,7 @@ export default {
 
       // Call the save function to handle the data
       // TODO: Replace with Actual Endpoint
-      axios.post('http://127.0.0.1:5001/clients', this.client)
+      axiosInstance.post('http://127.0.0.1:5001/clients', this.client)
         .then(response => {
           console.log('Client profile saved successfully:', response.data);
           toast("Client profile saved successfully!", {

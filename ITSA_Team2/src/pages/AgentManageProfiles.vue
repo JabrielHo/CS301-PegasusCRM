@@ -182,7 +182,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axiosInstance from "../services/axiosInstance";
 // Get AgentID
 import { fetchUserAttributes } from "aws-amplify/auth";
 
@@ -254,7 +254,7 @@ export default {
     async loadClientProfiles() {
       await this.getUserAttributes();
       // TODO: Replace with actual API call
-      axios
+      axiosInstance
         .get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
         .then((response) => {
           this.clients = response.data.clients;
@@ -275,7 +275,7 @@ export default {
     async loadClientAccountsCount(clientId) {
       // TODO: Replace with actual API call
       try {
-        const response = await axios.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
+        const response = await axiosInstance.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
         console.log("Client accounts loaded:", response.data);
 
         // Calculate and return the account count
