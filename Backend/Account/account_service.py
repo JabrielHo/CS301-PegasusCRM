@@ -25,7 +25,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# Get Currencies from json
+# Get Currencies from json file
 with open("currencies.json", "r") as f:
     VALID_CURRENCIES = json.load(f)
 
