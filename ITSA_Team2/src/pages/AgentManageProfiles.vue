@@ -6,25 +6,52 @@
       <p class="dashboard-subtitle">Manage client profile information</p>
     </div>
 
-    <!-- Search and Account Table -->
+    <!-- Search and Client Table -->
     <div class="card">
       <div class="card-header">
         <div class="search-container">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by Client Name or ID..." @keyup.enter="performGlobalSearch" />
-          <button class="btn-search" @click="performGlobalSearch" title="Search">
-            Search
-          </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            id="search"
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search by Client Name or ID..."
+            @keyup="performGlobalSearch"
+          />
+          <button class="btn-search" @click="performGlobalSearch" title="Search">Search</button>
         </div>
         <div class="table-info">
-          <span v-if="isSearchMode">
-            {{ clients.length }} of {{ allSearchResults.length }} accounts found
-          </span>
-          <span v-else>
-            {{ clients.length }} accounts found
-          </span>
+          <span v-if="isSearchMode"> {{ allSearchResults.length }} of {{ clients.length }} clients found </span>
+          <span v-else> {{ clients.length }} clients found </span>
           <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="15" y1="9" x2="9" y2="15"></line>
+              <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
             Clear Search
           </button>
         </div>
@@ -41,33 +68,37 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="client in clients" 
-              :key="client.ClientID"
-              @click="navigateToProfile(client.ClientID)"
-              class="account-row"
-            >
+            <tr v-for="client in paginatedClients" :key="client.ClientID" @click="navigateToProfile(client.ClientID)">
               <td>{{ client.ClientID }}</td>
               <td>{{ client.FirstName + " " + client.LastName }}</td>
               <td>
-                <span :class="[
-                  'status-badge', 
-                  client.Verified ? 'confirmed' : 'pending'
-                ]">
-                  {{ client.Verified ? 'Verified' : 'Not Verified' }}
+                <span :class="['status-badge', client.Verified ? 'confirmed' : 'pending']">
+                  {{ client.Verified ? "Verified" : "Not Verified" }}
                 </span>
               </td>
               <td>
-                Jabriel
-                <!-- Placeholder for number of bank accounts -->
-                <!-- {{ account.bankAccounts ? account.bankAccounts.length : 0 }} -->
+                {{ client.accountCount !== undefined ? client.accountCount : "Loading..." }}
               </td>
             </tr>
-            <tr v-if="paginatedAccounts.length === 0">
+            <tr v-if="allSearchResults.length === 0 && isSearchMode">
               <td colspan="5" class="no-results">
                 <div class="empty-state">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                  <p>No accounts found matching your search criteria</p>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <p>No clients found matching your search criteria</p>
                 </div>
               </td>
             </tr>
@@ -78,90 +109,65 @@
       <!-- Pagination controls -->
       <div class="pagination">
         <!-- Show page numbers for search mode -->
-        <div v-if="isSearchMode" class="pagination-pages">
-          <button 
-            v-for="page in totalPages" 
-            :key="page" 
+        <button class="btn-pagination" :disabled="isPreviousDisabled" @click="previousPage">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <div class="pagination-pages">
+          <!-- First page button -->
+          <button v-if="currentPage > 3" @click="goToPage(1)" class="page-number">1</button>
+
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage > 4" class="page-ellipsis">...</span>
+
+          <!-- Page numbers around current page -->
+          <button
+            v-for="page in visiblePageNumbers"
+            :key="page"
             @click="goToPage(page)"
-            :class="['page-number', { active: currentPage === page }]">
+            :class="['page-number', { active: currentPage === page }]"
+          >
             {{ page }}
           </button>
-        </div>
-        <button 
-          class="btn-pagination" 
-          :disabled="isPreviousDisabled" 
-          @click="previousPage"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-        </button>
-        <span class="page-info" v-if="!isSearchMode">Page {{ currentPage }} of {{ totalPages }}</span>
-        <button 
-          class="btn-pagination" 
-          :disabled="isNextDisabled" 
-          @click="nextPage"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </button>
-      </div>
-    </div>
 
-    <!-- Edit Modal -->
-    <div v-if="showEditModal" class="modal-overlay" @click.self="closeEditModal">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Edit Client Account</h3>
-          <button class="btn-close" @click="closeEditModal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage < totalPages - 3" class="page-ellipsis">...</span>
+
+          <!-- Last page button -->
+          <button
+            v-if="currentPage < totalPages - 2 && totalPages > 1"
+            @click="goToPage(totalPages)"
+            class="page-number"
+          >
+            {{ totalPages }}
           </button>
         </div>
-        
-        <div class="modal-content">
-          <div class="account-id">
-            <svg class="account-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>Account ID: {{ editAccount.id }}</span>
-          </div>
-          
-          <div class="form-group">
-            <label for="clientName">Client Name</label>
-            <input id="clientName" v-model="editAccount.clientName" type="text" />
-          </div>
-
-          <div class="form-group">
-            <label for="dateCreated">Date Created</label>
-            <input id="dateCreated" v-model="editAccount.dateCreated" type="date" disabled />
-          </div>
-
-          <div class="form-section">
-            <h4>Account Status</h4>
-            <div class="status-toggle">
-              <button @click="toggleAccountStatus" :class="editAccount.active ? 'btn-disable' : 'btn-enable'">
-                <svg v-if="editAccount.active" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-                <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
-                {{ editAccount.active ? 'Deactivate Account' : 'Activate Account' }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <div class="action-buttons">
-            <button class="btn-cancel" @click="closeEditModal">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-              Cancel
-            </button>
-            <button class="btn-save" @click="saveAccountChanges">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-              Save Changes
-            </button>
-          </div>
-          
-          <div class="danger-zone">
-            <button class="btn-delete" @click="deleteAccount">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              Delete Account
-            </button>
-          </div>
-        </div>
+        <button class="btn-pagination" :disabled="isNextDisabled" @click="nextPage">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
 
@@ -169,210 +175,76 @@
     <div v-if="isSearching" class="modal-overlay">
       <div class="loading-container">
         <div class="loading-spinner"></div>
-        <p>Searching all accounts...</p>
-      </div>
-    </div>
-
-    <!-- No selection popup -->
-    <div v-if="showNoSelectionPopup" class="popup-overlay" @click.self="closePopup">
-      <div class="popup">
-        <div class="popup-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <h4>No Selection</h4>
-        </div>
-        <p>No account is selected. Please select an account to continue.</p>
-        <div class="popup-footer">
-          <button class="btn-primary" @click="closePopup">Close</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Deletion confirmation popup -->
-    <div v-if="showDeleteConfirmationPopup" class="popup-overlay" @click.self="closePopup">
-      <div class="popup">
-        <div class="popup-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          <h4>Confirm Deletion</h4>
-        </div>
-        <div class="popup-content">
-          <p>Are you sure you want to delete the following account(s)?</p>
-          <ul class="delete-list">
-            <li v-for="account in selectedAccountsList" :key="account.id">{{ account.clientName }} (ID: {{ account.id }})</li>
-          </ul>
-          <p class="warning-text">This action cannot be undone.</p>
-        </div>
-        <div class="popup-footer">
-          <button class="btn-cancel" @click="closePopup">Cancel</button>
-          <button class="btn-delete" @click="deleteAccounts">Delete</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Deleted accounts confirmation -->
-    <div v-if="showDeletedPopup" class="popup-overlay" @click.self="closePopup">
-      <div class="popup">
-        <div class="popup-header">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
-          <h4>Deletion Successful</h4>
-        </div>
-        <div class="popup-content">
-          <p>The following accounts have been deleted:</p>
-          <ul class="delete-list">
-            <li v-for="account in deletedAccounts" :key="account.id">{{ account.clientName }} (ID: {{ account.id }})</li>
-          </ul>
-        </div>
-        <div class="popup-footer">
-          <button class="btn-primary" @click="closePopup">Close</button>
-        </div>
+        <p>Searching all clients...</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 // Get AgentID
-import { fetchUserAttributes } from 'aws-amplify/auth'
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 export default {
   data() {
     return {
-      searchQuery: '',
-      agentID: '',
+      agentID: "",
       clients: [],
-      accounts: [
-        { 
-          id: '1234', 
-          clientName: 'John Haaland', 
-          dateCreated: '2021-03-20', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA001', type: 'Checking', balance: 5420.75 },
-            { id: 'BA002', type: 'Savings', balance: 12500.00 }
-          ]
-        },
-        { 
-          id: '1235', 
-          clientName: 'John Wick', 
-          dateCreated: '2021-03-21', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA003', type: 'Checking', balance: 2340.50 }
-          ]
-        },
-        { 
-          id: '1236', 
-          clientName: 'Jane Smith', 
-          dateCreated: '2021-03-22', 
-          active: false,
-          bankAccounts: [
-            { id: 'BA004', type: 'Savings', balance: 8750.25 },
-            { id: 'BA005', type: 'Investment', balance: 45000.00 },
-            { id: 'BA006', type: 'Checking', balance: 1250.75 }
-          ]
-        },
-        { 
-          id: '1237', 
-          clientName: 'Alan Turing', 
-          dateCreated: '2021-03-23', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA007', type: 'Checking', balance: 3700.00 }
-          ]
-        },
-        { 
-          id: '1238', 
-          clientName: 'Ada Lovelace', 
-          dateCreated: '2021-03-24', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA008', type: 'Savings', balance: 15800.50 },
-            { id: 'BA009', type: 'Investment', balance: 75000.00 }
-          ]
-        },
-        { 
-          id: '1239', 
-          clientName: 'Grace Hopper', 
-          dateCreated: '2021-03-25', 
-          active: false,
-          bankAccounts: []
-        },
-        { 
-          id: '1240', 
-          clientName: 'Dennis Ritchie', 
-          dateCreated: '2021-03-26', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA010', type: 'Checking', balance: 4250.75 }
-          ]
-        },
-        { 
-          id: '1241', 
-          clientName: 'Linus Torvalds', 
-          dateCreated: '2021-03-27', 
-          active: true,
-          bankAccounts: [
-            { id: 'BA011', type: 'Checking', balance: 8300.25 },
-            { id: 'BA012', type: 'Savings', balance: 27500.00 }
-          ]
-        },
-      ],
-      selectedAccounts: [], // Array to store selected account IDs
-      deletedAccounts: [], // Array to store deleted accounts for confirmation message
-      showNoSelectionPopup: false, // Flag to show no selection popup
-      showDeleteConfirmationPopup: false, // Flag to show delete confirmation popup
-      showDeletedPopup: false, // Flag to show deleted accounts confirmation popup
-      showEditModal: false,
-      editAccount: {},
+
+      //Pagination
       currentPage: 1,
       itemsPerPage: 5,
-      
-      // Search mode properties
+
+      // Search properties
+      searchQuery: "",
       isSearching: false,
       isSearchMode: false,
       allSearchResults: [],
     };
   },
   computed: {
-    filteredAccounts() {
-      if (this.isSearchMode) {
-        return this.allSearchResults;
+    visiblePageNumbers() {
+      let start = Math.max(1, this.currentPage - 2);
+      let end = Math.min(this.totalPages, this.currentPage + 2);
+
+      // Adjust the range to always show 5 pages if possible
+      if (end - start + 1 < 5) {
+        if (start === 1) {
+          end = Math.min(5, this.totalPages);
+        } else if (end === this.totalPages) {
+          start = Math.max(1, this.totalPages - 4);
+        }
       }
-      
-      const query = this.searchQuery.toLowerCase();
-      return this.accounts.filter(account => {
-        return (
-          (account.clientName && account.clientName.toLowerCase().includes(query)) ||
-          (account.id && account.id.includes(query))
-        );
-      });
-    },
-    selectedAccountsList() {
-      return this.accounts.filter(account => this.selectedAccounts.includes(account.id));
+
+      // Generate array of page numbers
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
     },
     totalPages() {
-      return Math.ceil(this.filteredAccounts.length / this.itemsPerPage);
-    },
-    paginatedAccounts() {
       if (this.isSearchMode) {
-        const start = (this.currentPage - 1) * this.itemsPerPage;
-        const end = start + this.itemsPerPage;
+        return Math.ceil(this.allSearchResults.length / this.itemsPerPage);
+      } else {
+        return Math.ceil(this.clients.length / this.itemsPerPage);
+      }
+    },
+    paginatedClients() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      if (this.isSearchMode) {
         return this.allSearchResults.slice(start, end);
       } else {
-        const start = (this.currentPage - 1) * this.itemsPerPage;
-        const end = start + this.itemsPerPage;
-        return this.filteredAccounts.slice(start, end);
+        return this.clients.slice(start, end);
       }
     },
     // Check if Previous button should be disabled
     isPreviousDisabled() {
       return this.currentPage <= 1;
     },
-    
+
     // Check if Next button should be disabled
     isNextDisabled() {
       return this.currentPage >= this.totalPages;
-    }
+    },
   },
   methods: {
     async getUserAttributes() {
@@ -382,162 +254,89 @@ export default {
     async loadClientProfiles() {
       await this.getUserAttributes();
       // TODO: Replace with actual API call
-      axios.get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
-        .then(response => {
+      axios
+        .get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
+        .then((response) => {
           this.clients = response.data.clients;
-          console.log('Client profiles loaded:', this.clients);
-        })
-        .catch(error => {
-          console.error('Error fetching client profiles:', error);
-        });
+          console.log("Client profiles loaded:", this.clients);
 
+          this.clients.forEach(async (client, index) => {
+            const accountCount = await this.loadClientAccountsCount(client.ClientID);
+            this.clients[index] = {
+              ...this.clients[index],
+              accountCount: accountCount,
+            };
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching client profiles:", error);
+        });
+    },
+    async loadClientAccountsCount(clientId) {
+      // TODO: Replace with actual API call
+      try {
+        const response = await axios.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
+        console.log("Client accounts loaded:", response.data);
+
+        // Calculate and return the account count
+        if (response.data.accounts && Array.isArray(response.data.accounts)) {
+          return response.data.accounts.length;
+        }
+        return 0;
+      } catch (error) {
+        console.error("Error fetching client accounts:", error);
+        return 0;
+      }
     },
     // Navigate to profile detail page
     navigateToProfile(accountId) {
-      if (!accountId){ 
-        console.error('Account Id missing')
+      if (!accountId) {
+        console.error("Account Id missing");
         return;
       }
       // Use router to navigate
       if (this.$router) {
-        this.$router.push({ name: 'Client Profile Page', params: { clientID: accountId } });
+        this.$router.push({ name: "Client Profile Page", params: { clientID: accountId } });
       } else {
         // Fallback if router is not defined (for demo purposes)
         console.log(`Navigating to client profile with ID: ${accountId}`);
         alert(`Navigating to client profile for ID: ${accountId}`);
       }
     },
-    
-    openEditModal(account) {
-      this.editAccount = { ...account }; // Clone the selected account
-      console.log('Editing account:', this.editAccount);
-      this.showEditModal = true;
-      document.body.classList.add('modal-open'); // Add class to body
-    },
-    
-    closeEditModal() {
-      this.showEditModal = false;
-      this.editAccount = {};
-      document.body.classList.remove('modal-open'); // Remove class from body
-    },
-    
-    toggleAccountStatus() {
-      this.editAccount.active = !this.editAccount.active;
-    },
-    
-    saveAccountChanges() {
-      // Find the account in the array and update it
-      const index = this.accounts.findIndex(account => account.id === this.editAccount.id);
-      if (index !== -1) {
-        this.accounts[index] = { ...this.editAccount };
-      }
-      
-      // If in search mode, update the search results as well
-      if (this.isSearchMode) {
-        const searchIndex = this.allSearchResults.findIndex(account => account.id === this.editAccount.id);
-        if (searchIndex !== -1) {
-          this.allSearchResults[searchIndex] = { ...this.editAccount };
-        }
-      }
-      
-      this.closeEditModal();
-    },
-    
-    deleteAccount() {
-      // Set up for deletion confirmation
-      this.selectedAccounts = [this.editAccount.id];
-      this.closeEditModal();
-      this.showDeleteConfirmationPopup = true;
-    },
-    
-    editSelectedAccounts() {
-      if (this.selectedAccounts.length === 0) {
-        this.showNoSelectionPopup = true;
-        return;
-      }
-      
-      if (this.selectedAccounts.length === 1) {
-        // Find the account and open the edit modal
-        const accountToEdit = this.accounts.find(account => account.id === this.selectedAccounts[0]);
-        if (accountToEdit) {
-          this.openEditModal(accountToEdit);
-        }
-      } else {
-        // Navigate to edit page for multiple accounts (example: using Vue Router)
-        // This would be implemented in a real application
-        console.log('Editing multiple accounts:', this.selectedAccounts);
-        this.$router?.push({ name: 'EditAccount', params: { ids: this.selectedAccounts } });
-      }
-    },
-    
-    deleteSelectedAccounts() {
-      if (this.selectedAccounts.length === 0) {
-        this.showNoSelectionPopup = true;
-        return;
-      }
-      this.showDeleteConfirmationPopup = true;
-    },
-    
-    deleteAccounts() {
-      // Store deleted accounts for confirmation message
-      this.deletedAccounts = this.selectedAccountsList;
-      
-      // Delete selected accounts from the data
-      this.accounts = this.accounts.filter(account => !this.selectedAccounts.includes(account.id));
-      
-      // If in search mode, update search results
-      if (this.isSearchMode) {
-        this.allSearchResults = this.allSearchResults.filter(
-          account => !this.selectedAccounts.includes(account.id)
-        );
-      }
-      
-      this.selectedAccounts = []; // Reset selected accounts
-      this.showDeleteConfirmationPopup = false;
-      this.showDeletedPopup = true;
-    },
-    
-    // Global search across all accounts
+    // Global search across all clients
     async performGlobalSearch() {
       if (!this.searchQuery.trim()) {
         // If search query is empty, switch back to normal mode
         this.clearSearch();
         return;
       }
-      
-      this.isSearching = true;
-      
+      this.currentPage = 1;
       try {
-        // Simulate API search delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Apply search filter to all accounts
         const query = this.searchQuery.toLowerCase();
-        this.allSearchResults = this.accounts.filter(account => {
+        this.allSearchResults = this.clients.filter((client) => {
           return (
-            (account.clientName && account.clientName.toLowerCase().includes(query)) ||
-            (account.id && account.id.includes(query))
+            client.FirstName.toLowerCase().includes(query) ||
+            client.LastName.toLowerCase().includes(query) ||
+            client.ClientID.includes(query)
           );
         });
-        
-        // Switch to search mode and reset to first page
+        this.isSearching = true;
         this.isSearchMode = true;
-        this.currentPage = 1;
       } catch (error) {
-        console.error('Error performing global search:', error);
+        console.error("Error performing global search:", error);
       } finally {
         this.isSearching = false;
       }
     },
-    
+
     // Clear search and go back to normal mode
     clearSearch() {
-      this.searchQuery = '';
+      this.searchQuery = "";
       this.isSearchMode = false;
       this.allSearchResults = [];
       this.currentPage = 1;
     },
-    
+
     // Pagination methods
     nextPage() {
       if (this.currentPage < this.totalPages) {
@@ -552,12 +351,6 @@ export default {
     goToPage(page) {
       this.currentPage = page;
     },
-    
-    closePopup() {
-      this.showNoSelectionPopup = false;
-      this.showDeleteConfirmationPopup = false;
-      this.showDeletedPopup = false;
-    }
   },
   mounted() {
     this.loadClientProfiles();
@@ -565,8 +358,18 @@ export default {
 };
 </script>
 
-
 <style scoped>
+.page-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 :root {
   --primary-color: #3b82f6;
   --primary-hover: #2563eb;
@@ -596,7 +399,18 @@ export default {
 }
 
 .admin-dashboard {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    "Inter",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    "Open Sans",
+    "Helvetica Neue",
+    sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
   padding: 2rem;
@@ -718,7 +532,6 @@ export default {
 }
 
 .client-table th {
-
   padding: 1rem;
   background-color: #f1f5f9;
   color: #334155;
@@ -1032,7 +845,8 @@ body.modal-open {
   margin-bottom: 1rem;
 }
 
-.status-toggle, .role-buttons {
+.status-toggle,
+.role-buttons {
   display: flex;
   gap: 1rem;
 }
@@ -1109,7 +923,14 @@ body.modal-open {
   color: white;
 }
 /* Action Buttons */
-.btn-disable, .btn-enable, .btn-promote, .btn-demote, .btn-delete, .btn-cancel, .btn-save, .btn-primary {
+.btn-disable,
+.btn-enable,
+.btn-promote,
+.btn-demote,
+.btn-delete,
+.btn-cancel,
+.btn-save,
+.btn-primary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1279,45 +1100,53 @@ body.modal-open {
   .admin-dashboard {
     padding: 1rem;
   }
-  
+
   .toggle-container {
     flex-direction: column;
   }
-  
+
   .modal-footer {
     flex-direction: column-reverse;
     gap: 1rem;
   }
-  
-  .action-buttons, .danger-zone {
+
+  .action-buttons,
+  .danger-zone {
     width: 100%;
   }
-  
+
   .action-buttons {
     justify-content: flex-end;
   }
-  
-  .btn-delete, .btn-save, .btn-cancel {
+
+  .btn-delete,
+  .btn-save,
+  .btn-cancel {
     flex: 1;
     justify-content: center;
   }
-  
+
   .modal {
     width: 90%;
   }
 }
 
 /* Transitions */
-button, a {
+button,
+a {
   transition: all 0.2s ease;
 }
 
-input, select, textarea {
-  transition: border 0.2s ease, box-shadow 0.2s ease;
+input,
+select,
+textarea {
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
-.btn-save:active, .btn-primary:active {
+.btn-save:active,
+.btn-primary:active {
   transform: scale(0.98);
 }
-
 </style>
