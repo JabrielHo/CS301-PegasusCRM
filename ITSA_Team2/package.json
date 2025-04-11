@@ -12,7 +12,7 @@
     "@aws-amplify/ui-vue": "^4.2.30",
     "aws-amplify": "^6.13.4",
     "axios": "^1.8.4",
-    "i18n-iso-countries": "^7.14.0",
+    "country-list": "^2.3.0",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
     "vue-jwt-decode": "^0.1.0",

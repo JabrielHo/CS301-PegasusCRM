@@ -3,89 +3,97 @@
 
     <div class="form-container">
       <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label for="firstName">First Name</label>
-          <input v-model="client.FirstName" type="text" placeholder="First Name" required />
-        </div>
-        
-        <div class="form-group">
-          <label for="lastName">Last Name</label>
-          <input v-model="client.LastName" type="text" placeholder="Last Name" required />
+        <div class="form-columns">
+          <div class="form-column">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input v-model="client.FirstName" type="text" placeholder="First Name" required />
+            </div>
+            
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input v-model="client.LastName" type="text" placeholder="Last Name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="dateOfBirth">Date Of Birth</label>
+              <input v-model="client.DateOfBirth" type="date" placeholder="Date of Birth" required />
+            </div>
+
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select v-model="client.Gender" id="gender" required>
+                <option value="" disabled selected>Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer Not To Say</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input v-model="client.EmailAddress" type="email" placeholder="Email" required />
+            </div>
+
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <vue-tel-input
+                ref="phoneInput"
+                v-model="client.PhoneNumber"
+                :inputOptions="telInputOptions"
+                :dropdownOptions="telDropdownOptions"
+                mode="international"
+                required
+                class="tel-input-container"
+              ></vue-tel-input>
+            </div>
+          </div>
+
+          <div class="form-column">
+            <div class="form-group">
+              <label for="address">Address</label>
+              <input v-model="client.Address" type="text" placeholder="Address" required />
+            </div>
+
+            <div class="form-group">
+              <label for="city">City</label>
+              <input v-model="client.City" type="text" placeholder="City" required />
+            </div>
+
+            <div class="form-group">
+              <label for="state">State</label>
+              <input v-model="client.State" type="text" placeholder="State" required />
+            </div>
+
+            <div class="form-group">
+              <label for="country">Country</label>
+              <select v-model="client.Country" id="country" required @change="updatePhoneCountry">
+                <option value="" disabled selected>Select Country</option>
+                <option v-for="country in countries" :key="country.name" :value="country.name">
+                  {{ country.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="postalCode">Postal Code</label>
+              <input 
+                v-model="client.PostalCode" 
+                type="text" 
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="6"
+                placeholder="Postal Code" 
+                @input="validatePostalCode"
+                required />
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="dateOfBirth">Date Of Birth</label>
-          <input v-model="client.DateOfBirth" type="date" placeholder="Date of Birth" required />
+        <div class="form-actions">
+          <button type="submit">Save</button>
         </div>
-
-        <div class="form-group">
-          <label for="gender">Gender</label>
-          <select v-model="client.Gender" id="gender" required>
-            <option value="" disabled selected>Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-            <option value="Prefer not to say">Prefer Not To Say</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input v-model="client.EmailAddress" type="email" placeholder="Email" required />
-        </div>
-
-        <div class="form-group">
-          <label for="phone">Phone Number</label>
-          <vue-tel-input
-            ref="phoneInput"
-            v-model="client.PhoneNumber"
-            :inputOptions="telInputOptions"
-            :dropdownOptions="telDropdownOptions"
-            mode="international"
-            required
-            class="tel-input-container"
-          ></vue-tel-input>
-        </div>
-
-        <div class="form-group">
-          <label for="address">Address</label>
-          <input v-model="client.Address" type="text" placeholder="Address" required />
-        </div>
-
-        <div class="form-group">
-          <label for="city">City</label>
-          <input v-model="client.City" type="text" placeholder="City" required />
-        </div>
-
-        <div class="form-group">
-          <label for="state">State</label>
-          <input v-model="client.State" type="text" placeholder="State" required />
-        </div>
-
-        <div class="form-group">
-          <label for="country">Country</label>
-          <select v-model="client.Country" id="country" required @change="updatePhoneCountry">
-            <option value="" disabled selected>Select Country</option>
-            <option v-for="country in countries" :key="country.name" :value="country.name">
-              {{ country.name }}
-            </option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="postalCode">Postal Code</label>
-          <input 
-            v-model="client.PostalCode" 
-            type="text" 
-            inputmode="numeric"
-            pattern="[0-9]*"
-            maxlength="6"
-            placeholder="Postal Code" 
-            @input="validatePostalCode"
-            required />
-        </div>
-
-        <button type="submit">Save</button>
       </form>
     </div>
   </div>
@@ -129,17 +137,14 @@ export default {
     };
   },
   created() {
-    // Access countries from global properties
-    const countryNames = this.$countries.getNames('en');
-    const countryCodes = this.$countries.getAlpha3Codes();
-    
-    this.countries = Object.keys(countryNames).map(code => ({
-      code: countryCodes[code] || code,
-      name: countryNames[code]
-    }));
-    
-    // Sort countries alphabetically by name
-    this.countries.sort((a, b) => a.name.localeCompare(b.name));
+  // Get countries from global properties
+  this.countries = this.$countries.getCountryData().map(country => ({
+    code: country.code,
+    name: country.name
+  }));
+  
+  // Sort countries alphabetically by name
+  this.countries.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
     async getUserAttributes() {
@@ -192,6 +197,14 @@ export default {
           }
           console.error('Error saving client profile:', error);
         });
+    },
+    // Note: updatePhoneCountry method is referenced but wasn't defined in original code
+    updatePhoneCountry() {
+      // Add implementation if needed
+    },
+    // validatePostalCode is referenced but wasn't defined in original code
+    validatePostalCode() {
+      // Add implementation if needed
     }
   }
 };
@@ -200,7 +213,7 @@ export default {
 <style scoped>
 .create-client-profile {
   padding: 30px;
-  max-width: 600px;
+  max-width: 900px; /* Increased from 600px to accommodate two columns */
   margin: 0 auto;
 }
 
@@ -218,6 +231,24 @@ h1 {
   border-radius: 8px;
   padding: 25px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* New styles for two-column layout */
+.form-columns {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -10px; /* Negative margin to offset padding in columns */
+}
+
+.form-column {
+  flex: 1;
+  padding: 0 10px;
+  min-width: 300px; /* Ensures column doesn't get too narrow */
+}
+
+.form-actions {
+  margin-top: 20px;
+  text-align: right;
 }
 
 .form-group {
@@ -310,21 +341,30 @@ button:hover {
   background-color: #0000cc;
 }
 
-@media (max-width: 600px) {
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
   .create-client-profile {
     padding: 15px;
+    max-width: 100%;
   }
   
   .form-container {
     padding: 15px;
   }
   
-  .actions {
+  .form-columns {
     flex-direction: column;
-    gap: 10px;
   }
   
-  .cancel-button, .submit-button {
+  .form-column {
+    width: 100%;
+  }
+  
+  .form-actions {
+    text-align: center;
+  }
+  
+  button {
     width: 100%;
   }
 }
