@@ -43,6 +43,7 @@
                 v-model="client.PhoneNumber"
                 :inputOptions="telInputOptions"
                 :dropdownOptions="telDropdownOptions"
+                :default-country="defaultCountryCode"
                 mode="international"
                 required
                 class="tel-input-container"
@@ -123,6 +124,7 @@ export default {
         PostalCode: '',
         Gender: ''
       },
+      defaultCountryCode: 'us', // Default country code for phone input
       countries: [],
       postalCodePatterns: {}, // Store postal code patterns by country name
       telInputOptions: {
@@ -207,13 +209,10 @@ export default {
         });
     },
     updatePhoneCountry() {
-      // Implementation for updating phone country code based on selected country
-      if (this.$refs.phoneInput && this.client.Country) {
-        // Find the country code for the selected country
+      if (this.client.Country) {
         const country = postalCodesData.find(c => c.name === this.client.Country);
         if (country && country.abbrev) {
-          // Set the country in the phone input component if available
-          this.$refs.phoneInput.setCountry(country.abbrev.toLowerCase());
+          this.defaultCountryCode = country.abbrev.toLowerCase();
         }
       }
     },
