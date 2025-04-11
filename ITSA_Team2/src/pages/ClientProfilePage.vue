@@ -634,6 +634,8 @@
 import axios from "axios";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
+import postalCodesData from '../postal_codes_regex.json'; // Adjust path as needed
+
 
 export default {
   name: "ClientProfilePage",
@@ -675,20 +677,23 @@ export default {
       accountTypeFilter: "",
     };
   },
-  // NOTE: Godewyn
-  // created() {
-  //   // Access countries from global properties
-  //   const countryNames = this.$countries.getNames("en");
-  //   const countryCodes = this.$countries.getAlpha3Codes();
-
-  //   this.countries = Object.keys(countryNames).map((code) => ({
-  //     code: countryCodes[code] || code,
-  //     name: countryNames[code],
-  //   }));
-
-  //   // Sort countries alphabetically by name
-  //   this.countries.sort((a, b) => a.name.localeCompare(b.name));
-  // },
+  created() {
+    // Extract countries from the imported JSON data
+    this.countries = postalCodesData
+      .map(country => ({
+        code: country.abbrev,
+        name: country.name
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Create a lookup for postal code patterns by country name
+    this.postalCodePatterns = postalCodesData.reduce((acc, country) => {
+      if (country.postal) {
+        acc[country.name] = country.postal;
+      }
+      return acc;
+    }, {});
+  },
   computed: {
     // Filter bank accounts based on search and type filter
     // filteredBankAccounts() {
