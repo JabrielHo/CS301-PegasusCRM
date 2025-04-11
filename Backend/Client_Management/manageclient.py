@@ -42,6 +42,11 @@ def async_route(f):
 
     return decorated_function
 
+# Health Check
+@manage_client_blueprint.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
+
 
 # Delete by clientId
 @manage_client_blueprint.route("/delete", methods=["DELETE"])
