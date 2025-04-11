@@ -17,7 +17,7 @@
     <div class="filter-panel" v-if="showFilters">
       <div class="filter-row">
         <div class="filter-group">
-          <label for="date-range">Date Range:</label>
+          <label for="date-range"">Date Range:</label>
           <select id="date-range" v-model="filters.dateRange">
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
@@ -47,8 +47,6 @@
             placeholder="Search by agent name"
           >
         </div>
-        
-        <button class="apply-filters-btn" @click="applyFilters">Apply Filters</button>
       </div>
     </div>
     
@@ -83,7 +81,7 @@
           <thead>
             <tr>
               <th @click="sortBy('agentName')">
-                Agent Name
+                Agent ID
                 <span class="sort-indicator" v-if="sortColumn === 'agentName'">
                   {{ sortDirection === 'asc' ? '↑' : '↓' }}
                 </span>
@@ -106,8 +104,6 @@
                   {{ sortDirection === 'asc' ? '↑' : '↓' }}
                 </span>
               </th>
-              <th>Details</th>
-              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -117,24 +113,17 @@
             <tr v-for="activity in paginatedActivities" :key="activity.id" class="activity-row">
               <td>
                 <div class="agent-name">
-                  <span class="agent-avatar">{{ getInitials(activity.agentName) }}</span>
-                  {{ activity.agentName }}
+                  {{ activity.agentID }}
                 </div>
               </td>
-              <td>{{ formatDateTime(activity.timestamp) }}</td>
+              <td>{{ formatDateTime(activity.dateTime) }}</td>
               <td>
                 <span class="activity-badge" :class="activityTypeClass(activity.activityType)">
-                  {{ activity.activityType }}
+
                 </span>
+                {{ activity.action }}
               </td>
               <td>{{ activity.clientName }}</td>
-              <td>{{ activity.details }}</td>
-              <td>
-                <div class="action-icons">
-                  <button class="icon-btn view-btn" title="View Details" @click="viewDetails(activity.id)">👁️</button>
-                  <button class="icon-btn notification-btn" title="Send Notification" @click="sendNotification(activity.id)">📧</button>
-                </div>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -173,6 +162,7 @@
 </template>
 
 <script>
+import axiosInstance from 'axios';
 export default {
   data() {
     return {
@@ -282,123 +272,21 @@ export default {
     // Fetch agent activities from API
     fetchAgentActivities() {
       this.isLoading = true;
-      
+
       // API endpoint for agent activities
-      const endpoint = '/api/agent-activities';
+      const endpoint = 'https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records';
       
-      // In a real implementation, you would use axios or fetch
-      // axios.get(endpoint, { params: this.filters })
-      //   .then(response => {
-      //     this.activities = response.data.activities;
-      //     this.isLoading = false;
-      //   })
-      //   .catch(error => {
-      //     console.error('Error fetching agent activities:', error);
-      //     this.isLoading = false;
-      //   });
+      axiosInstance.get(endpoint)
+        .then(response => {
+          this.activities = response.data;
+          this.isLoading = false;
       
-      // For demonstration, we'll use mock data
-      setTimeout(() => {
-        this.activities = [
-          {
-            id: 1,
-            agentName: 'Sarah Johnson',
-            timestamp: '2025-04-11T09:30:00',
-            activityType: 'Client Update',
-            clientName: 'Global Tech Inc.',
-            details: 'Updated contact information and policy preferences'
-          },
-          {
-            id: 2,
-            agentName: 'Michael Chen',
-            timestamp: '2025-04-11T08:45:00',
-            activityType: 'Policy Creation',
-            clientName: 'Amanda Wilson',
-            details: 'Created new homeowner policy #HO-29384'
-          },
-          {
-            id: 3,
-            agentName: 'Emily Rodriguez',
-            timestamp: '2025-04-10T16:20:00',
-            activityType: 'Claim Processing',
-            clientName: 'Robert Thompson',
-            details: 'Processed claim #CL-83726 for water damage'
-          },
-          {
-            id: 4,
-            agentName: 'David Kim',
-            timestamp: '2025-04-10T14:15:00',
-            activityType: 'Login',
-            clientName: 'N/A',
-            details: 'Logged in from Seattle office IP'
-          },
-          {
-            id: 5,
-            agentName: 'Sarah Johnson',
-            timestamp: '2025-04-10T11:05:00',
-            activityType: 'Client Update',
-            clientName: 'Sunset Restaurants',
-            details: 'Adjusted commercial liability coverage limits'
-          },
-          {
-            id: 6,
-            agentName: 'James Wilson',
-            timestamp: '2025-04-09T15:30:00',
-            activityType: 'Policy Creation',
-            clientName: 'Jennifer Adams',
-            details: 'Created new auto policy #AU-74621'
-          },
-          {
-            id: 7,
-            agentName: 'Lisa Garcia',
-            timestamp: '2025-04-09T13:40:00',
-            activityType: 'Claim Processing',
-            clientName: 'Thomas Wright',
-            details: 'Initiated claim investigation for #CL-92048'
-          },
-          {
-            id: 8,
-            agentName: 'Michael Chen',
-            timestamp: '2025-04-09T10:15:00',
-            activityType: 'Client Update',
-            clientName: 'Eastside Realty',
-            details: 'Added new property to existing policy'
-          },
-          {
-            id: 9,
-            agentName: 'Emily Rodriguez',
-            timestamp: '2025-04-08T16:50:00',
-            activityType: 'Policy Creation',
-            clientName: 'William Johnson',
-            details: 'Created new life insurance policy #LI-38295'
-          },
-          {
-            id: 10,
-            agentName: 'David Kim',
-            timestamp: '2025-04-08T09:20:00',
-            activityType: 'Login',
-            clientName: 'N/A',
-            details: 'Logged in from mobile device'
-          },
-          {
-            id: 11,
-            agentName: 'James Wilson',
-            timestamp: '2025-04-08T08:30:00',
-            activityType: 'Client Update',
-            clientName: 'Patricia Martinez',
-            details: 'Updated beneficiary information'
-          },
-          {
-            id: 12,
-            agentName: 'Lisa Garcia',
-            timestamp: '2025-04-07T14:25:00',
-            activityType: 'Claim Processing',
-            clientName: 'Michael Turner',
-            details: 'Approved claim #CL-74392 for auto collision'
-          }
-        ];
-        this.isLoading = false;
-      }, 800);
+          console.log('Fetched agent activities:', [...this.activities]);
+        })
+        .catch(error => {
+          console.error('Error fetching agent activities:', error);
+          this.isLoading = false;
+        });
     },
     
     // Fetch dashboard statistics
@@ -436,13 +324,6 @@ export default {
     toggleFilterPanel() {
       this.showFilters = !this.showFilters;
     },
-    
-    // Apply filters
-    applyFilters() {
-      this.currentPage = 1; // Reset to first page when applying filters
-      this.fetchAgentActivities();
-    },
-    
     // Sort table by column
     sortBy(column) {
       if (this.sortColumn === column) {
@@ -466,16 +347,7 @@ export default {
         minute: '2-digit'
       });
     },
-    
-    // Get initials for avatar
-    getInitials(name) {
-      return name
-        .split(' ')
-        .map(part => part.charAt(0))
-        .join('')
-        .toUpperCase();
-    },
-    
+
     // Get CSS class for activity type
     activityTypeClass(type) {
       const classes = {
