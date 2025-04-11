@@ -740,7 +740,7 @@ def validate_input(data):
     else:
         return {"status": "success", "message": "Validation passed."}
 
-app.register_blueprint(client_blueprint, url_prefix="/clients")
+app.register_blueprint(client_blueprint, url_prefix="/api/clients")
 
 #region Setting up Flask app
 if __name__ == "__main__":

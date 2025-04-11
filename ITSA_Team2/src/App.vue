@@ -58,10 +58,6 @@
                 <span class="nav-icon">⚙️</span>
                 Manage Accounts
               </router-link>
-              <router-link to="/admin-agent-activities" class="nav-link">
-                <span class="nav-icon">📝</span>
-                Agent Activities
-              </router-link>
             </div>
             
             <!-- Agent links -->
