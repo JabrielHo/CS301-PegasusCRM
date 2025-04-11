@@ -245,7 +245,7 @@ def create_client():
             "action": "Create|Client",
             "agentID": client.AgentID,
             "clientID": client.ClientID,
-            "dateTime": datetime.now(),
+            "dateTime": datetime.now().isoformat(),
             "clientName": f"{client.FirstName} {client.LastName}",
             "clientEmail": f"{client.EmailAddress}",
         }
