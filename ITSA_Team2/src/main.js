@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
 import router from './router'
-import * as countries from 'i18n-iso-countries'
+import countries from 'i18n-iso-countries'
 import VueTelInput from 'vue-tel-input'
 import 'vue-tel-input/vue-tel-input.css'
 
@@ -13,6 +13,7 @@ import enLocale from 'i18n-iso-countries/langs/en.json'
 countries.registerLocale(enLocale)
 const app = createApp(App)
 app.config.globalProperties.$countries = countries
+
 app.use(router)
 app.use(VueTelInput)
 app.mount('#app')
