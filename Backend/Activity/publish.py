@@ -6,10 +6,9 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# No manual session needed — boto3 automatically uses the IAM Role in Fargate!
 sqs = boto3.client('sqs', region_name=os.getenv('AWS_REGION', 'ap-southeast-1'))
 
-SQS_QUEUE_URL = os.getenv('QUEUE_URL')  # Load from environment variable
+SQS_QUEUE_URL = os.getenv('QUEUE_URL')
 
 def send_message_to_sqs(message_body):
     response = sqs.send_message(
