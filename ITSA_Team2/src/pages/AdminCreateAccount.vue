@@ -176,6 +176,9 @@ export default {
   max-width: 600px;
   margin: 0 auto;
   font-family: 'Arial', sans-serif;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 header {
