@@ -81,9 +81,7 @@
               <input 
                 v-model="client.PostalCode" 
                 type="text" 
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="6"
+                :inputmode="getInputMode()"
                 placeholder="Postal Code" 
                 @input="validatePostalCode"
                 required />
@@ -103,7 +101,8 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-// import { getData } from 'country-list'
+// Import the postal codes JSON file
+import postalCodesData from '../postal_codes_regex.json'; // Adjust path as needed
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
 
@@ -125,6 +124,7 @@ export default {
         Gender: ''
       },
       countries: [],
+      postalCodePatterns: {}, // Store postal code patterns by country name
       telInputOptions: {
         placeholder: 'Phone Number',
         type: 'tel',
@@ -137,17 +137,23 @@ export default {
       }
     };
   },
-  // NOTE: Godewyn
-  // created() {
-  // // Get countries from global properties
-  // this.countries = this.$countries.getCountryData().map(country => ({
-  //   code: country.code,
-  //   name: country.name
-  // }));
-  
-  // // Sort countries alphabetically by name
-  // this.countries.sort((a, b) => a.name.localeCompare(b.name));
-  // },
+  created() {
+    // Extract countries from the imported JSON data
+    this.countries = postalCodesData
+      .map(country => ({
+        code: country.abbrev,
+        name: country.name
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    
+    // Create a lookup for postal code patterns by country name
+    this.postalCodePatterns = postalCodesData.reduce((acc, country) => {
+      if (country.postal) {
+        acc[country.name] = country.postal;
+      }
+      return acc;
+    }, {});
+  },
   methods: {
     async getUserAttributes() {
       const user = await fetchUserAttributes();
@@ -200,13 +206,49 @@ export default {
           console.error('Error saving client profile:', error);
         });
     },
-    // Note: updatePhoneCountry method is referenced but wasn't defined in original code
     updatePhoneCountry() {
-      // Add implementation if needed
+      // Implementation for updating phone country code based on selected country
+      if (this.$refs.phoneInput && this.client.Country) {
+        // Find the country code for the selected country
+        const country = postalCodesData.find(c => c.name === this.client.Country);
+        if (country && country.abbrev) {
+          // Set the country in the phone input component if available
+          this.$refs.phoneInput.setCountry(country.abbrev.toLowerCase());
+        }
+      }
     },
-    // validatePostalCode is referenced but wasn't defined in original code
     validatePostalCode() {
-      // Add implementation if needed
+      const country = this.client.Country;
+      const postalCode = this.client.PostalCode;
+      
+      if (!country || !postalCode) return;
+      
+      const pattern = this.postalCodePatterns[country];
+      if (!pattern) return; // No validation pattern for this country
+      
+      try {
+        const regex = new RegExp(`^${pattern}$`);
+        if (!regex.test(postalCode)) {
+          toast(`Invalid postal code format for ${country}`, {
+            type: 'error',
+            autoClose: 3000
+          });
+        }
+      } catch (error) {
+        console.error('Invalid regex pattern:', error);
+      }
+    },
+    getInputMode() {
+      // Determine the input mode based on the selected country's postal code format
+      const country = this.client.Country;
+      if (!country) return 'text';
+      
+      const pattern = this.postalCodePatterns[country];
+      // If the pattern only contains numeric characters, use numeric input mode
+      if (pattern && pattern.includes('[0-9]') && !pattern.includes('[A-Z]') && !pattern.includes('[a-z]')) {
+        return 'numeric';
+      }
+      return 'text'; // Default to text for alphanumeric postal codes
     }
   }
 };
