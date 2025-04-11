@@ -675,19 +675,20 @@ export default {
       accountTypeFilter: "",
     };
   },
-  created() {
-    // Access countries from global properties
-    const countryNames = this.$countries.getNames("en");
-    const countryCodes = this.$countries.getAlpha3Codes();
+  // NOTE: Godewyn
+  // created() {
+  //   // Access countries from global properties
+  //   const countryNames = this.$countries.getNames("en");
+  //   const countryCodes = this.$countries.getAlpha3Codes();
 
-    this.countries = Object.keys(countryNames).map((code) => ({
-      code: countryCodes[code] || code,
-      name: countryNames[code],
-    }));
+  //   this.countries = Object.keys(countryNames).map((code) => ({
+  //     code: countryCodes[code] || code,
+  //     name: countryNames[code],
+  //   }));
 
-    // Sort countries alphabetically by name
-    this.countries.sort((a, b) => a.name.localeCompare(b.name));
-  },
+  //   // Sort countries alphabetically by name
+  //   this.countries.sort((a, b) => a.name.localeCompare(b.name));
+  // },
   computed: {
     // Filter bank accounts based on search and type filter
     // filteredBankAccounts() {

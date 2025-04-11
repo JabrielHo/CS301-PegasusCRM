@@ -7,10 +7,11 @@ import VueTelInput from 'vue-tel-input'
 import 'vue-tel-input/vue-tel-input.css'
 
 const app = createApp(App)
+// NOTE: Godewyn
 // Make country data available globally
-app.config.globalProperties.$countries = {
-    getCountryData: () => getData()
-}
+// app.config.globalProperties.$countries = {
+//     getCountryData: () => getData()
+// }
 
 app.use(router)
 app.use(VueTelInput)

@@ -233,7 +233,6 @@
 import axios from 'axios';
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
-import { getData } from 'country-list'
 
 export default {
   data() {

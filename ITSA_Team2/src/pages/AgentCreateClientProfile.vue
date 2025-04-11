@@ -103,7 +103,7 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import 'vue3-toastify/dist/index.css';
-import { getData } from 'country-list'
+// import { getData } from 'country-list'
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
 
@@ -137,16 +137,17 @@ export default {
       }
     };
   },
-  created() {
-  // Get countries from global properties
-  this.countries = this.$countries.getCountryData().map(country => ({
-    code: country.code,
-    name: country.name
-  }));
+  // NOTE: Godewyn
+  // created() {
+  // // Get countries from global properties
+  // this.countries = this.$countries.getCountryData().map(country => ({
+  //   code: country.code,
+  //   name: country.name
+  // }));
   
-  // Sort countries alphabetically by name
-  this.countries.sort((a, b) => a.name.localeCompare(b.name));
-  },
+  // // Sort countries alphabetically by name
+  // this.countries.sort((a, b) => a.name.localeCompare(b.name));
+  // },
   methods: {
     async getUserAttributes() {
       const user = await fetchUserAttributes();

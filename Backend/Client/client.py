@@ -14,16 +14,22 @@ app = Flask(__name__)
 
 load_dotenv()
 
-secret_string = os.getenv("SECRET_STRING")
+# secret_string = os.getenv("SECRET_STRING")
 
-secrets = json.loads(secret_string)
+# secrets = json.loads(secret_string)
 
-AWS_REGION = secrets.get("AWS_REGION")
-AWS_ACCESS_KEY_ID = secrets.get("AWS_ACCESS_KEY_ID")
-DB_USER = secrets.get("DB_USER")
-DB_PASSWORD = secrets.get("DB_PASSWORD")
-DB_HOST = secrets.get("DB_HOST")
-DB_NAME = secrets.get("DB_NAME")
+# AWS_REGION = secrets.get("AWS_REGION")
+# AWS_ACCESS_KEY_ID = secrets.get("AWS_ACCESS_KEY_ID")
+# DB_USER = secrets.get("DB_USER")
+# DB_PASSWORD = secrets.get("DB_PASSWORD")
+# DB_HOST = secrets.get("DB_HOST")
+# DB_NAME = secrets.get("DB_NAME")
+AWS_REGION = os.getenv("AWS_REGION")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
 DB_PORT = 3306
 
 # Set the SQLAlchemy URI using environment variables
@@ -505,7 +511,7 @@ def verify_user(clientId):
 # Get Client Documents
 @client_blueprint.route('/<string:clientId>/documents', methods=['GET'])
 def view_client_documents(clientId):
-    
+
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
 
     if not client:
