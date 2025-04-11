@@ -253,9 +253,8 @@ export default {
     },
     async loadClientProfiles() {
       await this.getUserAttributes();
-      // TODO: Replace with actual API call
       axios
-        .get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/all/${this.agentID}`)
         .then((response) => {
           this.clients = response.data.clients;
           console.log("Client profiles loaded:", this.clients);

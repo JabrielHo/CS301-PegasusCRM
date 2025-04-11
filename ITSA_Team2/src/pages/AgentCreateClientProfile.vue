@@ -175,9 +175,7 @@ export default {
       
       console.log('Saving client profile:', this.client);
 
-      // Call the save function to handle the data
-      // TODO: Replace with Actual Endpoint
-      axios.post('http://127.0.0.1:5001/clients', this.client)
+      axios.post('https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients', this.client)
         .then(response => {
           console.log('Client profile saved successfully:', response.data);
           toast("Client profile saved successfully!", {

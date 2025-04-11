@@ -760,9 +760,8 @@ export default {
       this.editedClient.active = !this.editedClient.active;
     },
     loadClient() {
-      // Assuming your API is set to retrieve client by ID
       axios
-        .get(`http://127.0.0.1:5001/clients/${this.clientID}`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`)
         .then((response) => {
           this.client = response.data.client;
           console.log("Client data loaded:", this.client);
@@ -782,7 +781,7 @@ export default {
       // TODO: Remove with Actual Endpoint
       axios
         .put(
-          `http://127.0.0.1:5001/clients/${this.clientID}`,
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`,
           this.editedClient
         )
         .then((response) => {
@@ -824,7 +823,7 @@ export default {
     // Fetch Documents from S3
     fetchVerificationDocuments(clientID) {
       axios
-        .get(`http://127.0.0.1:5001/clients/${clientID}/documents`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/documents`)
         .then((response) => {
           this.documents = response.data.documents.map((doc) => {
             // Extract the file name by splitting at '/' and returning the last part
@@ -837,7 +836,7 @@ export default {
     },
     // Send verification email
     sendVerification(clientID){
-      axios.post(`http://127.0.0.1:5001/clients/${clientID}/verify`)
+      axios.post(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify`)
         .then(() => {
           toast("Verification email sent successfully!", {
             type: "success",
@@ -855,7 +854,7 @@ export default {
     // Verify user
     verifyUser(clientID) {
       axios
-        .put(`http://127.0.0.1:5001/clients/${clientID}/verify_user`, {
+        .put(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify_user`, {
           Verified: true,
         })
         .then(() => {
@@ -877,7 +876,7 @@ export default {
     getPresignedUrl(doc) {
       axios
         .get(
-          `http://127.0.0.1:5001/clients/${this.clientID}/documents/presign/${doc}`
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}/documents/presign/${doc}`
         )
         .then((response) => {
           console.log("Pre-signed URL fetched successfully:", response.data);
@@ -906,7 +905,7 @@ export default {
       // Your logic to delete client
       console.log("Deleting client:", clientID);
       axios
-        .delete(`http://127.0.0.1:5001/clients/${clientID}`)
+        .delete(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}`)
         .then(() => {
           toast("Client deleted successfully!", {
             type: "success",
