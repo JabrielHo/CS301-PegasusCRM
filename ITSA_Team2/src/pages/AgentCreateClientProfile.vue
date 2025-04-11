@@ -1,6 +1,5 @@
 <template>
   <div class="create-client-profile">
-
     <div class="form-container">
       <form @submit.prevent="submitForm">
         <div class="form-columns">
@@ -84,7 +83,7 @@
                 type="text" 
                 :inputmode="getInputMode()"
                 placeholder="Postal Code" 
-                @input="validatePostalCode"
+                @blur="validatePostalCodeOnBlur"
                 required />
             </div>
           </div>
@@ -136,7 +135,9 @@ export default {
         showDialCodeInSelection: true,
         showFlags: true,
         showSearchBox: true
-      }
+      },
+      lastValidatedPostalCode: '', // Track the last validated value to prevent duplicate toasts
+      isPostalCodeValid: true, // Track if postal code is valid
     };
   },
   created() {
@@ -162,6 +163,11 @@ export default {
       this.client.AgentID = user.sub;
     },
     submitForm() {
+      // Validate the postal code before submitting
+      if (!this.validatePostalCode()) {
+        return; // Stop if postal code is invalid
+      }
+
       // Remove spaces from the phone number before submitting
       this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, '');
       // Get AgentID
@@ -182,18 +188,18 @@ export default {
         .catch(error => {
           // Handle error response
           // If the error response contains validation errors
-          if(error.status == 400){
+          if(error.response && error.response.status === 400){
             const errors = error.response.data.errors;
             // Display error messages 
-            for (const error of errors) {
-              toast(error, {
+            for (const errorMsg of errors) {
+              toast(errorMsg, {
                 type: 'error',
                 autoClose: 3000
               });
             }
           }
           // If the error response indicates a conflict (e.g., duplicate email)
-          else if(error.status == 409){
+          else if(error.response && error.response.status === 409){
             toast(error.response.data.error, {
               type: 'error',
               autoClose: 3000
@@ -215,26 +221,53 @@ export default {
           this.defaultCountryCode = country.abbrev.toLowerCase();
         }
       }
+      // Clear postal code when country changes to avoid validation errors
+      this.client.PostalCode = '';
+      this.isPostalCodeValid = true;
+      this.lastValidatedPostalCode = '';
+    },
+    validatePostalCodeOnBlur() {
+      // Only validate on blur if postal code has changed
+      if (this.client.PostalCode !== this.lastValidatedPostalCode) {
+        this.validatePostalCode();
+      }
     },
     validatePostalCode() {
       const country = this.client.Country;
       const postalCode = this.client.PostalCode;
       
-      if (!country || !postalCode) return;
+      // Skip validation if postal code is empty or no country is selected
+      if (!postalCode || !country) {
+        return true;
+      }
       
+      // Get pattern for the selected country
       const pattern = this.postalCodePatterns[country];
-      if (!pattern) return; // No validation pattern for this country
+      if (!pattern) {
+        return true; // No validation pattern for this country
+      }
       
       try {
         const regex = new RegExp(`^${pattern}$`);
+        
+        // Update last validated postal code to prevent duplicate toasts
+        this.lastValidatedPostalCode = postalCode;
+        
         if (!regex.test(postalCode)) {
-          toast(`Invalid postal code format for ${country}`, {
+          const errorMsg = `Invalid postal code format for ${country}`;
+          toast(errorMsg, {
             type: 'error',
             autoClose: 3000
           });
+          this.isPostalCodeValid = false;
+          return false;
         }
+        
+        this.isPostalCodeValid = true;
+        return true;
       } catch (error) {
         console.error('Invalid regex pattern:', error);
+        return true; // Allow submission if regex is invalid
       }
     },
     getInputMode() {
@@ -248,6 +281,19 @@ export default {
         return 'numeric';
       }
       return 'text'; // Default to text for alphanumeric postal codes
+    }
+  },
+  watch: {
+    // Watch for country changes and update accordingly
+    'client.Country': function() {
+      this.updatePhoneCountry();
+    },
+    // Reset validation when postal code is changed
+    'client.PostalCode': function() {
+      // If user is changing the postal code, don't show the error until they finish (blur)
+      if (this.client.PostalCode !== this.lastValidatedPostalCode) {
+        this.isPostalCodeValid = true;
+      }
     }
   }
 };
