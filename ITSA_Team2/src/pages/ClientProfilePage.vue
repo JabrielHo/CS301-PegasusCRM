@@ -110,15 +110,14 @@
             >
               View Documents
             </button>
-            <!-- Display list of documents if available -->
-            <div v-if="documents.length > 0">
-              <div v-for="(doc, index) in documents" :key="index">
-                <button class="btn-view" @click="getPresignedUrl(doc)">
-                  View {{ doc.split("/").pop() }}
-                </button>
-              </div>
-            </div>
-
+            <!-- Button to send verification -->
+            <button
+              class="btn-verify"
+              v-if="!client.Verified"
+              @click="sendVerification(client.ClientID)"
+            >
+              Send Verification
+            </button>
             <!-- Button to verify user -->
             <button
               class="btn-verify"
@@ -127,6 +126,19 @@
             >
               Verify User
             </button>
+          </div>
+          <div class="info-group">
+            <!-- Display list of documents if available -->
+            <div
+              v-if="documents.length > 0"
+              style="display: flex; gap: 10px; margin: 10px 0"
+            >
+              <div v-for="(doc, index) in documents" :key="index">
+                <button class="btn-view" @click="getPresignedUrl(doc)">
+                  View {{ doc.split("/").pop() }}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -817,6 +829,23 @@ export default {
           console.error("Error fetching documents:", error);
         });
     },
+    // Send verification email
+    sendVerification(clientID){
+      axios.post(`http://127.0.0.1:5001/clients/${clientID}/verify`)
+        .then(() => {
+          toast("Verification email sent successfully!", {
+            type: "success",
+            autoClose: 3000,
+          });
+        })
+        .catch((error) => {
+          console.error("Error sending verification email:", error);
+          toast("Error sending verification email. Please try again.", {
+            type: "error",
+            autoClose: 3000,
+          });
+        });
+    },
     // Verify user
     verifyUser(clientID) {
       axios
@@ -848,11 +877,7 @@ export default {
           console.log("Pre-signed URL fetched successfully:", response.data);
           this.imageUrl = response.data.link; // Store the pre-signed URL
 
-          window.open(
-            response.data.link,
-            "_blank"
-          ); // Open the pre-signed URL in a new tab
-
+          window.open(response.data.link, "_blank"); // Open the pre-signed URL in a new tab
         });
     },
     openDeletePopup(itemType, item) {
