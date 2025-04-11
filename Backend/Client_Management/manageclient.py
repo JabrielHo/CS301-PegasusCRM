@@ -98,7 +98,7 @@ async def delete_client():
                 }
 
                 print(message)
-                # send_message_to_sqs(message)
+                send_message_to_sqs(message)
 
                 return jsonify(await delete_response.json()), delete_response.status
 

@@ -24,7 +24,10 @@ DB_USER = secrets.get("DB_USER")
 DB_PASSWORD = secrets.get("DB_PASSWORD")
 DB_HOST = secrets.get("DB_HOST")
 DB_NAME = secrets.get("DB_NAME")
+QUEUE_URL = secrets.get("QUEUE_URL")
 DB_PORT = 3306
+
+sqs = boto3.client('sqs', region_name=AWS_REGION)
 
 # Set the SQLAlchemy URI using environment variables
 app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
@@ -124,6 +127,12 @@ def send_email(recipient, clientId, user_name):
         print(f"Email sent! Message ID: {response['MessageId']}")
     except ClientError as e:
         print(f"Error sending email: {e.response['Error']['Message']}")
+
+def send_message_to_sqs(message_body):
+    response = sqs.send_message(
+        QueueUrl=SQS_QUEUE_URL,
+        MessageBody=json.dumps(message_body)
+    )
 
 # Client Model
 class Client(db.Model):
@@ -227,6 +236,20 @@ def create_client():
         # Create S3 bucket directory using ClientID
         s3_directory = f"{client.AgentID}/{client.ClientID}/"
         s3.put_object(Bucket=BUCKET_NAME, Key=s3_directory)
+
+        transaction_id = str(uuid.uuid4())
+
+        send_message_to_sqs(
+        {
+            "transactionID": transaction_id,
+            "action": "Create|Client",
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": f"{client.EmailAddress}",
+        }
+    )   
 
     except Exception as e:
         return jsonify({
