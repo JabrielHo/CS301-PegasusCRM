@@ -505,6 +505,7 @@ def verify_user(clientId):
 # Get Client Documents
 @client_blueprint.route('/<string:clientId>/documents', methods=['GET'])
 def view_client_documents(clientId):
+    
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
 
     if not client:
