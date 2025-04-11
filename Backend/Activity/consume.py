@@ -3,9 +3,14 @@ import boto3
 import json
 import os
 from dotenv import load_dotenv
+from flask import request
+from flask_cors import CORS
+
+
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes 
 
 # Again, no manual credentials needed
 sqs = boto3.client('sqs', region_name=os.getenv('AWS_REGION', 'ap-southeast-1'))
@@ -22,8 +27,6 @@ def create_record_logic(data):
     if 'transactionID' not in data:
         raise ValueError("Missing transactionID field")
     table.put_item(Item=data)
-
-from flask import request
 
 # Create (Insert) a new record
 @app.route('/records', methods=['POST'])
@@ -62,7 +65,6 @@ def read_record(transactionID):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 # Update an existing record by transactionID
 @app.route('/records/<transactionID>', methods=['PUT'])
 def update_record(transactionID):
@@ -85,7 +87,6 @@ def update_record(transactionID):
         return jsonify({"status": "success", "message": "Record updated successfully"}), 200
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
-
 
 # Delete a record by transactionID
 @app.route('/records/<transactionID>', methods=['DELETE'])
@@ -238,7 +239,6 @@ def process_messages():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 @app.route('/process/status/<clientID>', methods=['GET'])
 def get_process_status(clientID):
     try:
@@ -268,6 +268,5 @@ def get_process_status(clientID):
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5004)  # Make sure it's accessible inside Fargate
+    app.run(host='0.0.0.0', port=5004)

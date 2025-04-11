@@ -311,7 +311,7 @@ def verify_client(clientId):
 
 # Update Client
 # SQS Not Done
-@client_blueprint.route('<string:clientId>', methods=['PUT'])
+@client_blueprint.route('/<string:clientId>', methods=['PUT'])
 def update_client(clientId):
     
     data = request.get_json()
