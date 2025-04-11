@@ -5,7 +5,6 @@ import HomeView from "../pages/HomeView.vue";
 import AdminDashboard from "../pages/AdminDashboard.vue";
 import AdminManageAccount from "../pages/AdminManageAccount.vue";
 import AdminCreateAccount from "../pages/AdminCreateAccount.vue";
-import AdminAgentActivities from "../pages/AdminAgentActivities.vue";
 import AgentDashboard from "../pages/AgentDashboard.vue";
 import AgentCreateClientProfile from "../pages/AgentCreateClientProfile.vue";
 import AgentViewTransactions from "../pages/AgentViewTransactions.vue";
@@ -48,12 +47,6 @@ const routes = [
     name: "Admin Create Account",
     component: AdminCreateAccount,
     meta: { roles: ["ADMINS", "ROOT_ADMIN"] },
-  },
-  {
-    path: "/admin-agent-activities",
-    name: "Admin Agent Activities",
-    component: AdminAgentActivities,
-    // Going to delete
   },
   {
     path: "/agent-dashboard",

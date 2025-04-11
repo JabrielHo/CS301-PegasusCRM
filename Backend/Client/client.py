@@ -311,7 +311,7 @@ def verify_client(clientId):
 
 # Update Client
 # SQS Not Done
-@client_blueprint.route('<string:clientId>', methods=['PUT'])
+@client_blueprint.route('/<string:clientId>', methods=['PUT'])
 def update_client(clientId):
     
     data = request.get_json()
@@ -740,7 +740,7 @@ def validate_input(data):
     else:
         return {"status": "success", "message": "Validation passed."}
 
-app.register_blueprint(client_blueprint, url_prefix="/clients")
+app.register_blueprint(client_blueprint, url_prefix="/api/clients")
 
 #region Setting up Flask app
 if __name__ == "__main__":
