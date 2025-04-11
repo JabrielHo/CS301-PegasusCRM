@@ -253,9 +253,8 @@ export default {
     },
     async loadClientProfiles() {
       await this.getUserAttributes();
-      // TODO: Replace with actual API call
       axiosInstance
-        .get(`http://127.0.0.1:5001/clients/all/${this.agentID}`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/all/${this.agentID}`)
         .then((response) => {
           this.clients = response.data.clients;
           console.log("Client profiles loaded:", this.clients);
@@ -275,7 +274,7 @@ export default {
     async loadClientAccountsCount(clientId) {
       // TODO: Replace with actual API call
       try {
-        const response = await axiosInstance.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
+        const response = await axiosInstance.get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_account/retrieve/${clientId}`);
         console.log("Client accounts loaded:", response.data);
 
         // Calculate and return the account count

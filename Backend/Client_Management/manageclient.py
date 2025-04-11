@@ -17,7 +17,6 @@ load_dotenv()
 # Service URLs
 CLIENT_SERVICE_URL = os.getenv("CLIENT_SERVICE_URL", "http://localhost:5001")
 ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:5003")
-QUEUE_URL = os.getenv("QUEUE_URL", "https://sqs.ap-southeast-1.amazonaws.com/123456789012/MyQueue")
 
 # Blueprints
 manage_client_blueprint = Blueprint("manage_client", __name__)
@@ -25,13 +24,13 @@ manage_account_blueprint = Blueprint("manage_account", __name__)
 
 # SQS Setup
 sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION", "ap-southeast-1"))
-SQS_QUEUE_URL = os.getenv("QUEUE_URL")
+QUEUE_URL = os.getenv("QUEUE_URL")
 
 
 # SQS Publish function
 def send_message_to_sqs(message_body):
     response = sqs.send_message(
-        QueueUrl=SQS_QUEUE_URL, MessageBody=json.dumps(message_body)
+        QueueUrl=QUEUE_URL, MessageBody=json.dumps(message_body)
     )
     print(f"Message sent! Message ID: {response['MessageId']}")
 
@@ -62,7 +61,7 @@ async def delete_client():
         async with aiohttp.ClientSession() as session:
             # Get client data
             async with session.get(
-                f"{CLIENT_SERVICE_URL}/clients/{client_id}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{client_id}"
             ) as client_response:
                 if client_response.status != 200:
                     return jsonify(await client_response.json()), client_response.status
@@ -87,7 +86,7 @@ async def delete_client():
 
             # Delete client if no accounts found
             async with session.delete(
-                f"{CLIENT_SERVICE_URL}/clients/{client_id}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{client_id}"
             ) as delete_response:
                 transaction_id = str(uuid.uuid4())
                 message = {
@@ -121,7 +120,7 @@ async def create_account():
         async with aiohttp.ClientSession() as session:
             # Get client data
             async with session.get(
-                f"{CLIENT_SERVICE_URL}/clients/{data['clientId']}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{data['clientId']}"
             ) as client_response:
                 if client_response.status != 200:
                     return jsonify(await client_response.json()), client_response.status
@@ -182,7 +181,7 @@ async def delete_account(account_id):
 
             # Get client data
             async with session.get(
-                f"{CLIENT_SERVICE_URL}/clients/{client_id}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{client_id}"
             ) as client_response:
                 if client_response.status != 200:
                     return jsonify(await client_response.json()), client_response.status
@@ -242,7 +241,7 @@ async def update_account(account_id):
 
             # Get client data
             async with session.get(
-                f"{CLIENT_SERVICE_URL}/clients/{client_id}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{client_id}"
             ) as client_response:
                 if client_response.status != 200:
                     return jsonify(await client_response.json()), client_response.status
@@ -288,7 +287,7 @@ async def retrieve_account(client_id):
         async with aiohttp.ClientSession() as session:
             # First check if the client exists
             async with session.get(
-                f"{CLIENT_SERVICE_URL}/clients/{client_id}"
+                f"{CLIENT_SERVICE_URL}/api/clients/{client_id}"
             ) as client_response:
                 if client_response.status != 200:
                     return jsonify(await client_response.json()), client_response.status

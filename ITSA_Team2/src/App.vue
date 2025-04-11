@@ -5,7 +5,7 @@
       <!-- Custom Header Slot - Logo and branding -->
       <template v-slot:header>
         <div class="auth-header">
-          <img src="../src/assets/pegasus.png" alt="Pegasus Logo" class="auth-logo">
+          <img src="../src/assets/Pegasus2.png" alt="Pegasus Logo" class="auth-logo">
           <h1 class="auth-title">Pegasus</h1>
         </div>
       </template>
@@ -26,7 +26,7 @@
                 :to="isAdmin ? '/admin-dashboard' : isAgent ? '/agent-dashboard' : '/'"
                 class="logo-link"
               >
-                <img src="../src/assets/pegasus.png" alt="">
+                <img src="../src/assets/Pegasus2.png" alt="">
                 <h1 class="logo">Pegasus</h1>
               </router-link>
             </div>

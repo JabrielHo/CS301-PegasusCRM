@@ -22,12 +22,8 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path
-              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-            ></path>
-            <path
-              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
-            ></path>
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
           </svg>
           Edit Profile
         </button>
@@ -89,54 +85,26 @@
           <div class="info-group">
             <div class="info-label">Status</div>
             <div class="info-value">
-              <span
-                :class="[
-                  'status-badge',
-                  client.Verified ? 'confirmed' : 'pending',
-                ]"
-              >
+              <span :class="['status-badge', client.Verified ? 'confirmed' : 'pending']">
                 {{ client.Verified ? "Verified" : "Not Verified" }}
               </span>
             </div>
           </div>
-          <div
-            class="info-group"
-            style="display: flex; gap: 10px; margin: 10px 0"
-          >
+          <div class="info-group" style="display: flex; gap: 10px; margin: 10px 0">
             <!-- Button to view verification documents -->
-            <button
-              class="btn-view"
-              @click="fetchVerificationDocuments(client.ClientID)"
-            >
-              View Documents
-            </button>
+            <button class="btn-view" @click="fetchVerificationDocuments(client.ClientID)">View Documents</button>
             <!-- Button to send verification -->
-            <button
-              class="btn-verify"
-              v-if="!client.Verified"
-              @click="sendVerification(client.ClientID)"
-            >
+            <button class="btn-verify" v-if="!client.Verified" @click="sendVerification(client.ClientID)">
               Send Verification
             </button>
             <!-- Button to verify user -->
-            <button
-              class="btn-verify"
-              v-if="!client.Verified"
-              @click="verifyUser(client.ClientID)"
-            >
-              Verify User
-            </button>
+            <button class="btn-verify" v-if="!client.Verified" @click="verifyUser(client.ClientID)">Verify User</button>
           </div>
           <div class="info-group">
             <!-- Display list of documents if available -->
-            <div
-              v-if="documents.length > 0"
-              style="display: flex; gap: 10px; margin: 10px 0"
-            >
+            <div v-if="documents.length > 0" style="display: flex; gap: 10px; margin: 10px 0">
               <div v-for="(doc, index) in documents" :key="index">
-                <button class="btn-view" @click="getPresignedUrl(doc)">
-                  View {{ doc.split("/").pop() }}
-                </button>
+                <button class="btn-view" @click="getPresignedUrl(doc)">View {{ doc.split("/").pop() }}</button>
               </div>
             </div>
           </div>
@@ -167,100 +135,173 @@
       </div>
 
       <!-- Account Search and Filter -->
-      <!-- <div class="accounts-filter">
-          <div class="search-container">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-            <input id="accountSearch" v-model="accountSearchQuery" type="text" placeholder="Search accounts..." />
-          </div>
-          <div class="filter-container">
-            <label for="typeFilter">Filter by type:</label>
-            <select id="typeFilter" v-model="accountTypeFilter">
-              <option value="">All Types</option>
-              <option value="Checking">Checking</option>
-              <option value="Savings">Savings</option>
-              <option value="Investment">Investment</option>
-            </select>
-          </div>
-        </div> -->
+      <div class="accounts-filter">
+        <div class="search-container">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input id="accountSearch" v-model="accountSearchQuery" type="text" placeholder="Search accounts..." />
+        </div>
+        <div class="filter-container">
+          <label for="typeFilter">Filter by type:</label>
+          <select id="typeFilter" v-model="accountTypeFilter">
+            <option value="">All Types</option>
+            <option value="Checking">Checking</option>
+            <option value="Savings">Savings</option>
+            <option value="Investment">Investment</option>
+          </select>
+        </div>
+      </div>
 
       <!-- Accounts Table -->
-      <!-- <div class="accounts-table">
-          <table>
-            <thead>
-              <tr>
-                <th>Account ID</th>
-                <th>Account Type</th>
-                <th>Status</th>
-                <th>Opening Date</th>
-                <th>Initial Deposit</th>
-                <th>Currency</th>
-                <th>Branch ID</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="account in filteredBankAccounts" :key="account.id" class="account-row">
-                <td>{{ account.id }}</td>
-                <td>{{ account.type }}</td>
-                <td>
-                  <span :class="['status-badge', account.active ? 'confirmed' : 'pending']">
-                    {{ account.active ? 'Active' : 'Inactive' }}
-                  </span>
-                </td>
-                <td>{{ formatDate(account.openingDate) }}</td>
-                <td>{{ formatCurrency(account.initialDeposit, account.currency) }}</td>
-                <td>{{ account.currency }}</td>
-                <td>{{ account.branchId }}</td>
-                <td>
-                  <div class="action-buttons-cell">
-                    <button class="btn-icon" title="View Transactions" @click="viewTransactions(account.id)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></svg>
-                    </button>
-                    <button class="btn-icon" title="Edit Account" @click="editAccount(account.id)">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </button>
-                    <button class="btn-icon danger" title="Freeze Account" @click="toggleAccountStatus(account.id)">
-                      <svg v-if="account.active" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0z"></path></svg>
-                      <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M4.93 4.93l14.14 14.14"></path></svg>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr v-if="filteredBankAccounts.length === 0">
-                <td colspan="8" class="no-results">
-                  <div class="empty-state">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    <p>No bank accounts found for this client</p>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div> -->
+      <div class="accounts-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Account ID</th>
+              <th>Account Type</th>
+              <th>Status</th>
+              <th>Opening Date</th>
+              <th>Initial Deposit</th>
+              <th>Currency</th>
+              <th>Branch ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="account in filteredBankAccounts" :key="account.id" class="account-row">
+              <td>{{ account.id }}</td>
+              <td>{{ account.type }}</td>
+              <td>
+                <span :class="['status-badge', account.active ? 'confirmed' : 'pending']">
+                  {{ account.accountStatus }}
+                </span>
+              </td>
+              <td>{{ formatDate(account.openingDate) }}</td>
+              <td>{{ formatCurrency(account.initialDeposit, account.currency) }}</td>
+              <td>{{ account.currency }}</td>
+              <td>{{ account.branchId }}</td>
+              <td>
+                <div class="action-buttons-cell">
+                  <button class="btn-icon" title="View Transactions" @click="viewTransactions(account.id)">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+                      <path
+                        d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+                      ></path>
+                    </svg>
+                  </button>
+                  <button class="btn-icon" title="Edit Account" @click="editAccount(account.id)">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                  </button>
+                  <button class="btn-icon danger" title="Freeze Account" @click="toggleAccountStatus(account.id)">
+                    <svg
+                      v-if="account.active"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M2 12h20M2 12a10 10 0 1 0 20 0 10 10 0 1 0-20 0z"></path>
+                    </svg>
+                    <svg
+                      v-else
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M12 2v20M4.93 4.93l14.14 14.14"></path>
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr v-if="filteredBankAccounts.length === 0">
+              <td colspan="8" class="no-results">
+                <div class="empty-state">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  <p>No bank accounts found for this client</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       <!-- Account Summary Footer -->
-      <!-- <div class="account-summary">
-          <div class="summary-item">
-            <div class="summary-label">Total Accounts</div>
-            <div class="summary-value">{{ client.bankAccounts.length }}</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">Active Accounts</div>
-            <div class="summary-value">{{ client.bankAccounts.filter(a => a.active).length }}</div>
-          </div>
-          <div class="summary-item">
-            <div class="summary-label">Total Balance</div>
-            <div class="summary-value">{{ formatCurrency(totalBalance, 'USD') }}</div>
-          </div>
-        </div> -->
+      <div class="account-summary">
+        <div class="summary-item">
+          <div class="summary-label">Total Accounts</div>
+          <div class="summary-value">{{ client.bankAccounts.length }}</div>
+        </div>
+        <div class="summary-item">
+          <div class="summary-label">Active Accounts</div>
+          <div class="summary-value">{{ client.bankAccounts.filter((a) => a.active).length }}</div>
+        </div>
+      </div>
     </div>
 
     <!-- Edit Profile Modal -->
-    <div
-      v-if="showEditProfileModal"
-      class="modal-overlay"
-      @click.self="closeEditModal"
-    >
+    <div v-if="showEditProfileModal" class="modal-overlay" @click.self="closeEditModal">
       <div class="modal">
         <div class="modal-header">
           <h3>Edit Client Profile</h3>
@@ -285,38 +326,22 @@
         <div class="modal-content">
           <div class="form-group">
             <label for="editFirstName">First Name</label>
-            <input
-              id="editFirstName"
-              v-model="editedClient.FirstName"
-              type="text"
-            />
+            <input id="editFirstName" v-model="editedClient.FirstName" type="text" />
           </div>
 
           <div class="form-group">
             <label for="editLastName">Last Name</label>
-            <input
-              id="editLastName"
-              v-model="editedClient.LastName"
-              type="text"
-            />
+            <input id="editLastName" v-model="editedClient.LastName" type="text" />
           </div>
 
           <div class="form-group">
             <label for="editDateOfBirth">Date of Birth</label>
-            <input
-              id="editDateOfBirth"
-              v-model="editedClient.DateOfBirth"
-              type="date"
-            />
+            <input id="editDateOfBirth" v-model="editedClient.DateOfBirth" type="date" />
           </div>
 
           <div class="form-group">
             <label for="editEmailAddress">Email Address</label>
-            <input
-              id="editEmailAddress"
-              v-model="editedClient.EmailAddress"
-              type="email"
-            />
+            <input id="editEmailAddress" v-model="editedClient.EmailAddress" type="email" />
           </div>
 
           <div class="form-group">
@@ -348,18 +373,9 @@
 
           <div class="form-group">
             <label for="country">Country</label>
-            <select
-              v-model="client.Country"
-              id="country"
-              required
-              @change="updatePhoneCountry"
-            >
+            <select v-model="client.Country" id="country" required @change="updatePhoneCountry">
               <option value="" disabled selected>Select Country</option>
-              <option
-                v-for="country in countries"
-                :key="country.name"
-                :value="country.name"
-              >
+              <option v-for="country in countries" :key="country.name" :value="country.name">
                 {{ country.name }}
               </option>
             </select>
@@ -367,11 +383,7 @@
 
           <div class="form-group">
             <label for="editPostalCode">Postal Code</label>
-            <input
-              id="editPostalCode"
-              v-model="editedClient.PostalCode"
-              type="text"
-            />
+            <input id="editPostalCode" v-model="editedClient.PostalCode" type="text" />
           </div>
 
           <div class="form-group">
@@ -389,26 +401,15 @@
         <div class="modal-footer">
           <div class="action-buttons">
             <button class="btn-cancel" @click="closeEditModal">Cancel</button>
-            <button class="btn-save" @click="saveProfileChanges">
-              Save Changes
-            </button>
-            <button
-              class="btn-delete"
-              @click="openDeletePopup('client', client)"
-            >
-              Delete
-            </button>
+            <button class="btn-save" @click="saveProfileChanges">Save Changes</button>
+            <button class="btn-delete" @click="openDeletePopup('client', client)">Delete</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Edit Bank Account Modal -->
-    <div
-      v-if="showEditAccountModal"
-      class="modal-overlay"
-      @click.self="closeAccountModal"
-    >
+    <div v-if="showEditAccountModal" class="modal-overlay" @click.self="closeAccountModal">
       <div class="modal">
         <div class="modal-header">
           <h3>
@@ -464,16 +465,10 @@
 
           <div class="form-group" v-if="isAddingAccount">
             <label for="initialDeposit">Initial Deposit</label>
-            <input
-              id="initialDeposit"
-              v-model="editedAccount.initialDeposit"
-              type="number"
-              min="0"
-              step="0.01"
-            />
+            <input id="initialDeposit" v-model="editedAccount.initialDeposit" type="number" min="0" step="0.01" />
           </div>
 
-          <div class="form-group">
+          <div class="form-group" v-if="isAddingAccount">
             <label for="accountCurrency">Currency</label>
             <select id="accountCurrency" v-model="editedAccount.currency">
               <option value="USD">USD - US Dollar</option>
@@ -484,24 +479,19 @@
             </select>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" v-if="isAddingAccount">
             <label for="branchId">Branch ID</label>
             <select id="branchId" v-model="editedAccount.branchId">
-              <option value="BR001">BR001 - Main Branch</option>
-              <option value="BR002">BR002 - Downtown Branch</option>
-              <option value="BR003">BR003 - West Side Branch</option>
-              <option value="BR004">BR004 - East Side Branch</option>
-              <option value="BR005">BR005 - North Branch</option>
+              <template v-for="branch in branches">
+                <option :value="branch.branchId">{{ branch.branchName }}</option>
+              </template>
             </select>
           </div>
 
           <div class="form-section" v-if="!isAddingAccount">
             <h4>Account Status</h4>
             <div class="status-toggle">
-              <button
-                @click="toggleEditedAccountStatus"
-                :class="editedAccount.active ? 'btn-disable' : 'btn-enable'"
-              >
+              <button @click="toggleEditedAccountStatus" :class="editedAccount.active ? 'btn-disable' : 'btn-enable'">
                 <svg
                   v-if="editedAccount.active"
                   xmlns="http://www.w3.org/2000/svg"
@@ -532,11 +522,7 @@
                   <path d="M5 12h14"></path>
                   <path d="M12 5v14"></path>
                 </svg>
-                {{
-                  editedAccount.active
-                    ? "Deactivate Account"
-                    : "Activate Account"
-                }}
+                {{ editedAccount.active ? "Deactivate Account" : "Activate Account" }}
               </button>
             </div>
           </div>
@@ -544,9 +530,7 @@
 
         <div class="modal-footer">
           <div class="action-buttons">
-            <button class="btn-cancel" @click="closeAccountModal">
-              Cancel
-            </button>
+            <button class="btn-cancel" @click="closeAccountModal">Cancel</button>
             <button class="btn-save" @click="saveAccountChanges">
               {{ isAddingAccount ? "Create Account" : "Save Changes" }}
             </button>
@@ -566,9 +550,7 @@
                 stroke-linejoin="round"
               >
                 <polyline points="3 6 5 6 21 6"></polyline>
-                <path
-                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                ></path>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
               </svg>
               Delete Account
             </button>
@@ -578,11 +560,7 @@
     </div>
 
     <!-- Client/Account Delete Confirmation Popup -->
-    <div
-      v-if="showDeleteConfirmation"
-      class="popup-overlay"
-      @click.self="closePopup"
-    >
+    <div v-if="showDeleteConfirmation" class="popup-overlay" @click.self="closePopup">
       <div class="popup">
         <div class="popup-header">
           <svg
@@ -605,20 +583,14 @@
         <div class="popup-content">
           <p>Are you sure you want to delete this {{ itemType }}?</p>
           <!-- If Deleting Client -->
-          <p v-if="itemToDelete.ClientID">
-            <strong>Client ID:</strong> {{ itemToDelete.ClientID }}
-          </p>
+          <p v-if="itemToDelete.ClientID"><strong>Client ID:</strong> {{ itemToDelete.ClientID }}</p>
           <p v-if="itemToDelete.FirstName || itemToDelete.LastName">
             <strong>Name:</strong>
             {{ itemToDelete.FirstName + " " + itemToDelete.LastName }}
           </p>
           <!-- If Deleting Account -->
-          <p v-if="itemToDelete.accountID">
-            <strong>ID:</strong> {{ itemToDelete.clientID }}
-          </p>
-          <p v-if="itemToDelete.type">
-            <strong>Type:</strong> {{ itemToDelete.type }}
-          </p>
+          <p v-if="itemToDelete.accountID"><strong>ID:</strong> {{ itemToDelete.clientID }}</p>
+          <p v-if="itemToDelete.type"><strong>Type:</strong> {{ itemToDelete.type }}</p>
           <p class="warning-text">This action cannot be undone.</p>
         </div>
         <div class="popup-footer">
@@ -634,8 +606,7 @@
 import axiosInstance from "../services/axiosInstance";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
-import postalCodesData from '../postal_codes_regex.json'; // Adjust path as needed
-
+import postalCodesData from "../postal_codes_regex.json"; // Adjust path as needed
 
 export default {
   name: "ClientProfilePage",
@@ -643,7 +614,9 @@ export default {
     return {
       // Client data
       clientID: null,
-      client: {},
+      client: {
+        bankAccounts: [],
+      },
 
       // Country + Telephone
       countries: [],
@@ -675,17 +648,18 @@ export default {
       editedAccount: {},
       accountSearchQuery: "",
       accountTypeFilter: "",
+      branches: "",
     };
   },
   created() {
     // Extract countries from the imported JSON data
     this.countries = postalCodesData
-      .map(country => ({
+      .map((country) => ({
         code: country.abbrev,
-        name: country.name
+        name: country.name,
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    
+
     // Create a lookup for postal code patterns by country name
     this.postalCodePatterns = postalCodesData.reduce((acc, country) => {
       if (country.postal) {
@@ -696,36 +670,23 @@ export default {
   },
   computed: {
     // Filter bank accounts based on search and type filter
-    // filteredBankAccounts() {
-    //   return this.client.bankAccounts.filter(account => {
-    //     // Search by account ID
-    //     const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
+    filteredBankAccounts() {
+      return this.client.bankAccounts.filter((account) => {
+        // Search by account ID
+        const matchesSearch = account.id.toLowerCase().includes(this.accountSearchQuery.toLowerCase());
 
-    //     // Filter by account type
-    //     const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
+        // Filter by account type
+        const matchesType = !this.accountTypeFilter || account.type === this.accountTypeFilter;
 
-    //     return matchesSearch && matchesType;
-    //   });
-    // },
-
-    // Calculate total balance across all accounts
-    totalBalance() {
-      return this.client.bankAccounts.reduce((total, account) => {
-        // Simple conversion rates for demonstration - in a real app these would be fetched from an API
-        let conversionRate = 1;
-        if (account.currency === "EUR") conversionRate = 1.1;
-        if (account.currency === "GBP") conversionRate = 1.3;
-        if (account.currency === "JPY") conversionRate = 0.0091;
-        if (account.currency === "CAD") conversionRate = 0.75;
-
-        return total + account.balance * conversionRate;
-      }, 0);
+        return matchesSearch && matchesType;
+      });
     },
   },
   mounted() {
     // Retrieve the clientID from the URL params
     this.clientID = this.$route.params.clientID;
     this.loadClient(); // Call the method to load client data using the clientID
+    this.getBranches();
   },
   methods: {
     // Format date to a readable format
@@ -762,27 +723,63 @@ export default {
     loadClient() {
       // Assuming your API is set to retrieve client by ID
       axiosInstance
-        .get(`http://127.0.0.1:5001/clients/${this.clientID}`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`)
         .then((response) => {
           this.client = response.data.client;
           console.log("Client data loaded:", this.client);
+          this.loadClientAccounts(this.clientID);
         })
         .catch((error) => {
           console.error("Error fetching client data:", error);
         });
     },
+    async loadClientAccounts(clientId) {
+      try {
+        const response = await axiosInstance.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
+        console.log("Client accounts loaded:", response.data);
+
+        if (response.data.accounts && Array.isArray(response.data.accounts)) {
+          this.client.bankAccounts = response.data.accounts.map((account) => ({
+            id: account.accountId,
+            type: account.accountType,
+            active: account.accountStatus === "Active",
+            accountStatus: account.accountStatus,
+            openingDate: account.openingDate,
+            initialDeposit: account.initialDeposit,
+            currency: account.currency,
+            branchId: account.branchId,
+          }));
+        } else {
+          // No accounts or invalid response
+          this.client.bankAccounts = [];
+        }
+      } catch (error) {
+        console.error("Error fetching client accounts:", error);
+        this.client.bankAccounts = [];
+      }
+    },
+    async getBranches() {
+      try {
+        const response = await axiosInstance.get(
+          "http://account-ecs-lb-852197336.ap-southeast-1.elb.amazonaws.com/api/branches"
+        );
+        console.log("Branches loaded:", response.data);
+
+        this.branches = response.data.branches;
+      } catch (error) {
+        console.error("Error fetching branches:", error);
+        this.branches = [];
+      }
+    },
     // Save profile changes
     saveProfileChanges() {
-      this.editedClient.PhoneNumber = this.editedClient.PhoneNumber.replace(
-        /\s+/g,
-        ""
-      );
+      this.editedClient.PhoneNumber = this.editedClient.PhoneNumber.replace(/\s+/g, "");
       this.client = { ...this.editedClient };
 
       // TODO: Remove with Actual Endpoint
       axiosInstance
         .put(
-          `http://127.0.0.1:5001/clients/${this.clientID}`,
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`,
           this.editedClient
         )
         .then((response) => {
@@ -824,7 +821,7 @@ export default {
     // Fetch Documents from S3
     fetchVerificationDocuments(clientID) {
       axiosInstance
-        .get(`http://127.0.0.1:5001/clients/${clientID}/documents`)
+        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/documents`)
         .then((response) => {
           this.documents = response.data.documents.map((doc) => {
             // Extract the file name by splitting at '/' and returning the last part
@@ -837,7 +834,7 @@ export default {
     },
     // Send verification email
     sendVerification(clientID){
-      axiosInstance.post(`http://127.0.0.1:5001/clients/${clientID}/verify`)
+      axiosInstance.post(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify`)
         .then(() => {
           toast("Verification email sent successfully!", {
             type: "success",
@@ -855,7 +852,7 @@ export default {
     // Verify user
     verifyUser(clientID) {
       axiosInstance
-        .put(`http://127.0.0.1:5001/clients/${clientID}/verify_user`, {
+        .put(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify_user`, {
           Verified: true,
         })
         .then(() => {
@@ -877,14 +874,14 @@ export default {
     getPresignedUrl(doc) {
       axiosInstance
         .get(
-          `http://127.0.0.1:5001/clients/${this.clientID}/documents/presign/${doc}`
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}/documents/presign/${doc}`
         )
         .then((response) => {
           console.log("Pre-signed URL fetched successfully:", response.data);
           this.imageUrl = response.data.link; // Store the pre-signed URL
 
-          window.open(response.data.link, "_blank"); // Open the pre-signed URL in a new tab
-        });
+        window.open(response.data.link, "_blank"); // Open the pre-signed URL in a new tab
+      });
     },
     openDeletePopup(itemType, item) {
       this.itemType = itemType;
@@ -906,7 +903,7 @@ export default {
       // Your logic to delete client
       console.log("Deleting client:", clientID);
       axiosInstance
-        .delete(`http://127.0.0.1:5001/clients/${clientID}`)
+        .delete(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}`)
         .then(() => {
           toast("Client deleted successfully!", {
             type: "success",
@@ -975,9 +972,7 @@ export default {
         this.client.bankAccounts.push(newAccount);
       } else {
         // Update existing account
-        const index = this.client.bankAccounts.findIndex(
-          (a) => a.id === this.editedAccount.id
-        );
+        const index = this.client.bankAccounts.findIndex((a) => a.id === this.editedAccount.id);
         if (index !== -1) {
           this.client.bankAccounts[index] = { ...this.editedAccount };
         }
@@ -988,12 +983,9 @@ export default {
 
     // Toggle account status
     toggleAccountStatus(accountId) {
-      const index = this.client.bankAccounts.findIndex(
-        (a) => a.id === accountId
-      );
+      const index = this.client.bankAccounts.findIndex((a) => a.id === accountId);
       if (index !== -1) {
-        this.client.bankAccounts[index].active =
-          !this.client.bankAccounts[index].active;
+        this.client.bankAccounts[index].active = !this.client.bankAccounts[index].active;
         // In a real app, this would send an API request to update the status
       }
     },
@@ -1007,9 +999,7 @@ export default {
 
     // Delete account
     deleteAccount() {
-      this.client.bankAccounts = this.client.bankAccounts.filter(
-        (account) => account.id !== this.accountToDelete.id
-      );
+      this.client.bankAccounts = this.client.bankAccounts.filter((account) => account.id !== this.accountToDelete.id);
       this.closePopup();
       // In a real app, this would send an API request to delete the account
     },

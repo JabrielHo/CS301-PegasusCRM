@@ -55,9 +55,6 @@ def get_accounts_by_client(clientId):
     )
     accounts = db.session.execute(stmt).scalars().all()
 
-    if not accounts:
-        return jsonify({"message": "No accounts found for this client"}), 404
-
     return (
         jsonify(
             {

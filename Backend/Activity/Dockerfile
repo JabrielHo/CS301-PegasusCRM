@@ -1,5 +1,5 @@
 # Use Python base image
-FROM python:3.11
+FROM python:3.13-slim
 
 # Set working directory
 WORKDIR /app
@@ -12,7 +12,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Expose Flask port
-EXPOSE 5000
+EXPOSE 5004
 
 # Start the app
 CMD ["python", "consume.py"]

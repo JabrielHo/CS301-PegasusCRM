@@ -6,20 +6,24 @@ from dotenv import load_dotenv
 from flask import request
 from flask_cors import CORS
 
+app = Flask(__name__)
 
 load_dotenv()
 
-app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes 
 
 # Again, no manual credentials needed
-sqs = boto3.client('sqs', region_name=os.getenv('AWS_REGION', 'ap-southeast-1'))
-dynamodb = boto3.resource('dynamodb', region_name=os.getenv('AWS_REGION', 'ap-southeast-1'))
-ses = boto3.client('ses', region_name=os.getenv('AWS_REGION', 'ap-southeast-1'))
+sqs = boto3.client('sqs', region_name='ap-southeast-1')
+dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-1')
+ses = boto3.client('ses', region_name='ap-southeast-1')
 
-SQS_QUEUE_URL = os.getenv('QUEUE_URL')
-DYNAMODB_TABLE = os.getenv('DYNAMO_TABLE')
-SENDER_EMAIL = os.getenv('SENDER_EMAIL')  # This should be verified in SES
+secret_string = os.getenv('SECRET_STRING')
+
+secrets = json.loads(secret_string)
+
+SQS_QUEUE_URL = secrets.get('QUEUE_URL')
+DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
+SENDER_EMAIL = secrets.get('SENDER_EMAIL')
 
 table = dynamodb.Table(DYNAMODB_TABLE)
 
@@ -27,6 +31,10 @@ def create_record_logic(data):
     if 'transactionID' not in data:
         raise ValueError("Missing transactionID field")
     table.put_item(Item=data)
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "healthy"}), 200
 
 # Create (Insert) a new record
 @app.route('/records', methods=['POST'])
@@ -53,7 +61,7 @@ def get_all_records():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # Read (Get) a record by transactionID
-@app.route('/records/<transactionID>', methods=['GET'])
+@app.route('/records/<string:transactionID>', methods=['GET'])
 def read_record(transactionID):
     try:
         response = table.get_item(Key={'transactionID': transactionID})
@@ -66,7 +74,7 @@ def read_record(transactionID):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # Update an existing record by transactionID
-@app.route('/records/<transactionID>', methods=['PUT'])
+@app.route('/records/<string:transactionID>', methods=['PUT'])
 def update_record(transactionID):
     try:
         data = request.json
@@ -89,7 +97,7 @@ def update_record(transactionID):
         return jsonify({"status": "error", "message": str(e)}), 500
 
 # Delete a record by transactionID
-@app.route('/records/<transactionID>', methods=['DELETE'])
+@app.route('/records/<string:transactionID>', methods=['DELETE'])
 def delete_record(transactionID):
     try:
         table.delete_item(Key={'transactionID': transactionID})
@@ -239,7 +247,7 @@ def process_messages():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/process/status/<clientID>', methods=['GET'])
+@app.route('/process/status/<string:clientID>', methods=['GET'])
 def get_process_status(clientID):
     try:
         # Query all records matching the clientID

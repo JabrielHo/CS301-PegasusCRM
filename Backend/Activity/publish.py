@@ -1,3 +1,4 @@
+# Refer to this file for how to publish to SQS
 import boto3
 import json
 import uuid
