@@ -8,15 +8,16 @@ import datetime
 from datetime import timezone
 import json
 
+app = Flask(__name__)
+
 load_dotenv()
 
 secret_string = os.getenv("SECRET_STRING")
 
 secrets = json.loads(secret_string)
 
-DB_URL = secrets["DB_URL"]
+DB_URL = secrets.get("DB_URL")
 
-app = Flask(__name__)
 CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
