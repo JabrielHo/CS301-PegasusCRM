@@ -125,13 +125,32 @@
           </svg>
         </button>
         <div class="pagination-pages">
+          <!-- First page button -->
+          <button v-if="currentPage > 3" @click="goToPage(1)" class="page-number">1</button>
+
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage > 4" class="page-ellipsis">...</span>
+
+          <!-- Page numbers around current page -->
           <button
-            v-for="page in totalPages"
+            v-for="page in visiblePageNumbers"
             :key="page"
             @click="goToPage(page)"
             :class="['page-number', { active: currentPage === page }]"
           >
             {{ page }}
+          </button>
+
+          <!-- Ellipsis if needed -->
+          <span v-if="currentPage < totalPages - 3" class="page-ellipsis">...</span>
+
+          <!-- Last page button -->
+          <button
+            v-if="currentPage < totalPages - 2 && totalPages > 1"
+            @click="goToPage(totalPages)"
+            class="page-number"
+          >
+            {{ totalPages }}
           </button>
         </div>
         <button class="btn-pagination" :disabled="isNextDisabled" @click="nextPage">
@@ -185,6 +204,22 @@ export default {
     };
   },
   computed: {
+    visiblePageNumbers() {
+      let start = Math.max(1, this.currentPage - 2);
+      let end = Math.min(this.totalPages, this.currentPage + 2);
+
+      // Adjust the range to always show 5 pages if possible
+      if (end - start + 1 < 5) {
+        if (start === 1) {
+          end = Math.min(5, this.totalPages);
+        } else if (end === this.totalPages) {
+          start = Math.max(1, this.totalPages - 4);
+        }
+      }
+
+      // Generate array of page numbers
+      return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    },
     totalPages() {
       if (this.isSearchMode) {
         return Math.ceil(this.allSearchResults.length / this.itemsPerPage);
@@ -324,6 +359,17 @@ export default {
 </script>
 
 <style scoped>
+.page-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
 :root {
   --primary-color: #3b82f6;
   --primary-hover: #2563eb;
