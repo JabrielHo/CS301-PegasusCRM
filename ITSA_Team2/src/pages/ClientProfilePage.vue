@@ -603,7 +603,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import axiosInstance from "../services/axiosInstance";
 import { toast } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 import postalCodesData from "../postal_codes_regex.json"; // Adjust path as needed
@@ -721,7 +721,8 @@ export default {
       this.editedClient.active = !this.editedClient.active;
     },
     loadClient() {
-      axios
+      // Assuming your API is set to retrieve client by ID
+      axiosInstance
         .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`)
         .then((response) => {
           this.client = response.data.client;
@@ -734,7 +735,7 @@ export default {
     },
     async loadClientAccounts(clientId) {
       try {
-        const response = await axios.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
+        const response = await axiosInstance.get(`http://127.0.0.1:5002/manage_account/retrieve/${clientId}`);
         console.log("Client accounts loaded:", response.data);
 
         if (response.data.accounts && Array.isArray(response.data.accounts)) {
@@ -759,7 +760,7 @@ export default {
     },
     async getBranches() {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           "http://account-ecs-lb-852197336.ap-southeast-1.elb.amazonaws.com/api/branches"
         );
         console.log("Branches loaded:", response.data);
@@ -776,7 +777,7 @@ export default {
       this.client = { ...this.editedClient };
 
       // TODO: Remove with Actual Endpoint
-      axios
+      axiosInstance
         .put(
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}`,
           this.editedClient
@@ -819,7 +820,7 @@ export default {
     },
     // Fetch Documents from S3
     fetchVerificationDocuments(clientID) {
-      axios
+      axiosInstance
         .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/documents`)
         .then((response) => {
           this.documents = response.data.documents.map((doc) => {
@@ -833,7 +834,7 @@ export default {
     },
     // Send verification email
     sendVerification(clientID){
-      axios.post(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify`)
+      axiosInstance.post(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify`)
         .then(() => {
           toast("Verification email sent successfully!", {
             type: "success",
@@ -850,7 +851,7 @@ export default {
     },
     // Verify user
     verifyUser(clientID) {
-      axios
+      axiosInstance
         .put(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify_user`, {
           Verified: true,
         })
@@ -871,7 +872,7 @@ export default {
     },
     // Get pre-signed URL for document
     getPresignedUrl(doc) {
-      axios
+      axiosInstance
         .get(
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}/documents/presign/${doc}`
         )
@@ -901,7 +902,7 @@ export default {
     deleteClient(clientID) {
       // Your logic to delete client
       console.log("Deleting client:", clientID);
-      axios
+      axiosInstance
         .delete(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}`)
         .then(() => {
           toast("Client deleted successfully!", {
