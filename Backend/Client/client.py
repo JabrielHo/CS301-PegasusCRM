@@ -130,7 +130,7 @@ def send_email(recipient, clientId, user_name):
 
 def send_message_to_sqs(message_body):
     response = sqs.send_message(
-        QueueUrl=SQS_QUEUE_URL,
+        QueueUrl=QUEUE_URL,
         MessageBody=json.dumps(message_body)
     )
 
