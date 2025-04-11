@@ -10,10 +10,16 @@ import json
 
 load_dotenv()
 
+secret_string = os.getenv("SECRET_STRING")
+
+secrets - json.loads(secret_string)
+
+DB_URL = secrets["DB_URL"]
+
 app = Flask(__name__)
 CORS(app)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
