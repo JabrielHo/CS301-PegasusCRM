@@ -37,7 +37,7 @@
             </svg>
             Clear Search
           </button>
-          <button class="refresh-btn" @click="refreshTransactions(client_id)">
+          <button class="refresh-btn" @click="refreshTransactions(this.clientId)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M23 4v6h-6"></path>
@@ -183,6 +183,7 @@
 import axiosInstance from "../services/axiosInstance"; // Adjust the import path as necessary
 
 export default {
+  props: ['clientId'],
   data() {
     return {
       searchQuery: '',
@@ -332,7 +333,8 @@ export default {
     }
   },
   created() {
-    this.loadTransactions();
+    // console.log(this.clientId);
+    this.loadTransactions(this.clientId);
   },
   watch: {
     // Reset selectAll when page changes or search results change

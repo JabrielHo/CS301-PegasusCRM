@@ -65,6 +65,7 @@ const routes = [
     name: "Agent View Transactions",
     component: AgentViewTransactions,
     meta: { roles: ["AGENTS"] },
+    props: true
   },
   {
     path: "/agent-manage-profiles",
@@ -90,7 +91,7 @@ const routes = [
     path: '/unauthorized',
     name: 'Unauthorized',
     component: () => import('../pages/Unauthorized.vue'),
-  },  
+  },
 
   // Components
   {
@@ -133,6 +134,12 @@ const routes = [
     name: "getListOfUsers",
     component: getListOfUsers,
   },
+
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../pages/NotFound.vue')
+  }
 ];
 
 import { fetchAuthSession } from "aws-amplify/auth";
