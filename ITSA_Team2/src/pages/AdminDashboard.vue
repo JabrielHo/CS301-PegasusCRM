@@ -180,7 +180,7 @@
 </template>
 
 <script>
-import axiosInstance from "axios";
+import axiosInstance from "../services/axiosInstance";
 export default {
   data() {
     return {

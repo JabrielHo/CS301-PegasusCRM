@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import axiosInstance from "axios";
+import axiosInstance from "../services/axiosInstance"; // Import your axios instance";
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
 
