@@ -16,7 +16,7 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
           <input id="search" v-model="searchQuery" type="text" placeholder="Search by Transaction ID or Amount..."
-            @keyup.enter="searchTransactions" />
+            @keyup="searchTransactions" />
           <button class="btn-search" @click="searchTransactions" title="Search">
             Search
           </button>

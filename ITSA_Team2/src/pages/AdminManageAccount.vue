@@ -317,6 +317,7 @@ import {
   enableUserInGroup,
   resetUserPassword
 } from '../services/client.ts'; // Adjust the import path as needed
+import { fetchUserAttributes } from 'aws-amplify/auth';
 
 export default {
   data() {
@@ -388,6 +389,16 @@ export default {
     }
   },
   methods: {
+    async getCurrentUserEmail() {
+      try {
+        const userAttributes = await fetchUserAttributes();
+        const email = userAttributes.email
+        return email;
+      } catch (error) {
+        console.error('Error fetching current user email:', error);
+        return null;
+      }
+    },
     async fetchUsers(groupName, token = null) {
       try {
         const result = await getListOfUsersFromGroups(token, groupName);
@@ -600,6 +611,15 @@ export default {
         const confirmation = confirm('Are you sure you want to disable this user?');
         if (!confirmation) return;
 
+        const email = await this.getCurrentUserEmail(); // Fetch current user email if needed
+        if (email === this.editUser.email) {
+          toast('You cannot disable your own account.', {
+            type: 'error',
+            autoClose: 3000,
+          });
+          return;
+        }
+
         await disableUserInGroup(this.editUser.email);
         console.log('User disabled successfully');
         this.editUser.enabled = false; // Update the enabled property locally
@@ -684,6 +704,15 @@ export default {
         const confirmation = confirm('Are you sure you want to delete this user?');
         if (!confirmation) return;
 
+        const email = await this.getCurrentUserEmail(); // Fetch current user email if needed
+        if (email === this.editUser.email) {
+          toast('You cannot delete your own account.', {
+            type: 'error',
+            autoClose: 3000,
+          });
+          return;
+        }
+
         await deleteUserFromGroup(this.editUser.email);
         console.log('User deleted successfully');
 
@@ -723,6 +752,15 @@ export default {
 
     async demoteToAgent() {
       try {
+        const email = await this.getCurrentUserEmail(); // Fetch current user email if needed
+        if (email === this.editUser.email) {
+          toast('You cannot demote your own account.', {
+            type: 'error',
+            autoClose: 3000,
+          });
+          return;
+        }
+
         await removeUserFromGroup(this.editUser.email, 'ADMINS');
         await addUserToGroup(this.editUser.email, 'AGENTS');
         console.log('User demoted to Agent successfully');
