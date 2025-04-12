@@ -300,7 +300,7 @@
       <div class="pagination">
         <button
           class="btn-pagination"
-          :disabled="currentPage === 1"
+          :disabled="isPreviousDisabled"
           @click="previousPage"
         >
           <svg
@@ -363,7 +363,7 @@
 
         <button
           class="btn-pagination"
-          :disabled="currentPage === totalPages"
+          :disabled="isNextDisabled"
           @click="nextPage"
         >
           Next
@@ -779,6 +779,12 @@ export default {
       itemsPerPage: 5,
     };
   },
+  watch: {
+    // Reset page to 1 when filter changes
+    accountTypeFilter() {
+      this.currentPage = 1;
+    },
+  },
   created() {
     // Extract countries from the imported JSON data
     this.countries = postalCodesData
@@ -830,11 +836,13 @@ export default {
     },
     // Check if Previous button should be disabled
     isPreviousDisabled() {
-      return this.currentPage <= 1;
+      return this.currentPage <= 1 || !this.filteredBankAccounts.length;
     },
-    // Check if Next button should be disabled
+
     isNextDisabled() {
-      return this.currentPage >= this.totalPages;
+      return (
+        this.currentPage >= this.totalPages || !this.filteredBankAccounts.length
+      );
     },
     // Filter bank accounts based on type filter
     filteredBankAccounts() {
@@ -949,7 +957,6 @@ export default {
             branchId: account.branchId,
           }));
         } else {
-          // No accounts or invalid response
           this.client.bankAccounts = [];
         }
       } catch (error) {
