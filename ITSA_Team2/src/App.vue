@@ -67,10 +67,10 @@
                 <span class="nav-icon">👤</span>
                 New Client
               </router-link>
-              <router-link to="/agent-view-transactions" class="nav-link">
+              <!-- <router-link to="/agent-view-transactions" class="nav-link">
                 <span class="nav-icon">💰</span>
                 Transactions
-              </router-link>
+              </router-link> -->
               <router-link to="/agent-manage-profiles" class="nav-link">
                 <span class="nav-icon">📁</span>
                 Manage Clients
