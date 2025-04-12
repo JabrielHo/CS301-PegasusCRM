@@ -304,19 +304,6 @@ async def retrieve_account(client_id):
                         accounts_response.status,
                     )
                 
-                transaction_id = str(uuid.uuid4())
-                message = {
-                    "transactionID": transaction_id,
-                    "action": "Read|Account",
-                    "agentID": client_data["client"].get("AgentID"),
-                    "clientID": client_data["client"].get("ClientID"),
-                    "dateTime": datetime.datetime.now().isoformat(),
-                    "clientName": f"{client_data['client'].get('FirstName')} {client_data['client'].get('LastName')}",
-                    "clientEmail": client_data["client"].get("EmailAddress"),
-                }
-
-                send_message_to_sqs(message)
-
                 return jsonify(await accounts_response.json()), accounts_response.status
 
     except aiohttp.ClientError as e:
