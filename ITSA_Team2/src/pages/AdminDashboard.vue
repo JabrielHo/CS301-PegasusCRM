@@ -239,14 +239,27 @@ export default {
           ) {
             return false;
           }
-          if (
-            this.filters.action !== "all" && activity.action !== this.filters.action){
-              const action = activity.action.toLowerCase();
+          if (this.filters.action !== "all" && activity.action !== this.filters.action){
+
+            const actionType = activity.action.split('|')[0].toLowerCase();
+
+            const filterMap = {
+              read: ["read", "verify", "generate"],
+              create: ["create"],
+              update: ["update"],
+              delete: ["delete"],
+            };
 
             if (this.filters.action === "all") {
-              return true; // show everything
+              return true;
             }
-            return action.split('|')[0].toLowerCase() === this.filters.action;
+
+            const allowedActions = filterMap[this.filters.action];
+
+            if (allowedActions) {
+              return allowedActions.some(keyword => actionType.includes(keyword));
+            }
+            return false;
           }
           // Date filtering would be applied here
           if (this.filters.dateFrom || this.filters.dateTo) {
