@@ -17,21 +17,20 @@ sqs = boto3.client('sqs', region_name='ap-southeast-1')
 dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-1')
 ses = boto3.client('ses', region_name='ap-southeast-1')
 
-# Testing CICD
 # START: UNCOMMENT OUT THIS WHEN PUSHING UR CODE BACK
-# secret_string = os.getenv('SECRET_STRING')
+secret_string = os.getenv('SECRET_STRING')
 
-# secrets = json.loads(secret_string)
+secrets = json.loads(secret_string)
 
-# SQS_QUEUE_URL = secrets.get('QUEUE_URL')
-# DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
-# SENDER_EMAIL = secrets.get('SENDER_EMAIL')
+SQS_QUEUE_URL = secrets.get('QUEUE_URL')
+DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
+SENDER_EMAIL = secrets.get('SENDER_EMAIL')
 # END
 
 # START: COMMENT OUT WHEN PUSHING
-SQS_QUEUE_URL = os.getenv('QUEUE_URL')
-DYNAMODB_TABLE = os.getenv('DYNAMO_TABLE')
-SENDER_EMAIL = os.getenv('SENDER_EMAIL')
+# SQS_QUEUE_URL = os.getenv('QUEUE_URL')
+# DYNAMODB_TABLE = os.getenv('DYNAMO_TABLE')
+# SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 # END
 
 table = dynamodb.Table(DYNAMODB_TABLE)
