@@ -7,55 +7,50 @@
           <span class="filter-icon">⚡</span> Filters
         </button>
         <button class="refresh-btn" @click="refreshData" :disabled="isLoading">
-          <span class="refresh-icon" :class="{ 'spinning': isLoading }">↻</span> 
-          {{ isLoading ? 'Loading...' : 'Refresh' }}
+          <span class="refresh-icon" :class="{ spinning: isLoading }">↻</span>
+          {{ isLoading ? "Loading..." : "Refresh" }}
         </button>
       </div>
     </div>
-    
+
     <!-- Filter panel -->
     <div class="filter-panel" v-if="showFilters">
       <div class="filter-row">
         <div class="filter-group">
-          <label for="date-range"">Date Range:</label>
+          <label for="date-range">Date Range:</label>
           <select id="date-range" v-model="filters.dateRange">
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
             <option value="last7days">Last 7 Days</option>
             <option value="last30days">Last 30 Days</option>
-            <option value="custom">Custom Range</option>
           </select>
         </div>
-        
+
         <div class="filter-group">
           <label for="activity-type">Activity Type:</label>
-          <select id="activity-type" v-model="filters.activityType">
-            <option value="all">All Activities</option>
-            <option value="login">Login</option>
-            <option value="client-update">Client Update</option>
-            <option value="policy-creation">Policy Creation</option>
-            <option value="claim-processing">Claim Processing</option>
-          </select>
+          <select id="activity-type" v-model="filters.action">
+          <option value="all">All Activities</option>
+          <option value="create">Create</option>
+          <option value="read">Read</option>
+          <option value="update">Update</option>
+          <option value="delete">Delete</option>
+        </select>
         </div>
-        
+
         <div class="filter-group">
           <label for="agent-search">Search Agent:</label>
-          <input 
-            type="text" 
-            id="agent-search" 
-            v-model="filters.agentSearch" 
-            placeholder="Search by agent name"
-          >
+          <select v-model="filters.agentID">
+            <option value="">All Agents</option>
+            <option v-for="id in uniqueAgentIDs" :key="id" :value="id">
+              {{ id }}
+            </option>
+          </select>
         </div>
       </div>
     </div>
-    
+
     <!-- Stats summary boxes -->
     <div class="stats-summary">
-      <div class="stat-box">
-        <div class="stat-value">{{ stats.totalAgents }}</div>
-        <div class="stat-label">Active Agents</div>
-      </div>
       <div class="stat-box">
         <div class="stat-value">{{ stats.totalActivities }}</div>
         <div class="stat-label">Total Activities</div>
@@ -69,39 +64,39 @@
         <div class="stat-label">New Clients Today</div>
       </div>
     </div>
-    
+
     <!-- Main table -->
     <div id="table-container">
       <div class="status-bar" v-if="isLoading">
         <div class="loading-indicator">Loading agent activity data...</div>
       </div>
-      
+
       <div class="agent-table" v-else>
         <table>
           <thead>
             <tr>
-              <th @click="sortBy('agentName')">
+              <th @click="sortBy('agentID')">
                 Agent ID
-                <span class="sort-indicator" v-if="sortColumn === 'agentName'">
-                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                <span class="sort-indicator" v-if="sortColumn === 'agentID'">
+                  {{ sortDirection === "asc" ? "↑" : "↓" }}
                 </span>
               </th>
-              <th @click="sortBy('timestamp')">
+              <th @click="sortBy('dateTime')">
                 Date & Time
-                <span class="sort-indicator" v-if="sortColumn === 'timestamp'">
-                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                <span class="sort-indicator" v-if="sortColumn === 'dateTime'">
+                  {{ sortDirection === "asc" ? "↑" : "↓" }}
                 </span>
               </th>
-              <th @click="sortBy('activityType')">
+              <th @click="sortBy('action')">
                 Activity Type
-                <span class="sort-indicator" v-if="sortColumn === 'activityType'">
-                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                <span class="sort-indicator" v-if="sortColumn === 'action'">
+                  {{ sortDirection === "asc" ? "↑" : "↓" }}
                 </span>
               </th>
               <th @click="sortBy('clientName')">
                 Client
                 <span class="sort-indicator" v-if="sortColumn === 'clientName'">
-                  {{ sortDirection === 'asc' ? '↑' : '↓' }}
+                  {{ sortDirection === "asc" ? "↑" : "↓" }}
                 </span>
               </th>
             </tr>
@@ -110,7 +105,11 @@
             <tr v-if="paginatedActivities.length === 0">
               <td colspan="6" class="no-data">No agent activities found</td>
             </tr>
-            <tr v-for="activity in paginatedActivities" :key="activity.id" class="activity-row">
+            <tr
+              v-for="activity in paginatedActivities"
+              :key="activity.id"
+              class="activity-row"
+            >
               <td>
                 <div class="agent-name">
                   {{ activity.agentID }}
@@ -118,10 +117,12 @@
               </td>
               <td>{{ formatDateTime(activity.dateTime) }}</td>
               <td>
-                <span class="activity-badge" :class="activityTypeClass(activity.activityType)">
-
+                <span
+                  class="activity-badge"
+                  :class="activityTypeClass(activity.action)"
+                >
+                  {{ activity.action }}
                 </span>
-                {{ activity.action }}
               </td>
               <td>{{ activity.clientName }}</td>
             </tr>
@@ -129,30 +130,30 @@
         </table>
       </div>
     </div>
-    
+
     <!-- Pagination controls -->
     <div class="pagination">
-      <button 
-        class="pagination-btn" 
-        :disabled="currentPage === 1" 
+      <button
+        class="pagination-btn"
+        :disabled="currentPage === 1"
         @click="currentPage--"
       >
         Previous
       </button>
       <div class="page-numbers">
-        <button 
-          v-for="page in displayedPageNumbers" 
-          :key="page" 
-          class="page-number" 
+        <button
+          v-for="page in displayedPageNumbers"
+          :key="page"
+          class="page-number"
           :class="{ active: currentPage === page }"
           @click="currentPage = page"
         >
           {{ page }}
         </button>
       </div>
-      <button 
-        class="pagination-btn" 
-        :disabled="currentPage === totalPages" 
+      <button
+        class="pagination-btn"
+        :disabled="currentPage === totalPages"
         @click="currentPage++"
       >
         Next
@@ -162,49 +163,119 @@
 </template>
 
 <script>
-import axiosInstance from 'axios';
+import axiosInstance from "axios";
 export default {
   data() {
     return {
       isLoading: false,
       showFilters: false,
       filters: {
-        dateRange: 'last7days',
-        activityType: 'all',
-        agentSearch: ''
+        dateRange: "last7days",
+        action: "all",
+        agentID: "",
       },
       stats: {
-        totalAgents: 0,
         totalActivities: 0,
         avgActivitiesPerDay: 0,
-        newClients: 0
+        newClients: 0,
       },
       activities: [],
       currentPage: 1,
       itemsPerPage: 10,
-      sortColumn: 'timestamp',
-      sortDirection: 'desc'
+      sortColumn: "dateTime",
+      sortDirection: "desc",
     };
+  },
+  watch: {
+    "filters.dateRange": {
+      immediate: true,
+      handler(newVal) {
+        const today = new Date();
+        let from, to;
+
+        switch (newVal) {
+          case "today":
+            from = new Date(today.setHours(0, 0, 0, 0));
+            to = new Date();
+            break;
+          case "yesterday":
+            from = new Date(today);
+            from.setDate(from.getDate() - 1);
+            from.setHours(0, 0, 0, 0);
+            to = new Date(from);
+            to.setHours(23, 59, 59, 999);
+            break;
+          case "last7days":
+            from = new Date(today);
+            from.setDate(from.getDate() - 6);
+            from.setHours(0, 0, 0, 0);
+            to = new Date();
+            break;
+          case "last30days":
+            from = new Date(today);
+            from.setDate(from.getDate() - 29);
+            from.setHours(0, 0, 0, 0);
+            to = new Date();
+            break;
+          default:
+            from = null;
+            to = null;
+        }
+
+        this.filters.dateFrom = from;
+        this.filters.dateTo = to;
+      },
+    },
   },
   computed: {
     filteredActivities() {
-      return this.activities.filter(activity => {
-        // Apply filters here when implemented
-        if (this.filters.agentSearch && !activity.agentName.toLowerCase().includes(this.filters.agentSearch.toLowerCase())) {
-          return false;
-        }
-        if (this.filters.activityType !== 'all' && activity.activityType !== this.filters.activityType) {
-          return false;
-        }
-        // Date filtering would be applied here
-        return true;
-      }).sort((a, b) => {
-        // Apply sorting
-        const modifier = this.sortDirection === 'asc' ? 1 : -1;
-        if (a[this.sortColumn] < b[this.sortColumn]) return -1 * modifier;
-        if (a[this.sortColumn] > b[this.sortColumn]) return 1 * modifier;
-        return 0;
-      });
+      return this.activities
+        .filter((activity) => {
+          // Apply filters here when implemented
+          // Agent ID filter
+          if (
+            this.filters.agentID &&
+            activity.agentID !== this.filters.agentID
+          ) {
+            return false;
+          }
+          if (
+            this.filters.action !== "all" && activity.action !== this.filters.action){
+              const action = activity.action.toLowerCase();
+
+            if (this.filters.action === "all") {
+              return true; // show everything
+            }
+            return action.split('|')[0].toLowerCase() === this.filters.action;
+          }
+          // Date filtering would be applied here
+          if (this.filters.dateFrom || this.filters.dateTo) {
+            const activityDate = new Date(activity.dateTime);
+            if (
+              this.filters.dateFrom &&
+              activityDate < new Date(this.filters.dateFrom)
+            ) {
+              return false;
+            }
+            if (
+              this.filters.dateTo &&
+              activityDate > new Date(this.filters.dateTo)
+            ) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .sort((a, b) => {
+          // Apply sorting
+          const modifier = this.sortDirection === "asc" ? 1 : -1;
+          if (a[this.sortColumn] < b[this.sortColumn]) return -1 * modifier;
+          if (a[this.sortColumn] > b[this.sortColumn]) return 1 * modifier;
+          return 0;
+        });
+    },
+    uniqueAgentIDs() {
+      return [...new Set(this.activities.map((a) => a.agentID))];
     },
     paginatedActivities() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
@@ -212,12 +283,15 @@ export default {
       return this.filteredActivities.slice(start, end);
     },
     totalPages() {
-      return Math.max(1, Math.ceil(this.filteredActivities.length / this.itemsPerPage));
+      return Math.max(
+        1,
+        Math.ceil(this.filteredActivities.length / this.itemsPerPage)
+      );
     },
     displayedPageNumbers() {
       const pages = [];
       const maxPageButtons = 5;
-      
+
       if (this.totalPages <= maxPageButtons) {
         // Show all pages if there are only a few
         for (let i = 1; i <= this.totalPages; i++) {
@@ -226,47 +300,46 @@ export default {
       } else {
         // Always include first page
         pages.push(1);
-        
+
         // Calculate range around current page
         let startPage = Math.max(2, this.currentPage - 1);
         let endPage = Math.min(this.totalPages - 1, this.currentPage + 1);
-        
+
         // Adjust if we're near the beginning
         if (this.currentPage <= 3) {
           endPage = Math.min(maxPageButtons - 1, this.totalPages - 1);
         }
-        
+
         // Adjust if we're near the end
         if (this.currentPage >= this.totalPages - 2) {
           startPage = Math.max(2, this.totalPages - maxPageButtons + 2);
         }
-        
+
         // Add ellipsis if needed
         if (startPage > 2) {
-          pages.push('...');
+          pages.push("...");
         }
-        
+
         // Add middle pages
         for (let i = startPage; i <= endPage; i++) {
           pages.push(i);
         }
-        
+
         // Add ellipsis if needed
         if (endPage < this.totalPages - 1) {
-          pages.push('...');
+          pages.push("...");
         }
-        
+
         // Always include last page
         pages.push(this.totalPages);
       }
-      
+
       return pages;
-    }
+    },
   },
   created() {
     // Fetch initial data when component is created
     this.fetchAgentActivities();
-    this.fetchDashboardStats();
   },
   methods: {
     // Fetch agent activities from API
@@ -274,105 +347,96 @@ export default {
       this.isLoading = true;
 
       // API endpoint for agent activities
-      const endpoint = 'https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records';
-      
-      axiosInstance.get(endpoint)
-        .then(response => {
+      const endpoint =
+        "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records";
+
+      axiosInstance
+        .get(endpoint)
+        .then((response) => {
           this.activities = response.data;
           this.isLoading = false;
-      
-          console.log('Fetched agent activities:', [...this.activities]);
+
+          console.log("Fetched agent activities:", [...this.activities]);
+          this.fetchDashboardStats();
         })
-        .catch(error => {
-          console.error('Error fetching agent activities:', error);
+        .catch((error) => {
+          console.error("Error fetching agent activities:", error);
           this.isLoading = false;
         });
     },
-    
+
     // Fetch dashboard statistics
     fetchDashboardStats() {
-      // API endpoint for dashboard stats
-      const endpoint = '/api/dashboard-stats';
-      
-      // In a real implementation, you would use axios or fetch
-      // axios.get(endpoint)
-      //   .then(response => {
-      //     this.stats = response.data;
-      //   })
-      //   .catch(error => {
-      //     console.error('Error fetching dashboard stats:', error);
-      //   });
-      
-      // For demonstration, we'll use mock data
-      setTimeout(() => {
-        this.stats = {
-          totalAgents: 8,
-          totalActivities: 127,
-          avgActivitiesPerDay: 18,
-          newClients: 3
-        };
-      }, 600);
+      // Get unique days from activities
+      const uniqueDays = new Set(
+        this.activities.map(
+          (a) => new Date(a.dateTime).toISOString().split("T")[0]
+        )
+      );
+      // Calculate average activities per day
+      const avgActivitiesPerDay = Math.round(
+        this.activities.length / uniqueDays.size
+      );
+
+      this.stats = {
+        totalActivities: this.activities.length,
+        avgActivitiesPerDay: Math.round(avgActivitiesPerDay),
+        newClients: this.activities.filter(
+          (activity) => activity.action === "Create|Client"
+        ).length,
+      };
     },
-    
+
     // Refresh data
     refreshData() {
       this.fetchAgentActivities();
-      this.fetchDashboardStats();
     },
-    
+
     // Toggle filter panel visibility
     toggleFilterPanel() {
       this.showFilters = !this.showFilters;
+      console.log("Filter panel toggled:", this.showFilters);
     },
     // Sort table by column
     sortBy(column) {
       if (this.sortColumn === column) {
         // Toggle direction if clicking the same column
-        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+        this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
       } else {
         // Default to ascending order for new column
         this.sortColumn = column;
-        this.sortDirection = 'asc';
+        this.sortDirection = "asc";
       }
     },
-    
+
     // Format date and time
     formatDateTime(timestamp) {
       const date = new Date(timestamp);
-      return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     },
 
     // Get CSS class for activity type
     activityTypeClass(type) {
-      const classes = {
-        'Login': 'activity-login',
-        'Client Update': 'activity-update',
-        'Policy Creation': 'activity-create',
-        'Claim Processing': 'activity-claim'
-      };
-      return classes[type] || 'activity-default';
+      const action = type.split('|')[0].toLowerCase();
+      if (action === "create") {
+        return "activity-create";
+      } else if (action === "read") {
+        return "activity-read";
+      } else if (action === "update") {
+        return "activity-update";
+      } else if (action === "delete") {
+        return "activity-delete";
+      }else {
+        return "activity-read";
+      }
     },
-    
-    // View activity details
-    viewDetails(activityId) {
-      // In a real application, this would open a modal or navigate to a details page
-      console.log(`Viewing details for activity ID: ${activityId}`);
-      alert(`View details for activity ID: ${activityId}`);
-    },
-    
-    // Send notification to agent
-    sendNotification(activityId) {
-      // In a real application, this would open a notification form or dialog
-      console.log(`Sending notification related to activity ID: ${activityId}`);
-      alert(`Send notification related to activity ID: ${activityId}`);
-    }
-  }
+  },
 };
 </script>
 
@@ -383,7 +447,7 @@ export default {
   display: flex;
   flex-direction: column;
   background-color: #f5f7fa;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .header-actions {
@@ -405,7 +469,8 @@ h1 {
   gap: 10px;
 }
 
-.refresh-btn, .filter-btn {
+.refresh-btn,
+.filter-btn {
   padding: 8px 15px;
   border: none;
   border-radius: 6px;
@@ -418,7 +483,7 @@ h1 {
 }
 
 .refresh-btn {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -435,7 +500,8 @@ h1 {
   background-color: #2b6cb0;
 }
 
-.refresh-icon, .filter-icon {
+.refresh-icon,
+.filter-icon {
   display: inline-block;
   font-size: 14px;
 }
@@ -445,8 +511,12 @@ h1 {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Filter panel styles */
@@ -455,7 +525,7 @@ h1 {
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .filter-row {
@@ -477,7 +547,8 @@ h1 {
   color: #4a5568;
 }
 
-.filter-group select, .filter-group input {
+.filter-group select,
+.filter-group input {
   padding: 8px 12px;
   border: 1px solid #e2e8f0;
   border-radius: 4px;
@@ -507,7 +578,7 @@ h1 {
   border-radius: 8px;
   padding: 20px;
   text-align: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease;
 }
 
@@ -531,7 +602,7 @@ h1 {
 #table-container {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   flex-grow: 1;
 }
@@ -614,7 +685,7 @@ h1 {
   font-weight: 500;
 }
 
-.activity-login {
+.activity-read {
   background-color: #e6fffa;
   color: #2c7a7b;
 }
@@ -629,14 +700,9 @@ h1 {
   color: #6b46c1;
 }
 
-.activity-claim {
+.activity-delete {
   background-color: #fff5f5;
   color: #c53030;
-}
-
-.activity-default {
-  background-color: #f7fafc;
-  color: #4a5568;
 }
 
 .action-icons {
@@ -721,21 +787,21 @@ h1 {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .filter-group {
     min-width: 100%;
   }
-  
+
   .stats-summary {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .header-actions {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   h1 {
     margin-bottom: 10px;
   }
