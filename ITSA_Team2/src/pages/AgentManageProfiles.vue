@@ -65,7 +65,35 @@
         </div>
       </div>
 
-      <div class="client-table">
+      <!-- Empty state when no clients exist -->
+      <div v-if="clients.length === 0 && !isLoading" class="empty-state-container">
+        <div class="empty-state">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          <h2>No clients found!</h2>
+          <p>Start by adding your first client to the system</p>
+          <button class="btn-add-client" @click="navigateToAddClient">
+            Add Client
+          </button>
+        </div>
+      </div>
+
+      <!-- Client table (only shown when clients exist) -->
+      <div v-else-if="clients.length > 0" class="client-table">
         <table>
           <thead>
             <tr>
@@ -127,8 +155,14 @@
         </table>
       </div>
 
-      <!-- Pagination controls -->
-      <div class="pagination">
+      <!-- Loading indicator -->
+      <div v-else class="loading-indicator">
+        <div class="loading-spinner"></div>
+        <p>Loading clients...</p>
+      </div>
+
+      <!-- Pagination controls (only shown when clients exist) -->
+      <div v-if="clients.length > 0" class="pagination">
         <button
           class="btn-pagination"
           :disabled="isPreviousDisabled"
@@ -235,6 +269,7 @@ export default {
     return {
       agentID: "",
       clients: [],
+      isLoading: true,
 
       //Pagination
       currentPage: 1,
@@ -296,13 +331,15 @@ export default {
       this.agentID = user.sub;
     },
     async loadClientProfiles() {
+      this.isLoading = true;
       await this.getUserAttributes();
-      axiosInstance
-        .get(
+      try {
+        const response = await axiosInstance.get(
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/all/${this.agentID}`
-        )
-        .then((response) => {
-          this.clients = response.data.clients;
+        );
+        this.clients = response.data.clients;
+
+        if (this.clients.length > 0) {
           this.clients.forEach(async (client, index) => {
             const accountCount = await this.loadClientAccountsCount(
               client.ClientID
@@ -312,18 +349,18 @@ export default {
               accountCount: accountCount,
             };
           });
-        })
-        .catch((error) => {
-          console.error("Error fetching client profiles:", error);
-        });
+        }
+      } catch (error) {
+        console.error("Error fetching client profiles:", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
     async loadClientAccountsCount(clientId) {
-      // TODO: Replace with actual API call
       try {
         const response = await axiosInstance.get(
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_account/retrieve/${clientId}`
         );
-
         // Calculate and return the account count
         if (response.data.accounts && Array.isArray(response.data.accounts)) {
           return response.data.accounts.length;
@@ -351,6 +388,10 @@ export default {
         console.log(`Navigating to client profile with ID: ${accountId}`);
         alert(`Navigating to client profile for ID: ${accountId}`);
       }
+    },
+    // Navigate to add client page
+    navigateToAddClient() {
+      this.$router.push('agent-create-client-profile')
     },
     // Global search across all clients
     async performGlobalSearch() {
@@ -408,6 +449,79 @@ export default {
 </script>
 
 <style scoped>
+/* Add these styles for the empty state */
+.empty-state-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  width: 100%;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.empty-state svg {
+  color: #888;
+  margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+  margin: 0.5rem 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.empty-state p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.btn-add-client {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-add-client:hover {
+  background-color: #4338ca;
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+}
+
+.loading-spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #3498db;
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 .page-ellipsis {
   display: flex;
   align-items: center;
