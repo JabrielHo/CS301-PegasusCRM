@@ -10,27 +10,48 @@
     <div class="card profile-card">
       <div class="card-header">
         <h2>Profile Details</h2>
-        <button class="btn-edit-profile" @click="openEditModal">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
-            ></path>
-            <path
-              d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
-            ></path>
-          </svg>
-          Edit Profile
-        </button>
+        <div class="header-actions">
+          <button class="btn-edit-profile" @click="openEditModal">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+              ></path>
+              <path
+                d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+              ></path>
+            </svg>
+            Edit Profile
+          </button>
+          <button class="btn-add" @click="viewTransactions(client.ClientID)">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline>
+              <path
+                d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+              ></path>
+            </svg>
+            View Transactions
+          </button>
+        </div>
       </div>
       <div class="profile-content">
         <div class="profile-info">
@@ -219,30 +240,6 @@
               <td>{{ getBranchName(account.branchId) }}</td>
               <td>
                 <div class="action-buttons-cell">
-                  <button
-                    class="btn-icon"
-                    title="View Transactions"
-                    @click="viewTransactions(account.id)"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <polyline
-                        points="22 12 16 12 14 15 10 15 8 12 2 12"
-                      ></polyline>
-                      <path
-                        d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
-                      ></path>
-                    </svg>
-                  </button>
                   <button
                     class="btn-icon"
                     title="Edit Account"
@@ -1131,19 +1128,19 @@ export default {
             type: "success",
             autoClose: 3000,
           });
-            // Redirect *after* toast has time to show (e.g. after 3s)
+          // Redirect *after* toast has time to show (e.g. after 3s)
           setTimeout(() => {
             this.$router.push("/agent-manage-profiles");
           }, 3000);
         })
         .catch((error) => {
           console.error("Error deleting client:", error);
-          if(error.response.status === 400) {
+          if (error.response.status === 400) {
             toast(error.response.data.error, {
               type: "error",
               autoClose: 3000,
             });
-          }else {
+          } else {
             toast("An unexpected error occurred. Please try again.", {
               type: "error",
               autoClose: 3000,
@@ -1151,8 +1148,8 @@ export default {
           }
           this.closePopup();
         });
-        // Redirect to the agent manage profiles page
-        this.$router.push("/agent-manage-profiles");
+      // Redirect to the agent manage profiles page
+      this.$router.push("/agent-manage-profiles");
     },
     // Open add/edit account modal
     openAddAccountModal() {
@@ -1255,6 +1252,7 @@ export default {
           // Refresh the accounts list
           this.loadClientAccounts(this.clientID);
           this.closePopup();
+          this.closeAccountModal();
         })
         .catch((error) => {
           console.error("Error deleting account:", error);
@@ -1265,10 +1263,8 @@ export default {
         });
     },
     // View transactions (placeholder function - would navigate to transactions page)
-    viewTransactions(accountId) {
-      console.log(`View transactions for account ${accountId}`);
-      // In a real app, this would navigate to a transactions page
-      // this.$router.push(`/transactions/${accountId}`);
+    viewTransactions(clientId) {
+      this.$router.push(`/agent-view-transactions/${clientId}`);
     },
   },
 };
@@ -1304,11 +1300,7 @@ export default {
 }
 
 .admin-dashboard {
-  font-family:
-    "Inter",
-    system-ui,
-    -apple-system,
-    sans-serif;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
   padding: 2rem;
@@ -1345,9 +1337,7 @@ export default {
   box-shadow: 0 4px 20px var(--shadow-color);
   overflow: hidden;
   border: 1px solid var(--border-color);
-  transition:
-    box-shadow 0.3s ease,
-    transform 0.2s ease;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
   margin-bottom: 2rem;
 }
 
@@ -1362,6 +1352,12 @@ export default {
   padding: 1.5rem;
   background-color: #f8fafc;
   border-bottom: 1px solid var(--border-color);
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
 .card-header h2 {
@@ -1429,24 +1425,21 @@ export default {
 
 /* Button Styles */
 .btn-edit-profile {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  color: var(--text-primary);
+  gap: 5px;
   font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
   transition: all 0.2s ease;
+  background-color: #3b82f6;
+  color: white;
 }
 
 .btn-edit-profile:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: #2b6cb0;
 }
 
 .btn-edit-profile svg {
@@ -1454,24 +1447,21 @@ export default {
 }
 
 .btn-add {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid var(--border-color);
-  border-radius: 0.5rem;
-  color: var(--text-primary);
+  gap: 5px;
   font-weight: 500;
-  font-size: 0.875rem;
-  cursor: pointer;
   transition: all 0.2s ease;
+  background-color: #3b82f6;
+  color: white;
 }
 
 .btn-add:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: #2b6cb0;
 }
 
 /* Accounts Filter */
@@ -1556,7 +1546,7 @@ export default {
 .action-buttons-cell {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
 }
 
 .btn-icon {
@@ -2081,9 +2071,7 @@ textarea:focus-visible {
   font-weight: 500;
   cursor: pointer;
   font-size: 14px;
-  transition:
-    background-color 0.2s,
-    transform 0.1s;
+  transition: background-color 0.2s, transform 0.1s;
   flex: 1; /* Make buttons take equal space */
   white-space: nowrap;
   display: flex;
@@ -2391,9 +2379,9 @@ textarea:focus-visible {
 }
 
 .page-number.active {
-  background-color: #4f46e5;
+  background-color: #3b82f6;
   color: white;
-  border-color: #4f46e5;
+  border-color: #3b82f6;
 }
 
 .page-number:hover:not(.active) {
