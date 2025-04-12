@@ -272,7 +272,7 @@ export default {
       try {
         // axios get transactions
         const response = await axiosInstance.get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/transactions/client/${client_id ?? "ce139e65-be8a-4506-8c5a-bf45fd58d41f"}`);
-        console.log(response);
+        // console.log(response);
         this.transactions = response.data;
       } catch (error) {
         console.error('Error fetching transactions:', error);

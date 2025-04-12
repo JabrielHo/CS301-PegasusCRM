@@ -123,7 +123,7 @@
         ];
       },
       submitForm() {
-        console.log('Creating bank account:', this.bankAcc);
+        // console.log('Creating bank account:', this.bankAcc);
         // Implement save logic here
       }
     }

@@ -219,7 +219,7 @@ export default {
           this.client
         )
         .then((response) => {
-          console.log("Client profile saved successfully:", response.data);
+          // console.log("Client profile saved successfully:", response.data);
           toast("Client profile saved successfully!", {
             type: "success",
             autoClose: 3000,

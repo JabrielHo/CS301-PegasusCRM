@@ -988,7 +988,7 @@ export default {
           this.editedClient
         )
         .then((response) => {
-          console.log("Client profile saved successfully:", response.data);
+          // console.log("Client profile saved successfully:", response.data);
           toast("Client profile saved successfully!", {
             type: "success",
             autoClose: 3000,
@@ -1090,7 +1090,7 @@ export default {
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${this.clientID}/documents/presign/${doc}`
         )
         .then((response) => {
-          console.log("Pre-signed URL fetched successfully:", response.data);
+          // console.log("Pre-signed URL fetched successfully:", response.data);
           this.imageUrl = response.data.link; // Store the pre-signed URL
 
           window.open(response.data.link, "_blank"); // Open the pre-signed URL in a new tab
@@ -1113,7 +1113,7 @@ export default {
       }
     },
     deleteClient(clientID) {
-      console.log("Deleting client:", clientID);
+      // console.log("Deleting client:", clientID);
       axiosInstance
         .delete(
           `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_client/delete`,
@@ -1195,7 +1195,7 @@ export default {
             newAccount
           )
           .then((response) => {
-            console.log("Account created successfully:", response.data);
+            // console.log("Account created successfully:", response.data);
             toast("Account created successfully!", {
               type: "success",
               autoClose: 3000,
@@ -1221,7 +1221,7 @@ export default {
             updatedAccount
           )
           .then((response) => {
-            console.log("Account updated successfully:", response.data);
+            // console.log("Account updated successfully:", response.data);
             toast("Account updated successfully!", {
               type: "success",
               autoClose: 3000,

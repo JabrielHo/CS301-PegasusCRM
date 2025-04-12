@@ -99,6 +99,12 @@
                   {{ sortDirection === "asc" ? "↑" : "↓" }}
                 </span>
               </th>
+              <th @click="sortBy('emailSent')">
+                Email Sent
+                <span class="sort-indicator" v-if="sortColumn === 'emailSent'">
+                  {{ sortDirection === "asc" ? "↑" : "↓" }}
+                </span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -125,6 +131,17 @@
                 </span>
               </td>
               <td>{{ activity.clientName }}</td>
+              <td>
+                <span v-if="activity.action.startsWith('Read')" class="badge badge-na">
+                  N/A
+                </span>
+                <span v-else-if="activity.emailSent" class="badge badge-sent">
+                  Sent
+                </span>
+                <span v-else class="badge badge-not-sent">
+                  Not Sent
+                </span>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -369,11 +386,11 @@ export default {
           this.activities = response.data;
           this.isLoading = false;
 
-          console.log("Fetched agent activities:", [...this.activities]);
+          // console.log("Fetched agent activities:", [...this.activities]);
           this.fetchDashboardStats();
         })
         .catch((error) => {
-          console.error("Error fetching agent activities:", error);
+          // console.error("Error fetching agent activities:", error);
           this.isLoading = false;
         });
     },
@@ -408,7 +425,7 @@ export default {
     // Toggle filter panel visibility
     toggleFilterPanel() {
       this.showFilters = !this.showFilters;
-      console.log("Filter panel toggled:", this.showFilters);
+      // console.log("Filter panel toggled:", this.showFilters);
     },
     // Sort table by column
     sortBy(column) {
@@ -818,5 +835,29 @@ h1 {
   h1 {
     margin-bottom: 10px;
   }
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.badge-sent {
+  background-color: #c6f6d5; /* light green */
+  color: #2f855a; /* dark green */
+}
+
+.badge-not-sent {
+  background-color: #fed7d7; /* light red */
+  color: #c53030; /* dark red */
+}
+
+.badge-na {
+  background-color: #e2e8f0; /* light grey */
+  color: #4a5568; /* dark grey */
 }
 </style>

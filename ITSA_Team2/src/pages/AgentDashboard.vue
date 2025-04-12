@@ -122,10 +122,16 @@
               </td>
               <td>{{ activity.clientName }}</td>
               <td>
-                <span v-if="activity.emailSent" class="badge badge-sent">Sent</span>
-                <span v-else class="badge badge-not-sent">Not Sent</span>
+                <span v-if="activity.action.startsWith('Read')" class="badge badge-na">
+                  N/A
+                </span>
+                <span v-else-if="activity.emailSent" class="badge badge-sent">
+                  Sent
+                </span>
+                <span v-else class="badge badge-not-sent">
+                  Not Sent
+                </span>
               </td>
-
             </tr>
           </tbody>
         </table>
@@ -167,10 +173,10 @@
 import axiosInstance from "axios";
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
+
 export default {
   data() {
     return {
-      agentID: "",
       isLoading: false,
       showFilters: false,
       filters: {
@@ -358,13 +364,24 @@ export default {
     this.fetchAgentActivities();
   },
   methods: {
+    async fetchAgentID() {
+      try {
+        const userAttributes = await fetchUserAttributes();
+        const agentID = userAttributes.sub
+        return agentID;
+      } catch (error) {
+        console.error("Error fetching user attributes:", error);
+      }
+    },
     // Fetch agent activities from API
-    fetchAgentActivities() {
+    async fetchAgentActivities() {
       this.isLoading = true;
+
+      const agentID = await this.fetchAgentID();
 
       // API endpoint for agent activities
       const endpoint =
-        "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records";
+        `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records/${agentID}`;
 
       axiosInstance
         .get(endpoint)
@@ -372,11 +389,11 @@ export default {
           this.activities = response.data;
           this.isLoading = false;
 
-          console.log("Fetched agent activities:", [...this.activities]);
+          // console.log("Fetched agent activities:", [...this.activities]);
           this.fetchDashboardStats();
         })
         .catch((error) => {
-          console.error("Error fetching agent activities:", error);
+          // console.error("Error fetching agent activities:", error);
           this.isLoading = false;
         });
     },
@@ -411,7 +428,7 @@ export default {
     // Toggle filter panel visibility
     toggleFilterPanel() {
       this.showFilters = !this.showFilters;
-      console.log("Filter panel toggled:", this.showFilters);
+      // console.log("Filter panel toggled:", this.showFilters);
     },
     // Sort table by column
     sortBy(column) {
@@ -833,13 +850,19 @@ h1 {
 }
 
 .badge-sent {
-  background-color: #c6f6d5; /* light green background */
-  color: #2f855a; /* darker green text */
+  background-color: #c6f6d5; /* light green */
+  color: #2f855a; /* dark green */
 }
 
 .badge-not-sent {
-  background-color: #fed7d7; /* light red background */
-  color: #c53030; /* darker red text */
+  background-color: #fed7d7; /* light red */
+  color: #c53030; /* dark red */
 }
+
+.badge-na {
+  background-color: #e2e8f0; /* light grey */
+  color: #4a5568; /* dark grey */
+}
+
 
 </style>
