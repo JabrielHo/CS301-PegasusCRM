@@ -25,6 +25,9 @@ secrets = json.loads(secret_string)
 SQS_QUEUE_URL = secrets.get('QUEUE_URL')
 DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
 SENDER_EMAIL = secrets.get('SENDER_EMAIL')
+
+print("SECRET_STRING:", secret_string)
+print("DYNAMODB_TABLE:", DYNAMODB_TABLE)
 # END
 
 # START: COMMENT OUT WHEN PUSHING
