@@ -99,8 +99,13 @@ import { ref, onMounted, watch } from 'vue';
 import { Amplify } from 'aws-amplify';
 import { fetchUserAttributes, fetchAuthSession } from 'aws-amplify/auth';
 import outputs from '../amplify_outputs.json';
+import { cognitoUserPoolsTokenProvider } from 'aws-amplify/auth/cognito';
+import { sessionStorage } from 'aws-amplify/utils';
+
 
 Amplify.configure(outputs);
+
+cognitoUserPoolsTokenProvider.setKeyValueStorage(sessionStorage);
 
 const displayName = ref('');
 const roleName = ref('');
