@@ -61,7 +61,7 @@ const routes = [
     meta: { roles: ["AGENTS"] },
   },
   {
-    path: "/agent-view-transactions",
+    path: "/agent-view-transactions/:clientId",
     name: "Agent View Transactions",
     component: AgentViewTransactions,
     meta: { roles: ["AGENTS"] },

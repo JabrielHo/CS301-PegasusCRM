@@ -6,17 +6,32 @@
           <div class="form-column">
             <div class="form-group">
               <label for="firstName">First Name</label>
-              <input v-model="client.FirstName" type="text" placeholder="First Name" required />
+              <input
+                v-model="client.FirstName"
+                type="text"
+                placeholder="First Name"
+                required
+              />
             </div>
-            
+
             <div class="form-group">
               <label for="lastName">Last Name</label>
-              <input v-model="client.LastName" type="text" placeholder="Last Name" required />
+              <input
+                v-model="client.LastName"
+                type="text"
+                placeholder="Last Name"
+                required
+              />
             </div>
 
             <div class="form-group">
               <label for="dateOfBirth">Date Of Birth</label>
-              <input v-model="client.DateOfBirth" type="date" placeholder="Date of Birth" required />
+              <input
+                v-model="client.DateOfBirth"
+                type="date"
+                placeholder="Date of Birth"
+                required
+              />
             </div>
 
             <div class="form-group">
@@ -32,7 +47,12 @@
 
             <div class="form-group">
               <label for="email">Email</label>
-              <input v-model="client.EmailAddress" type="email" placeholder="Email" required />
+              <input
+                v-model="client.EmailAddress"
+                type="email"
+                placeholder="Email"
+                required
+              />
             </div>
 
             <div class="form-group">
@@ -53,24 +73,48 @@
           <div class="form-column">
             <div class="form-group">
               <label for="address">Address</label>
-              <input v-model="client.Address" type="text" placeholder="Address" required />
+              <input
+                v-model="client.Address"
+                type="text"
+                placeholder="Address"
+                required
+              />
             </div>
 
             <div class="form-group">
               <label for="city">City</label>
-              <input v-model="client.City" type="text" placeholder="City" required />
+              <input
+                v-model="client.City"
+                type="text"
+                placeholder="City"
+                required
+              />
             </div>
 
             <div class="form-group">
               <label for="state">State</label>
-              <input v-model="client.State" type="text" placeholder="State" required />
+              <input
+                v-model="client.State"
+                type="text"
+                placeholder="State"
+                required
+              />
             </div>
 
             <div class="form-group">
               <label for="country">Country</label>
-              <select v-model="client.Country" id="country" required @change="updatePhoneCountry">
+              <select
+                v-model="client.Country"
+                id="country"
+                required
+                @change="updatePhoneCountry"
+              >
                 <option value="" disabled selected>Select Country</option>
-                <option v-for="country in countries" :key="country.name" :value="country.name">
+                <option
+                  v-for="country in countries"
+                  :key="country.name"
+                  :value="country.name"
+                >
                   {{ country.name }}
                 </option>
               </select>
@@ -78,19 +122,20 @@
 
             <div class="form-group">
               <label for="postalCode">Postal Code</label>
-              <input 
-                v-model="client.PostalCode" 
-                type="text" 
+              <input
+                v-model="client.PostalCode"
+                type="text"
                 :inputmode="getInputMode()"
-                placeholder="Postal Code" 
+                placeholder="Postal Code"
                 @blur="validatePostalCodeOnBlur"
-                required />
+                required
+              />
             </div>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit">Save</button>
+          <button type="submit" class="save-btn">Save</button>
         </div>
       </form>
     </div>
@@ -99,56 +144,56 @@
 
 <script>
 import axiosInstance from "../services/axiosInstance";
-import { toast } from 'vue3-toastify';
-import 'vue3-toastify/dist/index.css';
+import { toast } from "vue3-toastify";
+import "vue3-toastify/dist/index.css";
 // Import the postal codes JSON file
-import postalCodesData from '../postal_codes_regex.json'; // Adjust path as needed
+import postalCodesData from "../postal_codes_regex.json"; // Adjust path as needed
 // Get AgentID
-import { fetchUserAttributes } from 'aws-amplify/auth'
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 export default {
   data() {
     return {
       client: {
-        AgentID: '',
-        FirstName: '',
-        LastName: '',
-        DateOfBirth: '',
-        EmailAddress: '',
-        PhoneNumber: '',
-        Address: '',
-        City: '',
-        State: '',
-        Country: '',
-        PostalCode: '',
-        Gender: ''
+        AgentID: "",
+        FirstName: "",
+        LastName: "",
+        DateOfBirth: "",
+        EmailAddress: "",
+        PhoneNumber: "",
+        Address: "",
+        City: "",
+        State: "",
+        Country: "",
+        PostalCode: "",
+        Gender: "",
       },
-      defaultCountryCode: 'us', // Default country code for phone input
+      defaultCountryCode: "us", // Default country code for phone input
       countries: [],
       postalCodePatterns: {}, // Store postal code patterns by country name
       telInputOptions: {
-        placeholder: 'Phone Number',
-        type: 'tel',
-        inputClass: 'tel-input'
+        placeholder: "Phone Number",
+        type: "tel",
+        inputClass: "tel-input",
       },
       telDropdownOptions: {
         showDialCodeInSelection: true,
         showFlags: true,
-        showSearchBox: true
+        showSearchBox: true,
       },
-      lastValidatedPostalCode: '', // Track the last validated value to prevent duplicate toasts
+      lastValidatedPostalCode: "", // Track the last validated value to prevent duplicate toasts
       isPostalCodeValid: true, // Track if postal code is valid
     };
   },
   created() {
     // Extract countries from the imported JSON data
     this.countries = postalCodesData
-      .map(country => ({
+      .map((country) => ({
         code: country.abbrev,
-        name: country.name
+        name: country.name,
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
-    
+
     // Create a lookup for postal code patterns by country name
     this.postalCodePatterns = postalCodesData.reduce((acc, country) => {
       if (country.postal) {
@@ -169,60 +214,65 @@ export default {
       }
 
       // Remove spaces from the phone number before submitting
-      this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, '');
+      this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, "");
       // Get AgentID
       this.getUserAttributes();
-      
-      console.log('Saving client profile:', this.client);
 
-      axiosInstance.post('https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients', this.client)
-        .then(response => {
-          console.log('Client profile saved successfully:', response.data);
+      console.log("Saving client profile:", this.client);
+
+      axiosInstance
+        .post(
+          "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients",
+          this.client
+        )
+        .then((response) => {
+          console.log("Client profile saved successfully:", response.data);
           toast("Client profile saved successfully!", {
-            type: 'success',
-            autoClose: 3000
+            type: "success",
+            autoClose: 3000,
           });
         })
-        .catch(error => {
+        .catch((error) => {
           // Handle error response
           // If the error response contains validation errors
-          if(error.response && error.response.status === 400){
+          if (error.response && error.response.status === 400) {
             const errors = error.response.data.errors;
-            // Display error messages 
+            // Display error messages
             for (const errorMsg of errors) {
               toast(errorMsg, {
-                type: 'error',
-                autoClose: 3000
+                type: "error",
+                autoClose: 3000,
               });
             }
           }
           // If the error response indicates a conflict (e.g., duplicate email)
-          else if(error.response && error.response.status === 409){
+          else if (error.response && error.response.status === 409) {
             toast(error.response.data.error, {
-              type: 'error',
-              autoClose: 3000
+              type: "error",
+              autoClose: 3000,
             });
-          }
-          else {
+          } else {
             toast("An unexpected error occurred. Please try again.", {
-              type: 'error',
-              autoClose: 3000
+              type: "error",
+              autoClose: 3000,
             });
           }
-          console.error('Error saving client profile:', error);
+          console.error("Error saving client profile:", error);
         });
     },
     updatePhoneCountry() {
       if (this.client.Country) {
-        const country = postalCodesData.find(c => c.name === this.client.Country);
+        const country = postalCodesData.find(
+          (c) => c.name === this.client.Country
+        );
         if (country && country.abbrev) {
           this.defaultCountryCode = country.abbrev.toLowerCase();
         }
       }
       // Clear postal code when country changes to avoid validation errors
-      this.client.PostalCode = '';
+      this.client.PostalCode = "";
       this.isPostalCodeValid = true;
-      this.lastValidatedPostalCode = '';
+      this.lastValidatedPostalCode = "";
     },
     validatePostalCodeOnBlur() {
       // Only validate on blur if postal code has changed
@@ -233,67 +283,72 @@ export default {
     validatePostalCode() {
       const country = this.client.Country;
       const postalCode = this.client.PostalCode;
-      
+
       // Skip validation if postal code is empty or no country is selected
       if (!postalCode || !country) {
         return true;
       }
-      
+
       // Get pattern for the selected country
       const pattern = this.postalCodePatterns[country];
       if (!pattern) {
         return true; // No validation pattern for this country
       }
-      
+
       try {
         const regex = new RegExp(`^${pattern}$`);
-        
+
         // Update last validated postal code to prevent duplicate toasts
         this.lastValidatedPostalCode = postalCode;
-        
+
         if (!regex.test(postalCode)) {
           const errorMsg = `Invalid postal code format for ${country}`;
           toast(errorMsg, {
-            type: 'error',
-            autoClose: 3000
+            type: "error",
+            autoClose: 3000,
           });
           this.isPostalCodeValid = false;
           return false;
         }
-        
+
         this.isPostalCodeValid = true;
         return true;
       } catch (error) {
-        console.error('Invalid regex pattern:', error);
+        console.error("Invalid regex pattern:", error);
         return true; // Allow submission if regex is invalid
       }
     },
     getInputMode() {
       // Determine the input mode based on the selected country's postal code format
       const country = this.client.Country;
-      if (!country) return 'text';
-      
+      if (!country) return "text";
+
       const pattern = this.postalCodePatterns[country];
       // If the pattern only contains numeric characters, use numeric input mode
-      if (pattern && pattern.includes('[0-9]') && !pattern.includes('[A-Z]') && !pattern.includes('[a-z]')) {
-        return 'numeric';
+      if (
+        pattern &&
+        pattern.includes("[0-9]") &&
+        !pattern.includes("[A-Z]") &&
+        !pattern.includes("[a-z]")
+      ) {
+        return "numeric";
       }
-      return 'text'; // Default to text for alphanumeric postal codes
-    }
+      return "text"; // Default to text for alphanumeric postal codes
+    },
   },
   watch: {
     // Watch for country changes and update accordingly
-    'client.Country': function() {
+    "client.Country": function () {
       this.updatePhoneCountry();
     },
     // Reset validation when postal code is changed
-    'client.PostalCode': function() {
+    "client.PostalCode": function () {
       // If user is changing the postal code, don't show the error until they finish (blur)
       if (this.client.PostalCode !== this.lastValidatedPostalCode) {
         this.isPostalCodeValid = true;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -338,9 +393,17 @@ h1 {
   text-align: right;
 }
 
+.save-btn {
+  background-color: #3b82f6;
+}
+
+.save-btn:hover {
+  background-color: #2b6cb0;
+}
+
 .form-group {
   margin-bottom: 20px;
-} 
+}
 
 label {
   display: block;
@@ -350,7 +413,8 @@ label {
   font-size: 0.9rem;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -403,12 +467,13 @@ input, select {
 }
 
 /* Make sure the phone input components stay next to each other */
-:deep(.vti__dropdown), 
+:deep(.vti__dropdown),
 :deep(.vti__input) {
   display: inline-flex !important;
 }
 
-input:focus, select:focus {
+input:focus,
+select:focus {
   outline: none;
   border-color: #4a90e2;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
@@ -424,33 +489,29 @@ button {
   font-size: 1rem;
 }
 
-button:hover {
-  background-color: #0000cc;
-}
-
 /* Responsive styles for mobile devices */
 @media (max-width: 768px) {
   .create-client-profile {
     padding: 15px;
     max-width: 100%;
   }
-  
+
   .form-container {
     padding: 15px;
   }
-  
+
   .form-columns {
     flex-direction: column;
   }
-  
+
   .form-column {
     width: 100%;
   }
-  
+
   .form-actions {
     text-align: center;
   }
-  
+
   button {
     width: 100%;
   }
