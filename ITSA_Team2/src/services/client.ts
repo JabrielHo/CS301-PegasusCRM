@@ -16,10 +16,10 @@ export async function addUserToGroup(userId, groupName) {
       groupName: groupName,
       userId: userId,
     })
-    console.log('User added to group successfully:', result);
+    // console.log('User added to group successfully:', result);
     return result
   } catch (error){
-    console.log('Error adding user to group:', error);
+    // console.log('Error adding user to group:', error);
     throw error;
   }
 }
@@ -30,10 +30,10 @@ export async function removeUserFromGroup(userId, groupName) {
       groupName: groupName,
       userId: userId,
     })
-    console.log('User remove from group successfully:', result);
+    // console.log('User remove from group successfully:', result);
     return result
   } catch (error){
-    console.log('Error removing user from group:', error);
+    // console.log('Error removing user from group:', error);
     throw error;
   }
 }
@@ -47,10 +47,10 @@ export async function createUserToGroup(email, firstName, lastName, temporaryPas
       temporaryPassword: temporaryPassword,
       birthDate: birthDate
     })
-    console.log('User created successfully:', result);
+    // console.log('User created successfully:', result);
     return result
   } catch (error){
-    console.log('Error creating user in group:', error);
+    // console.log('Error creating user in group:', error);
     throw error;
   }
 }
@@ -60,10 +60,10 @@ export async function deleteUserFromGroup(email){
     const result = await client.mutations.deleteUserFromGroup({
       userId: email
     })
-    console.log('User deleted from group successfully:', result);
+    // console.log('User deleted from group successfully:', result);
     return result
   } catch (error){
-    console.log('Error deleting user from group:', error);
+    // console.log('Error deleting user from group:', error);
     throw error;
   }
 }
@@ -73,10 +73,10 @@ export async function disableUserInGroup(email){
     const result = await client.mutations.disableUserInGroup({
       userId: email
     })
-    console.log('User disabled from group successfully:', result);
+    // console.log('User disabled from group successfully:', result);
     return result
   } catch (error){
-    console.log('Error disabling user from group:', error);
+    // console.log('Error disabling user from group:', error);
     throw error;
   }
 }
@@ -86,10 +86,10 @@ export async function enableUserInGroup(email){
     const result = await client.mutations.enableUserInGroup({
       userId: email
     })
-    console.log('User enabled from group successfully:', result);
+    // console.log('User enabled from group successfully:', result);
     return result
   } catch (error){
-    console.log('Error enabling user from group:', error);
+    // console.log('Error enabling user from group:', error);
     throw error;
   }
 }
@@ -99,10 +99,10 @@ export async function resetUserPassword(email){
     const result = await client.mutations.resetUserPassword({
       userId: email
     })
-    console.log('User reset password successfully:', result);
+    // console.log('User reset password successfully:', result);
     return result
   } catch (error){
-    console.log('Error reset password:', error);
+    // console.log('Error reset password:', error);
     throw error;
   }
 }
@@ -115,10 +115,10 @@ export async function updateUserAttribute(email, firstName, lastName, birthDate)
       familyName: lastName,
       birthDate: birthDate
     })
-    console.log('User updated successfully:', result);
+    // console.log('User updated successfully:', result);
     return result
   } catch (error){
-    console.log('Error updating user in group:', error);
+    // console.log('Error updating user in group:', error);
     throw error;
   }
 }
@@ -128,10 +128,10 @@ export async function getListOfUsers(paginationToken) {
     const result = await client.queries.getListOfUsers({
       paginationToken : paginationToken
     })
-    console.log('User list retrieved successfully:', result);
+    // console.log('User list retrieved successfully:', result);
     return result
   } catch (error){
-    console.log('Error getting user list:', error);
+    // console.log('Error getting user list:', error);
     throw error;
   }
 }
@@ -142,10 +142,10 @@ export async function getListOfUsersFromGroups(paginationToken, groupName) {
       paginationToken : paginationToken,
       groupName : groupName
     })
-    console.log('User list retrieved successfully:', result);
+    // console.log('User list retrieved successfully:', result);
     return result
   } catch (error){
-    console.log('Error getting user list:', error);
+    // console.log('Error getting user list:', error);
     throw error;
   }
 }
@@ -156,10 +156,10 @@ export async function getUser(email) {
     const result = await client.queries.getUser({
       userId : email
     })
-    console.log('User list retrieved successfully:', result);
+    // console.log('User list retrieved successfully:', result);
     return result
   } catch (error){
-    console.log('Error getting user list:', error);
+    // console.log('Error getting user list:', error);
     throw error;
   }
 }
