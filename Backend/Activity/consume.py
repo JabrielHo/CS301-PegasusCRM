@@ -17,6 +17,7 @@ sqs = boto3.client('sqs', region_name='ap-southeast-1')
 dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-1')
 ses = boto3.client('ses', region_name='ap-southeast-1')
 
+# Testing CICD
 # START: UNCOMMENT OUT THIS WHEN PUSHING UR CODE BACK
 # secret_string = os.getenv('SECRET_STRING')
 
