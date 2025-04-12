@@ -374,10 +374,10 @@ export default {
       }
     },
     // Fetch agent activities from API
-    fetchAgentActivities() {
+    async fetchAgentActivities() {
       this.isLoading = true;
 
-      const agentID = this.fetchAgentID();
+      const agentID = await this.fetchAgentID();
 
       // API endpoint for agent activities
       const endpoint =
