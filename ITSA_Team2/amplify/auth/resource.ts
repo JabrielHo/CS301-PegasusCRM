@@ -20,11 +20,11 @@ export const auth = defineAuth(
     email: true
   },
   // Configure MFA
-  // multifactor: {
-  //   mode: 'OPTIONAL',
-  //   totp: true,
-  //   sms: true,
-  // },
+  multifactor: {
+    mode: 'REQUIRED',
+    totp: true,
+    sms: false,
+  },
   // Define user groups
   groups: ["ROOT_ADMIN", "ADMINS", "AGENTS"],
   // Add preferred username for display purposes
