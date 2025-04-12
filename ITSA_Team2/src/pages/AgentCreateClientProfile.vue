@@ -7,6 +7,7 @@
             <div class="form-group">
               <label for="firstName">First Name</label>
               <input
+                id="firstName"
                 v-model="client.FirstName"
                 type="text"
                 placeholder="First Name"
@@ -17,6 +18,7 @@
             <div class="form-group">
               <label for="lastName">Last Name</label>
               <input
+                id="lastName"
                 v-model="client.LastName"
                 type="text"
                 placeholder="Last Name"
@@ -27,6 +29,7 @@
             <div class="form-group">
               <label for="dateOfBirth">Date Of Birth</label>
               <input
+                id="dateOfBirth"
                 v-model="client.DateOfBirth"
                 type="date"
                 placeholder="Date of Birth"
@@ -48,6 +51,7 @@
             <div class="form-group">
               <label for="email">Email</label>
               <input
+              id="email"
                 v-model="client.EmailAddress"
                 type="email"
                 placeholder="Email"
@@ -58,6 +62,7 @@
             <div class="form-group">
               <label for="phone">Phone Number</label>
               <vue-tel-input
+                id="phone"
                 ref="phoneInput"
                 v-model="client.PhoneNumber"
                 :inputOptions="telInputOptions"
@@ -74,6 +79,7 @@
             <div class="form-group">
               <label for="address">Address</label>
               <input
+                id="address"
                 v-model="client.Address"
                 type="text"
                 placeholder="Address"
@@ -84,6 +90,7 @@
             <div class="form-group">
               <label for="city">City</label>
               <input
+                id="city"
                 v-model="client.City"
                 type="text"
                 placeholder="City"
@@ -94,6 +101,7 @@
             <div class="form-group">
               <label for="state">State</label>
               <input
+                id="state"
                 v-model="client.State"
                 type="text"
                 placeholder="State"
@@ -123,6 +131,7 @@
             <div class="form-group">
               <label for="postalCode">Postal Code</label>
               <input
+                id="postalCode"
                 v-model="client.PostalCode"
                 type="text"
                 placeholder="Postal Code"
