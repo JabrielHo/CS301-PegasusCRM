@@ -233,6 +233,10 @@ export default {
             type: "success",
             autoClose: 3000,
           });
+          // Redirect *after* toast has time to show (e.g. after 3s)
+          setTimeout(() => {
+            this.$router.push("/agent-manage-profiles");
+          }, 3000);
         })
         .catch((error) => {
           // Handle error response
