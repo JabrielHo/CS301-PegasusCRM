@@ -386,11 +386,11 @@ export default {
           this.activities = response.data;
           this.isLoading = false;
 
-          console.log("Fetched agent activities:", [...this.activities]);
+          // console.log("Fetched agent activities:", [...this.activities]);
           this.fetchDashboardStats();
         })
         .catch((error) => {
-          console.error("Error fetching agent activities:", error);
+          // console.error("Error fetching agent activities:", error);
           this.isLoading = false;
         });
     },
@@ -425,7 +425,7 @@ export default {
     // Toggle filter panel visibility
     toggleFilterPanel() {
       this.showFilters = !this.showFilters;
-      console.log("Filter panel toggled:", this.showFilters);
+      // console.log("Filter panel toggled:", this.showFilters);
     },
     // Sort table by column
     sortBy(column) {

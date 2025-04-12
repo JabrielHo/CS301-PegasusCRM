@@ -15,8 +15,8 @@ CORS(app)
 load_dotenv()
 
 # Service URLs
-CLIENT_SERVICE_URL = os.getenv("CLIENT_SERVICE_URL", "http://localhost:5001")
-ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://localhost:5003")
+CLIENT_SERVICE_URL = os.getenv("CLIENT_SERVICE_URL", "http://127.0.0.1:5001")
+ACCOUNT_SERVICE_URL = os.getenv("ACCOUNT_SERVICE_URL", "http://127.0.0.1:5003")
 
 # Blueprints
 manage_client_blueprint = Blueprint("manage_client", __name__)
@@ -25,7 +25,6 @@ manage_account_blueprint = Blueprint("manage_account", __name__)
 # SQS Setup
 sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION", "ap-southeast-1"))
 QUEUE_URL = os.getenv("QUEUE_URL")
-
 
 # SQS Publish function
 def send_message_to_sqs(message_body):
@@ -46,7 +45,6 @@ def async_route(f):
 @manage_client_blueprint.route('/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy"}), 200
-
 
 # Delete by clientId
 @manage_client_blueprint.route("/delete", methods=["DELETE"])
@@ -106,7 +104,6 @@ async def delete_client():
     except aiohttp.ClientError as e:
         return jsonify({"error": f"Error checking accounts: {str(e)}"}), 500
 
-
 # Create Account
 @manage_account_blueprint.route("/create", methods=["POST"])
 @async_route
@@ -157,7 +154,6 @@ async def create_account():
 
     except aiohttp.ClientError as e:
         return jsonify({"error": f"Error communicating with services: {str(e)}"}), 500
-
 
 # Delete Account
 @manage_account_blueprint.route("/delete/<string:account_id>", methods=["DELETE"])
@@ -214,7 +210,6 @@ async def delete_account(account_id):
 
     except aiohttp.ClientError as e:
         return jsonify({"error": f"Error communicating with services: {str(e)}"}), 500
-
 
 # Update Account
 @manage_account_blueprint.route("/update/<string:account_id>", methods=["PUT"])
@@ -278,7 +273,6 @@ async def update_account(account_id):
     except aiohttp.ClientError as e:
         return jsonify({"error": f"Error communicating with services: {str(e)}"}), 500
 
-
 # Read Account by clientId
 @manage_account_blueprint.route("/retrieve/<string:client_id>", methods=["GET"])
 @async_route
@@ -309,7 +303,72 @@ async def retrieve_account(client_id):
     except aiohttp.ClientError as e:
         return jsonify({"error": f"Error retrieving accounts: {str(e)}"}), 500
 
+@manage_client_blueprint.route("/verify/<client_id>", methods=["PUT"])
+@async_route
+async def verify_client(client_id):
+    try:
+        async with aiohttp.ClientSession() as session:
+            # Get all accounts for the client
+            async with session.get(f"{ACCOUNT_SERVICE_URL}/api/accounts/client/{client_id}") as accounts_response:
+                if accounts_response.status != 200:
+                    return jsonify(await accounts_response.json()), accounts_response.status
 
+                accounts_data = await accounts_response.json()
+                accounts = accounts_data.get("accounts", [])
+
+                if not accounts:
+                    return jsonify({"error": "No accounts found for this client"}), 404
+
+                # Process each account
+                for account in accounts:
+                    accountId = account["accountId"]
+                    current_status = account.get("accountStatus", "Unknown")
+
+                    if current_status != "Pending":
+                        continue  # Skip non-pending accounts
+
+                    account["accountStatus"] = "Active"
+
+                    async with session.put(f"{ACCOUNT_SERVICE_URL}/api/accounts/{accountId}", json=account) as response:
+                        if response.status != 200:
+                            return jsonify(await response.json()), response.status
+
+                    # Log account status update to SQS
+                    message = {
+                        "transactionID": str(uuid.uuid4()),
+                        "action": "Update|Account",
+                        "attributeName": "accountStatus",
+                        "beforeValue": current_status,
+                        "afterValue": "Active",
+                        "agentID": account.get("AgentID"),
+                        "clientID": client_id,
+                        "dateTime": datetime.datetime.now().isoformat(),
+                        "clientName": f"{account.get('FirstName', '')} {account.get('LastName', '')}",
+                        "clientEmail": account.get("EmailAddress"),
+                    }
+                    send_message_to_sqs(message)
+
+                # Verify the client after updating all accounts
+                async with session.put(f"{CLIENT_SERVICE_URL}/api/clients/{client_id}/verify_user",json={
+                    "Verified": True
+                }) as response:
+                    if response.status != 200:
+                        return jsonify(await response.json()), response.status
+
+                    # Log client verification to SQS
+                    message = {
+                        "transactionID": str(uuid.uuid4()),
+                        "action": "Verify|Client",
+                        "clientID": client_id,
+                        "dateTime": datetime.datetime.now().isoformat(),
+                    }
+                    send_message_to_sqs(message)
+
+                    return jsonify(await response.json()), response.status
+
+    except aiohttp.ClientError as e:
+        return jsonify({"error": f"Error verifying client: {str(e)}"}), 500
+    
 app.register_blueprint(manage_client_blueprint, url_prefix="/manage_client")
 app.register_blueprint(manage_account_blueprint, url_prefix="/manage_account")
 

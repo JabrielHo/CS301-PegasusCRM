@@ -403,7 +403,7 @@ export default {
       try {
         const result = await getListOfUsersFromGroups(token, groupName);
         const parsedResult = JSON.parse(result.data) || [];
-        console.log('Fetched users:', parsedResult);
+        // console.log('Fetched users:', parsedResult);
 
         // Update accounts with the new data
         this.accounts = parsedResult.Users.map(user => ({
@@ -420,9 +420,9 @@ export default {
         // Update pagination token and state
         this.paginationToken = parsedResult.NextToken || null;
         this.hasMoreUsers = !!this.paginationToken;
-        console.log('Updated accounts:', this.accounts);
+        // console.log('Updated accounts:', this.accounts);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        // console.error('Error fetching users:', error);
       }
     },
     async resetPassword() {
@@ -431,7 +431,7 @@ export default {
         if (!confirmation) return;
 
         const resetPasswordStatus = await resetUserPassword(this.editUser.email);
-        console.log('Reset password status:', resetPasswordStatus);
+        // console.log('Reset password status:', resetPasswordStatus);
         const resetPasswordErrorMessage = resetPasswordStatus?.errors?.[0]?.message;
         if (resetPasswordErrorMessage) {
           if (resetPasswordErrorMessage.includes("User password cannot be reset in the current state.")) {
@@ -536,9 +536,9 @@ export default {
         this.isSearchMode = true;
         this.currentPage = 1;
 
-        console.log('Global search results:', this.allSearchResults);
+        // console.log('Global search results:', this.allSearchResults);
       } catch (error) {
-        console.error('Error performing global search:', error);
+        // console.error('Error performing global search:', error);
       } finally {
         this.isSearching = false;
       }
@@ -621,7 +621,7 @@ export default {
         }
 
         await disableUserInGroup(this.editUser.email);
-        console.log('User disabled successfully');
+        // console.log('User disabled successfully');
         this.editUser.enabled = false; // Update the enabled property locally
 
         // Update the user in search results if in search mode
@@ -644,7 +644,7 @@ export default {
         if (!confirmation) return;
 
         await enableUserInGroup(this.editUser.email);
-        console.log('User enabled successfully');
+        // console.log('User enabled successfully');
         this.editUser.enabled = true; // Update the enabled property locally
 
         // Update the user in search results if in search mode
@@ -663,7 +663,7 @@ export default {
 
     openEditModal(account) {
       this.editUser = { ...account }; // Clone the selected user
-      console.log('Editing user:', this.editUser);
+      // console.log('Editing user:', this.editUser);
       this.showEditModal = true;
       document.body.classList.add('modal-open'); // Add class to body
     },
@@ -682,7 +682,7 @@ export default {
           this.editUser.family_name,
           this.editUser.UserDateOfBirth
         );
-        console.log('User updated successfully');
+        // console.log('User updated successfully');
 
         // Update the user in search results if in search mode
         if (this.isSearchMode) {
@@ -714,7 +714,7 @@ export default {
         }
 
         await deleteUserFromGroup(this.editUser.email);
-        console.log('User deleted successfully');
+        // console.log('User deleted successfully');
 
         // Remove user from search results if in search mode
         if (this.isSearchMode) {
@@ -734,7 +734,7 @@ export default {
       try {
         await removeUserFromGroup(this.editUser.email, 'AGENTS');
         await addUserToGroup(this.editUser.email, 'ADMINS');
-        console.log('User promoted to Admin successfully');
+        // console.log('User promoted to Admin successfully');
 
         // If in search mode and viewing agents, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'AGENTS') {
@@ -763,7 +763,7 @@ export default {
 
         await removeUserFromGroup(this.editUser.email, 'ADMINS');
         await addUserToGroup(this.editUser.email, 'AGENTS');
-        console.log('User demoted to Agent successfully');
+        // console.log('User demoted to Agent successfully');
 
         // If in search mode and viewing admins, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'ADMINS') {

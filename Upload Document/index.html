@@ -374,8 +374,8 @@
           const fileType = file.type;
           const ext = getFileExtension(fileType);
           const filename = `${documentType.value}.${ext}`;
-          console.log("File type:", fileType);
-          console.log(documentType.value);
+          // console.log("File type:", fileType);
+          // console.log(documentType.value);
           
           // Make POST request to the backend to generate presigned URL
           const response = await axios.post(

@@ -121,8 +121,8 @@ const fetchUserData = async () => {
     displayName.value = `${userAttributes.given_name} ${userAttributes.family_name}` || userAttributes.email || 'User';
     const session = await fetchAuthSession();
     const userGroups = session.tokens.accessToken.payload["cognito:groups"] || [];
-    console.log("Session:", session);
-    console.log("User:", userAttributes);
+    // console.log("Session:", session);
+    // console.log("User:", userAttributes);
     roleName.value = userGroups.join(', ');
 
     isAdmin.value = userGroups.includes('ADMINS') || userGroups.includes('ROOT_ADMIN');

@@ -385,7 +385,7 @@ export default {
         });
       } else {
         // Fallback if router is not defined (for demo purposes)
-        console.log(`Navigating to client profile with ID: ${accountId}`);
+        // console.log(`Navigating to client profile with ID: ${accountId}`);
         alert(`Navigating to client profile for ID: ${accountId}`);
       }
     },

@@ -87,7 +87,7 @@ export default {
         }
 
         const existingUser = await getUser(this.client.email);
-        console.log('Existing user:', existingUser);
+        // console.log('Existing user:', existingUser);
         if (existingUser.data) {
           toast('Email already exists. Please use a different email.', {
             type: 'error',
@@ -103,7 +103,7 @@ export default {
           this.client.temporaryPassword,
           this.client.dateOfBirth
         );
-        console.log('Create status:', createStatus);
+        // console.log('Create status:', createStatus);
         const passwordErrorMessage = createStatus?.errors?.[0]?.message
         if (passwordErrorMessage) {
           if (passwordErrorMessage.includes('Password did not conform with password policy')) {
@@ -126,7 +126,7 @@ export default {
 
         const addStatus = await addUserToGroup(this.client.email, this.client.role);
 
-        console.log('Add status:', addStatus);
+        // console.log('Add status:', addStatus);
         if (!addStatus) {
           toast('Failed to add user to group. Please try again.', {
             type: 'error',
