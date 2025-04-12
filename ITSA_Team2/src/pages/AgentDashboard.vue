@@ -173,10 +173,14 @@
 import axiosInstance from "axios";
 // Get AgentID
 import { fetchUserAttributes } from 'aws-amplify/auth'
+
+  const userAttributes = await fetchUserAttributes();
+  const agentID = userAttributes.sub
+
 export default {
   data() {
     return {
-      agentID: "",
+      agentID: agentID,
       isLoading: false,
       showFilters: false,
       filters: {
@@ -370,7 +374,7 @@ export default {
 
       // API endpoint for agent activities
       const endpoint =
-        "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records";
+        `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records/${this.agentID}`;
 
       axiosInstance
         .get(endpoint)
