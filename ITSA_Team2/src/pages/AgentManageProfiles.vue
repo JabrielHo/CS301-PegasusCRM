@@ -31,10 +31,18 @@
             placeholder="Search by Client Name or ID..."
             @keyup="performGlobalSearch"
           />
-          <button class="btn-search" @click="performGlobalSearch" title="Search">Search</button>
+          <button
+            class="btn-search"
+            @click="performGlobalSearch"
+            title="Search"
+          >
+            Search
+          </button>
         </div>
         <div class="table-info">
-          <span v-if="isSearchMode"> {{ allSearchResults.length }} of {{ clients.length }} clients found </span>
+          <span v-if="isSearchMode">
+            {{ allSearchResults.length }} of {{ clients.length }} clients found
+          </span>
           <span v-else> {{ clients.length }} clients found </span>
           <button v-if="isSearchMode" class="btn-clear" @click="clearSearch">
             <svg
@@ -68,16 +76,29 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="client in paginatedClients" :key="client.ClientID" @click="navigateToProfile(client.ClientID)">
+            <tr
+              v-for="client in paginatedClients"
+              :key="client.ClientID"
+              @click="navigateToProfile(client.ClientID)"
+            >
               <td>{{ client.ClientID }}</td>
               <td>{{ client.FirstName + " " + client.LastName }}</td>
               <td>
-                <span :class="['status-badge', client.Verified ? 'confirmed' : 'pending']">
+                <span
+                  :class="[
+                    'status-badge',
+                    client.Verified ? 'confirmed' : 'pending',
+                  ]"
+                >
                   {{ client.Verified ? "Verified" : "Not Verified" }}
                 </span>
               </td>
               <td>
-                {{ client.accountCount !== undefined ? client.accountCount : "Loading..." }}
+                {{
+                  client.accountCount !== undefined
+                    ? client.accountCount
+                    : "Loading..."
+                }}
               </td>
             </tr>
             <tr v-if="allSearchResults.length === 0 && isSearchMode">
@@ -108,8 +129,11 @@
 
       <!-- Pagination controls -->
       <div class="pagination">
-        <!-- Show page numbers for search mode -->
-        <button class="btn-pagination" :disabled="isPreviousDisabled" @click="previousPage">
+        <button
+          class="btn-pagination"
+          :disabled="currentPage === 1"
+          @click="previousPage"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -123,15 +147,24 @@
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
+          Previous
         </button>
+
         <div class="pagination-pages">
-          <!-- First page button -->
-          <button v-if="currentPage > 3" @click="goToPage(1)" class="page-number">1</button>
-
-          <!-- Ellipsis if needed -->
-          <span v-if="currentPage > 4" class="page-ellipsis">...</span>
-
-          <!-- Page numbers around current page -->
+          <button
+            v-if="
+              currentPage > 3 && currentPage - 3 != 1 && currentPage - 4 != 1
+            "
+            @click="goToPage(1)"
+            class="page-number"
+          >
+            1
+          </button>
+          <span
+            v-if="currentPage > 4 && currentPage - 4 != 1"
+            class="page-ellipsis"
+            >...</span
+          >
           <button
             v-for="page in visiblePageNumbers"
             :key="page"
@@ -140,20 +173,31 @@
           >
             {{ page }}
           </button>
-
-          <!-- Ellipsis if needed -->
-          <span v-if="currentPage < totalPages - 3" class="page-ellipsis">...</span>
-
-          <!-- Last page button -->
+          <span
+            v-if="currentPage < totalPages - 3 && currentPage + 4 != totalPages"
+            class="page-ellipsis"
+            >...</span
+          >
           <button
-            v-if="currentPage < totalPages - 2 && totalPages > 1"
+            v-if="
+              currentPage < totalPages - 2 &&
+              totalPages > 1 &&
+              currentPage + 3 != totalPages &&
+              currentPage + 4 != totalPages
+            "
             @click="goToPage(totalPages)"
             class="page-number"
           >
             {{ totalPages }}
           </button>
         </div>
-        <button class="btn-pagination" :disabled="isNextDisabled" @click="nextPage">
+
+        <button
+          class="btn-pagination"
+          :disabled="currentPage === totalPages"
+          @click="nextPage"
+        >
+          Next
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="16"
@@ -254,13 +298,16 @@ export default {
     async loadClientProfiles() {
       await this.getUserAttributes();
       axiosInstance
-        .get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/all/${this.agentID}`)
+        .get(
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/all/${this.agentID}`
+        )
         .then((response) => {
           this.clients = response.data.clients;
-          console.log("Client profiles loaded:", this.clients);
 
           this.clients.forEach(async (client, index) => {
-            const accountCount = await this.loadClientAccountsCount(client.ClientID);
+            const accountCount = await this.loadClientAccountsCount(
+              client.ClientID
+            );
             this.clients[index] = {
               ...this.clients[index],
               accountCount: accountCount,
@@ -274,8 +321,9 @@ export default {
     async loadClientAccountsCount(clientId) {
       // TODO: Replace with actual API call
       try {
-        const response = await axiosInstance.get(`https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_account/retrieve/${clientId}`);
-        console.log("Client accounts loaded:", response.data);
+        const response = await axiosInstance.get(
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_account/retrieve/${clientId}`
+        );
 
         // Calculate and return the account count
         if (response.data.accounts && Array.isArray(response.data.accounts)) {
@@ -295,7 +343,10 @@ export default {
       }
       // Use router to navigate
       if (this.$router) {
-        this.$router.push({ name: "Client Profile Page", params: { clientID: accountId } });
+        this.$router.push({
+          name: "Client Profile Page",
+          params: { clientID: accountId },
+        });
       } else {
         // Fallback if router is not defined (for demo purposes)
         console.log(`Navigating to client profile with ID: ${accountId}`);
@@ -398,18 +449,8 @@ export default {
 }
 
 .admin-dashboard {
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
   padding: 2rem;
@@ -1139,9 +1180,7 @@ a {
 input,
 select,
 textarea {
-  transition:
-    border 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-save:active,

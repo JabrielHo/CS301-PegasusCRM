@@ -91,7 +91,7 @@ def create_account():
 
     try:
         initial_deposit = float(data["initialDeposit"])
-        if initial_deposit <= 0:
+        if initial_deposit < 0:
             return jsonify({"message": "initialDeposit must be a positive number"}), 400
     except (ValueError, TypeError):
         return jsonify({"message": "initialDeposit must be a valid number"}), 400
