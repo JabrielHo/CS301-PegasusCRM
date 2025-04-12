@@ -125,9 +125,7 @@
               <input
                 v-model="client.PostalCode"
                 type="text"
-                :inputmode="getInputMode()"
                 placeholder="Postal Code"
-                @blur="validatePostalCodeOnBlur"
                 required
               />
             </div>
@@ -185,6 +183,10 @@ export default {
       isPostalCodeValid: true, // Track if postal code is valid
     };
   },
+  mounted() {
+    // Fetch user attributes to get AgentID
+    this.getUserAttributes();
+  },
   created() {
     // Extract countries from the imported JSON data
     this.countries = postalCodesData
@@ -208,17 +210,8 @@ export default {
       this.client.AgentID = user.sub;
     },
     submitForm() {
-      // Validate the postal code before submitting
-      if (!this.validatePostalCode()) {
-        return; // Stop if postal code is invalid
-      }
-
       // Remove spaces from the phone number before submitting
       this.client.PhoneNumber = this.client.PhoneNumber.replace(/\s+/g, "");
-      // Get AgentID
-      this.getUserAttributes();
-
-      console.log("Saving client profile:", this.client);
 
       axiosInstance
         .post(
@@ -251,13 +244,13 @@ export default {
               type: "error",
               autoClose: 3000,
             });
-          } else {
+          } 
+          else {
             toast("An unexpected error occurred. Please try again.", {
               type: "error",
               autoClose: 3000,
             });
           }
-          console.error("Error saving client profile:", error);
         });
     },
     updatePhoneCountry() {
@@ -269,86 +262,8 @@ export default {
           this.defaultCountryCode = country.abbrev.toLowerCase();
         }
       }
-      // Clear postal code when country changes to avoid validation errors
-      this.client.PostalCode = "";
-      this.isPostalCodeValid = true;
-      this.lastValidatedPostalCode = "";
-    },
-    validatePostalCodeOnBlur() {
-      // Only validate on blur if postal code has changed
-      if (this.client.PostalCode !== this.lastValidatedPostalCode) {
-        this.validatePostalCode();
-      }
-    },
-    validatePostalCode() {
-      const country = this.client.Country;
-      const postalCode = this.client.PostalCode;
-
-      // Skip validation if postal code is empty or no country is selected
-      if (!postalCode || !country) {
-        return true;
-      }
-
-      // Get pattern for the selected country
-      const pattern = this.postalCodePatterns[country];
-      if (!pattern) {
-        return true; // No validation pattern for this country
-      }
-
-      try {
-        const regex = new RegExp(`^${pattern}$`);
-
-        // Update last validated postal code to prevent duplicate toasts
-        this.lastValidatedPostalCode = postalCode;
-
-        if (!regex.test(postalCode)) {
-          const errorMsg = `Invalid postal code format for ${country}`;
-          toast(errorMsg, {
-            type: "error",
-            autoClose: 3000,
-          });
-          this.isPostalCodeValid = false;
-          return false;
-        }
-
-        this.isPostalCodeValid = true;
-        return true;
-      } catch (error) {
-        console.error("Invalid regex pattern:", error);
-        return true; // Allow submission if regex is invalid
-      }
-    },
-    getInputMode() {
-      // Determine the input mode based on the selected country's postal code format
-      const country = this.client.Country;
-      if (!country) return "text";
-
-      const pattern = this.postalCodePatterns[country];
-      // If the pattern only contains numeric characters, use numeric input mode
-      if (
-        pattern &&
-        pattern.includes("[0-9]") &&
-        !pattern.includes("[A-Z]") &&
-        !pattern.includes("[a-z]")
-      ) {
-        return "numeric";
-      }
-      return "text"; // Default to text for alphanumeric postal codes
-    },
-  },
-  watch: {
-    // Watch for country changes and update accordingly
-    "client.Country": function () {
-      this.updatePhoneCountry();
-    },
-    // Reset validation when postal code is changed
-    "client.PostalCode": function () {
-      // If user is changing the postal code, don't show the error until they finish (blur)
-      if (this.client.PostalCode !== this.lastValidatedPostalCode) {
-        this.isPostalCodeValid = true;
-      }
-    },
-  },
+    }
+  }
 };
 </script>
 
