@@ -1,5 +1,6 @@
 from flask import Flask, jsonify
 import boto3
+from boto3.dynamodb.conditions import Attr
 import json
 import os
 from dotenv import load_dotenv
@@ -18,19 +19,19 @@ dynamodb = boto3.resource('dynamodb', region_name='ap-southeast-1')
 ses = boto3.client('ses', region_name='ap-southeast-1')
 
 # START: UNCOMMENT OUT THIS WHEN PUSHING UR CODE BACK
-# secret_string = os.getenv('SECRET_STRING')
+secret_string = os.getenv('SECRET_STRING')
 
-# secrets = json.loads(secret_string)
+secrets = json.loads(secret_string)
 
-# SQS_QUEUE_URL = secrets.get('QUEUE_URL')
-# DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
-# SENDER_EMAIL = secrets.get('SENDER_EMAIL')
+SQS_QUEUE_URL = secrets.get('QUEUE_URL')
+DYNAMODB_TABLE = secrets.get('DYNAMO_TABLE')
+SENDER_EMAIL = secrets.get('SENDER_EMAIL')
 # END
 
 # START: COMMENT OUT WHEN PUSHING
-SQS_QUEUE_URL = os.getenv('QUEUE_URL')
-DYNAMODB_TABLE = os.getenv('DYNAMO_TABLE')
-SENDER_EMAIL = os.getenv('SENDER_EMAIL')
+# SQS_QUEUE_URL = os.getenv('QUEUE_URL')
+# DYNAMODB_TABLE = os.getenv('DYNAMO_TABLE')
+# SENDER_EMAIL = os.getenv('SENDER_EMAIL')
 # END
 
 table = dynamodb.Table(DYNAMODB_TABLE)
@@ -68,16 +69,21 @@ def get_all_records():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# Read (Get) a record by agentID
+# Get by agentID
 @app.route('/records/<string:agentID>', methods=['GET'])
 def read_record(agentID):
     try:
-        response = table.get_item(Key={'agentID': agentID})
-        
-        if 'Item' not in response:
+        # scan the table where agentID matches
+        response = table.scan(
+            FilterExpression=Attr('agentID').eq(agentID)
+        )
+        items = response.get('Items')
+
+        if not items:
             return jsonify({"error": "Record not found"}), 404
 
-        return jsonify(response['Item']), 200
+        return jsonify(items), 200
+
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
@@ -122,7 +128,7 @@ def process_messages():
             response = sqs.receive_message(
                 QueueUrl=SQS_QUEUE_URL,
                 MaxNumberOfMessages=10,  # Max allowed
-                WaitTimeSeconds=10       # Long polling to reduce empty responses
+                WaitTimeSeconds=10      # Long polling to reduce empty responses
             )
 
             messages = response.get('Messages', [])
@@ -256,34 +262,40 @@ def process_messages():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/process/status/<string:clientID>', methods=['GET'])
-def get_process_status(clientID):
-    try:
-        # Query all records matching the clientID
-        response = table.scan(
-            FilterExpression='clientID = :clientIDVal',
-            ExpressionAttributeValues={':clientIDVal': clientID}
-        )
-        
-        records = response.get('Items', [])
 
-        # Create a status list
-        status_list = []
-        for record in records:
-            status_list.append({
-                "transactionID": record.get('transactionID', 'Unknown'),
-                "emailSent": record.get('emailSent', False)
+@app.route('/process/status/<clientID>', methods=['GET'])
+def get_transaction_status(clientID):
+    try:
+        response = table.scan(
+            FilterExpression=Attr('clientID').eq(clientID)
+        )
+
+        items = response.get('Items', [])
+
+        transactions = []
+        for item in items:
+            transactions.append({
+                'transactionID': item.get('transactionID'),
+                'agentID': item.get('agentID'),
+                'clientID': item.get('clientID'),
+                'clientName': item.get('clientName'),
+                'dateTime': item.get('dateTime'),
+                'emailSent': item.get('emailSent', False)  # default to False if missing
             })
 
         return jsonify({
-            "status": "success",
-            "clientID": clientID,
-            "recordsFound": len(status_list),
-            "emailStatuses": status_list
+            'status': 'success',
+            'clientID': clientID,
+            'recordsFound': len(transactions),
+            'transactions': transactions
         }), 200
 
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5004)
