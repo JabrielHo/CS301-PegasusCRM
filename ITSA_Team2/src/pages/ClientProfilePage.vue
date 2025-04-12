@@ -1063,11 +1063,7 @@ export default {
     verifyUser(clientID) {
       axiosInstance
         .put(
-          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}/verify_user`,
-          {
-            Verified: true,
-          }
-        )
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_client/verify/${clientID}`)
         .then(() => {
           toast("User verified successfully!", {
             type: "success",
