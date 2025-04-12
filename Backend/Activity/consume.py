@@ -263,39 +263,5 @@ def process_messages():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@app.route('/process/status/<clientID>', methods=['GET'])
-def get_transaction_status(clientID):
-    try:
-        response = table.scan(
-            FilterExpression=Attr('clientID').eq(clientID)
-        )
-
-        items = response.get('Items', [])
-
-        transactions = []
-        for item in items:
-            transactions.append({
-                'transactionID': item.get('transactionID'),
-                'agentID': item.get('agentID'),
-                'clientID': item.get('clientID'),
-                'clientName': item.get('clientName'),
-                'dateTime': item.get('dateTime'),
-                'emailSent': item.get('emailSent', False)  # default to False if missing
-            })
-
-        return jsonify({
-            'status': 'success',
-            'clientID': clientID,
-            'recordsFound': len(transactions),
-            'transactions': transactions
-        }), 200
-
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5004)
