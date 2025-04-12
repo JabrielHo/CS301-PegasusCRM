@@ -9,23 +9,20 @@
           <h1 class="auth-title">Pegasus</h1>
         </div>
       </template>
-      
+
       <!-- Custom Footer Slot -->
       <template v-slot:footer>
         <div class="auth-footer">
           <p>Secure login provided by Pegasus</p>
         </div>
       </template>
-      
+
       <!-- Main App Content (Same as before) -->
       <template v-slot="{ user, signOut }">
         <div id="app">
           <header class="app-header">
             <div class="logo-container">
-              <router-link
-                :to="isAdmin ? '/admin-dashboard' : isAgent ? '/agent-dashboard' : '/'"
-                class="logo-link"
-              >
+              <router-link :to="isAdmin ? '/admin-dashboard' : isAgent ? '/agent-dashboard' : '/'" class="logo-link">
                 <img src="../src/assets/Pegasus2.png" alt="">
                 <h1 class="logo">Pegasus</h1>
               </router-link>
@@ -36,12 +33,12 @@
                 <span class="role-badge">{{ roleName }}</span>
               </div>
               <button class="sign-out-btn" @click="signOut">
-                <span class="sign-out-icon">⏻</span>
+                <i class="bi bi-power"></i>
                 Sign Out
               </button>
             </div>
           </header>
-          
+
           <!-- Enhanced Navigation Bar -->
           <nav class="main-nav">
             <!-- Admin Links -->
@@ -59,7 +56,7 @@
                 Manage Accounts
               </router-link>
             </div>
-            
+
             <!-- Agent links -->
             <div v-if="isAgent" class="nav-links">
               <router-link to="/agent-dashboard" class="nav-link">
@@ -80,10 +77,10 @@
               </router-link>
             </div>
           </nav>
-          
+
           <!-- Content area -->
           <main class="content-area">
-            <router-view/>
+            <router-view />
           </main>
         </div>
       </template>
@@ -131,7 +128,7 @@ const fetchUserData = async () => {
     isAdmin.value = userGroups.includes('ADMINS') || userGroups.includes('ROOT_ADMIN');
     isAgent.value = userGroups.includes('AGENTS');
 
-    if(isAdmin.value) {
+    if (isAdmin.value) {
       router.push('/admin-dashboard');
     } else if (isAgent.value) {
       router.push('/agent-dashboard');
@@ -412,18 +409,18 @@ onMounted(() => {
     flex-direction: column;
     padding: 12px;
   }
-  
+
   .user-info {
     margin-top: 10px;
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .nav-links {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .nav-link {
     width: 100%;
     justify-content: flex-start;
