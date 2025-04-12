@@ -46,7 +46,6 @@ def get_account(accountId):
 
     return jsonify(account.to_dict()), 200
 
-
 # Get Account Details by clientId
 @app.route("/api/accounts/client/<string:clientId>", methods=["GET"])
 def get_accounts_by_client(clientId):
@@ -64,7 +63,6 @@ def get_accounts_by_client(clientId):
         ),
         200,
     )
-
 
 # Create Account
 @app.route("/api/accounts", methods=["POST"])
@@ -135,7 +133,6 @@ def create_account():
             500,
         )
 
-
 # Update Account Status by accountId
 @app.route("/api/accounts/<string:accountId>", methods=["PUT"])
 def update_account_status(accountId):
@@ -196,7 +193,6 @@ def update_account_status(accountId):
             ),
             500,
         )
-
 
 # Delete Account by accountId
 @app.route("/api/accounts/<string:accountId>", methods=["DELETE"])
