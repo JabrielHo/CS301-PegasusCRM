@@ -237,11 +237,13 @@ def process_messages():
                             }
                         )
 
-                        table.update_item(
-                            Key={'transactionID': transaction_id},
-                            UpdateExpression="SET emailSent = :val1",
-                            ExpressionAttributeValues={':val1': True}
-                        )
+                        # Only update if no exception occurs
+                        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+                            table.update_item(
+                                Key={'transactionID': transaction_id},
+                                UpdateExpression="SET emailSent = :val1",
+                                ExpressionAttributeValues={':val1': True}
+                            )
 
                     except Exception as email_error:
                         print(f"Failed to send email to {receiver_email}: {str(email_error)}")
