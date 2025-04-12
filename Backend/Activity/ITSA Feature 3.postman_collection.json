@@ -15,15 +15,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://18.136.193.0:5004/records",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"records"
 					]
@@ -32,7 +32,7 @@
 			"response": []
 		},
 		{
-			"name": "Get record by transactionID",
+			"name": "Get record by agentID",
 			"request": {
 				"auth": {
 					"type": "noauth"
@@ -40,18 +40,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://18.136.193.0:5004/records/ea0f441a-f795-4503-aa88-b0d2796d9a4b",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records/f9aa156c-2011-70c4-3139-effdc2674ec8",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"records",
-						"ea0f441a-f795-4503-aa88-b0d2796d9a4b"
+						"f9aa156c-2011-70c4-3139-effdc2674ec8"
 					]
 				}
 			},
@@ -67,7 +67,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"transactionID\": \"d3f5c0aa-08b8-4e5f-b294-3c4e1a04cb92\",\r\n  \"action\": \"Update|Client\",\r\n  \"afterValue\": \"12341234\",\r\n  \"agentID\": \"A101\",\r\n  \"attributeName\": \"phoneNumber\",\r\n  \"beforeValue\": \"43143141\",\r\n  \"clientEmail\": \"jane.smith@example.com\",\r\n  \"clientID\": \"C789\",\r\n  \"clientName\": \"Jane Smith\",\r\n  \"dateTime\": \"2025-04-11T17:00:00Z\"\r\n}\r\n",
+					"raw": "{\r\n  \"transactionID\": \"d3f5c0aa-08b8-4e5f-b294-3c4e1a04cb92\",\r\n  \"action\": \"Update|Client\",\r\n  \"afterValue\": \"12341234\",\r\n  \"agentID\": \"f9aa156c-2011-70c4-3139-effdc2674ec8\",\r\n  \"attributeName\": \"phoneNumber\",\r\n  \"beforeValue\": \"43143141\",\r\n  \"clientEmail\": \"jane.smith@example.com\",\r\n  \"clientID\": \"5d51ca11-9b4d-4cb5-b10d-fa915ee4d635\",\r\n  \"clientName\": \"Jane Smith\",\r\n  \"dateTime\": \"2025-04-11T17:00:00Z\"\r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -75,15 +75,15 @@
 					}
 				},
 				"url": {
-					"raw": "http://18.136.193.0:5004/records",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"records"
 					]
@@ -109,18 +109,18 @@
 					}
 				},
 				"url": {
-					"raw": "http://18.136.193.0:5004/records/ea0f441a-f795-4503-aa88-b0d2796d9a4b",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records/6c9ddccb-e066-4652-be69-e8457ebd6d39",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"records",
-						"ea0f441a-f795-4503-aa88-b0d2796d9a4b"
+						"6c9ddccb-e066-4652-be69-e8457ebd6d39"
 					]
 				}
 			},
@@ -135,18 +135,18 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://18.136.193.0:5004/records/2981b5a2-d57b-4173-ad97-0280e9a50b91",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/records/6c9ddccb-e066-4652-be69-e8457ebd6d39",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"records",
-						"2981b5a2-d57b-4173-ad97-0280e9a50b91"
+						"6c9ddccb-e066-4652-be69-e8457ebd6d39"
 					]
 				}
 			},
@@ -161,15 +161,15 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://18.136.193.0:5004/process",
-					"protocol": "http",
+					"raw": "https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/process",
+					"protocol": "https",
 					"host": [
-						"18",
-						"136",
-						"193",
-						"0"
+						"6k8nzfwxjl",
+						"execute-api",
+						"ap-southeast-1",
+						"amazonaws",
+						"com"
 					],
-					"port": "5004",
 					"path": [
 						"process"
 					]
