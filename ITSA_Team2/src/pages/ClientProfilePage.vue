@@ -1109,27 +1109,43 @@ export default {
       }
     },
     deleteClient(clientID) {
-      // Your logic to delete client
       console.log("Deleting client:", clientID);
       axiosInstance
         .delete(
-          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/api/clients/${clientID}`
+          `https://6k8nzfwxjl.execute-api.ap-southeast-1.amazonaws.com/manage_client/delete`,
+          {
+            data: {
+              client_id: clientID,
+            },
+          }
         )
         .then(() => {
           toast("Client deleted successfully!", {
             type: "success",
             autoClose: 3000,
           });
+            // Redirect *after* toast has time to show (e.g. after 3s)
+          setTimeout(() => {
+            this.$router.push("/agent-manage-profiles");
+          }, 3000);
         })
         .catch((error) => {
           console.error("Error deleting client:", error);
-          toast("Error deleting client. Please try again.", {
-            type: "error",
-            autoClose: 3000,
-          });
+          if(error.response.status === 400) {
+            toast(error.response.data.error, {
+              type: "error",
+              autoClose: 3000,
+            });
+          }else {
+            toast("An unexpected error occurred. Please try again.", {
+              type: "error",
+              autoClose: 3000,
+            });
+          }
+          this.closePopup();
         });
-      // Redirect to the agent manage profiles page
-      this.$router.push("/agent-manage-profiles");
+        // Redirect to the agent manage profiles page
+        this.$router.push("/agent-manage-profiles");
     },
     // Open add/edit account modal
     openAddAccountModal() {
@@ -1281,7 +1297,11 @@ export default {
 }
 
 .admin-dashboard {
-  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--background-color);
   min-height: 100vh;
   padding: 2rem;
@@ -1318,7 +1338,9 @@ export default {
   box-shadow: 0 4px 20px var(--shadow-color);
   overflow: hidden;
   border: 1px solid var(--border-color);
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.2s ease;
   margin-bottom: 2rem;
 }
 
@@ -2052,7 +2074,9 @@ textarea:focus-visible {
   font-weight: 500;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s, transform 0.1s;
+  transition:
+    background-color 0.2s,
+    transform 0.1s;
   flex: 1; /* Make buttons take equal space */
   white-space: nowrap;
   display: flex;
