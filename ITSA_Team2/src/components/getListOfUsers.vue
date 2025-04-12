@@ -74,7 +74,7 @@ export default {
         paginationToken.value = parsedResult.PaginationToken || null;
         hasMoreUsers.value = !!paginationToken.value;
         
-        console.log('Users fetched:', users.value);
+        //console.log('Users fetched:', users.value);
       } catch (error) {
         console.error('Error fetching users:', error);
       }
