@@ -131,7 +131,7 @@
       <div class="pagination">
         <button
           class="btn-pagination"
-          :disabled="currentPage === 1"
+          :disabled="isPreviousDisabled"
           @click="previousPage"
         >
           <svg
@@ -194,7 +194,7 @@
 
         <button
           class="btn-pagination"
-          :disabled="currentPage === totalPages"
+          :disabled="isNextDisabled"
           @click="nextPage"
         >
           Next
@@ -282,12 +282,12 @@ export default {
     },
     // Check if Previous button should be disabled
     isPreviousDisabled() {
-      return this.currentPage <= 1;
+      return this.currentPage <= 1 || !this.clients.length;
     },
 
     // Check if Next button should be disabled
     isNextDisabled() {
-      return this.currentPage >= this.totalPages;
+      return this.currentPage >= this.totalPages || !this.clients.length;
     },
   },
   methods: {
@@ -303,7 +303,6 @@ export default {
         )
         .then((response) => {
           this.clients = response.data.clients;
-
           this.clients.forEach(async (client, index) => {
             const accountCount = await this.loadClientAccountsCount(
               client.ClientID
