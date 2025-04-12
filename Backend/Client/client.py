@@ -136,6 +136,28 @@ def send_message_to_sqs(message_body):
     )
     print(f"Message sent! Message ID: {response['MessageId']}")
 
+# Send SQS Message for Attribute Changes
+def send_attribute_change_messages(edited_fields, client):
+
+    for field, change in edited_fields.items():
+        old_value = change['old']
+        new_value = change['new']
+
+        message_body = {
+            "transactionID": str(uuid.uuid4()),
+            "action": "Update|Client",
+            "attributeName": field,
+            "beforeValue": old_value,
+            "afterValue": new_value,
+            "agentID": client.AgentID,
+            "clientID": client.ClientID,
+            "dateTime": datetime.now().isoformat(),
+            "clientName": f"{client.FirstName} {client.LastName}",
+            "clientEmail": client.EmailAddress
+        }
+
+        send_message_to_sqs(message_body)
+
 # Client Model
 class Client(db.Model):
     # Table Name is client
@@ -273,10 +295,6 @@ def verify_client(clientId):
     # Check if client exists
     client = db.session.scalar(db.select(Client).filter_by(ClientID=clientId))
 
-    # Set Attempts to 0
-    client.attempted_uploads = 0
-    db.session.commit()
-
     if not client:
         return jsonify(
             {
@@ -284,6 +302,10 @@ def verify_client(clientId):
                 "message": "Client not found"
             }
         ), 404
+    
+    # Set Attempts to 0
+    client.attempted_uploads = 0
+    db.session.commit()
     
     # Send email to client with link to upload their credentials
     send_email(client.EmailAddress, client.ClientID, client.FirstName + " " + client.LastName)    
@@ -310,7 +332,6 @@ def verify_client(clientId):
     ), 200
 
 # Update Client
-# SQS Not Done
 @client_blueprint.route('/<string:clientId>', methods=['PUT'])
 def update_client(clientId):
     
@@ -381,6 +402,8 @@ def update_client(clientId):
             "old": old_value,
             "new": getattr(client, field)
         }
+    # Send SQS message for each edited field
+    send_attribute_change_messages(edited_fields, client)
 
     return jsonify(
         {
