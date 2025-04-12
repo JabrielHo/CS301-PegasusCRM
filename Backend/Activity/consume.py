@@ -128,7 +128,7 @@ def process_messages():
             response = sqs.receive_message(
                 QueueUrl=SQS_QUEUE_URL,
                 MaxNumberOfMessages=10,  # Max allowed
-                WaitTimeSeconds=10      # Long polling to reduce empty responses
+                WaitTimeSeconds=2      # Long polling to reduce empty responses
             )
 
             messages = response.get('Messages', [])
@@ -150,6 +150,10 @@ def process_messages():
 
                 # Store transaction using shared logic
                 create_record_logic(body)
+                
+                if action_type not in ["Create", "Update", "Delete"]:
+                    print(f"Skipping action type: {action_type}")
+                    continue
 
                 transaction_id = body.get('transactionID', 'Unknown')
                 client_name = body.get('clientName', 'Valued Client')
@@ -171,6 +175,19 @@ def process_messages():
                         Best regards,
                         Scrooge Global Bank
                         """
+                        
+                        body_html = f"""
+                        <html>
+                        <head></head>
+                        <body>
+                        <p>Dear {client_name},</p>
+                        <p>Your <strong>{entity_display.lower()}</strong> has been successfully created in our system.</p>
+                        <p>Thank you for trusting Scrooge Global Bank.</p>
+                        <p>Best regards,<br>Scrooge Global Bank</p>
+                        </body>
+                        </html>
+                        """
+                        
                     elif action_type == "Update":
                         attribute = body.get('attributeName', 'details')
                         before = body.get('beforeValue', '')
@@ -189,6 +206,21 @@ def process_messages():
                         Best regards,
                         Scrooge Global Bank
                         """
+                        
+                        body_html = f"""
+                        <html>
+                        <head></head>
+                        <body>
+                        <p>Dear {client_name},</p>
+                        <p>Your <strong>{entity_display.lower()}'s {attribute}</strong> has been successfully updated in our system.</p>
+                        <p>Before: {before}</p>
+                        <p>After: {after}</p>
+                        <p>If you did not request this change, please contact our support immediately.</p>
+                        <p>Best regards,<br>Scrooge Global Bank</p>
+                        </body>
+                        </html>
+                        """
+                        
                     elif action_type == "Delete":
                         body_text = f"""
                         Dear {client_name},
@@ -200,50 +232,40 @@ def process_messages():
                         Best regards,
                         Scrooge Global Bank
                         """
-                    else:
-                        body_text = f"""
-                        Dear {client_name},
-
-                        This is a notification regarding your {entity_type.lower()}.
-
-                        For more details, please contact our support team.
-
-                        Best regards,
-                        Scrooge Global Bank
+                        
+                        body_html = f"""
+                        <html>
+                        <head></head>
+                        <body>
+                        <p>Dear {client_name},</p>
+                        <p>Your <strong>{entity_display.lower()}</strong> has been successfully deleted in our system.</p>
+                        <p>If you have any concerns, please contact our support team.</p>
+                        <p>Best regards,<br>Scrooge Global Bank</p>
+                        </body>
+                        </html>
                         """
 
-                    # Email Body (HTML)
-                    body_html = f"""
-                    <html>
-                    <head></head>
-                    <body>
-                    <p>Dear {client_name},</p>
-                    <p>Your <strong>{entity_display.lower()}</strong> has been successfully {action_type.lower()}d in our system.</p>
-                    <p>Best regards,<br>Scrooge Global Bank</p>
-                    </body>
-                    </html>
-                    """
-
                     try:
-                        ses.send_email(
-                            Source=SENDER_EMAIL,
-                            Destination={'ToAddresses': [receiver_email]},
-                            Message={
-                                'Subject': {'Data': subject, 'Charset': 'UTF-8'},
-                                'Body': {
-                                    'Text': {'Data': body_text, 'Charset': 'UTF-8'},
-                                    'Html': {'Data': body_html, 'Charset': 'UTF-8'}
+                        if action_type == "Create" or action_type == "Delete" or action_type == "Update":
+                            ses_response = ses.send_email(
+                                Source=SENDER_EMAIL,
+                                Destination={'ToAddresses': [receiver_email]},
+                                Message={
+                                    'Subject': {'Data': subject, 'Charset': 'UTF-8'},
+                                    'Body': {
+                                        'Text': {'Data': body_text, 'Charset': 'UTF-8'},
+                                        'Html': {'Data': body_html, 'Charset': 'UTF-8'}
+                                    }
                                 }
-                            }
-                        )
-
-                        # Only update if no exception occurs
-                        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-                            table.update_item(
-                                Key={'transactionID': transaction_id},
-                                UpdateExpression="SET emailSent = :val1",
-                                ExpressionAttributeValues={':val1': True}
                             )
+
+                            # Only update if no exception occurs
+                            if ses_response['ResponseMetadata']['HTTPStatusCode'] == 200:
+                                table.update_item(
+                                    Key={'transactionID': transaction_id},
+                                    UpdateExpression="SET emailSent = :val1",
+                                    ExpressionAttributeValues={':val1': True}
+                                )
 
                     except Exception as email_error:
                         print(f"Failed to send email to {receiver_email}: {str(email_error)}")
