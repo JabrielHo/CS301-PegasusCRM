@@ -37,7 +37,7 @@
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
           </svg>
-          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email or name..."
+          <input id="search" v-model="searchQuery" type="text" placeholder="Search by email, name or Agent ID"
             @keyup.enter="performGlobalSearch" />
           <button class="btn-search" @click="performGlobalSearch" title="Search">
             Search
@@ -352,7 +352,8 @@ export default {
         return (
           (account.email && account.email.toLowerCase().includes(query)) ||
           (account.given_name && account.given_name.toLowerCase().includes(query)) ||
-          (account.family_name && account.family_name.toLowerCase().includes(query))
+          (account.family_name && account.family_name.toLowerCase().includes(query)) ||
+          (account.sub && account.sub.toLowerCase().includes(query))
         );
       });
     },
