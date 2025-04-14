@@ -424,6 +424,10 @@ export default {
         // console.log('Updated accounts:', this.accounts);
       } catch (error) {
         // console.error('Error fetching users:', error);
+        toast('Failed to fetch users. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
     async resetPassword() {
@@ -540,6 +544,10 @@ export default {
         // console.log('Global search results:', this.allSearchResults);
       } catch (error) {
         // console.error('Error performing global search:', error);
+        toast('Failed to perform global search. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       } finally {
         this.isSearching = false;
       }
@@ -609,8 +617,6 @@ export default {
 
     async disableUser() {
       try {
-        const confirmation = confirm('Are you sure you want to disable this user?');
-        if (!confirmation) return;
 
         const email = await this.getCurrentUserEmail(); // Fetch current user email if needed
         if (email === this.editUser.email) {
@@ -633,16 +639,26 @@ export default {
           }
         }
 
+        this.showEditModal = false; // Close the modal after disabling
+        this.editUser = {}; // Clear the edit user data
+
+        toast('User disabled successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
+
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error disabling user:', error);
+        toast('Failed to disable the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
     async enableUser() {
       try {
-        const confirmation = confirm('Are you sure you want to enable this user?');
-        if (!confirmation) return;
 
         await enableUserInGroup(this.editUser.email);
         // console.log('User enabled successfully');
@@ -656,9 +672,21 @@ export default {
           }
         }
 
+        this.showEditModal = false; // Close the modal after disabling
+        this.editUser = {}; // Clear the edit user data
+
+        toast('User enabled successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
+
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error enabling user:', error);
+        toast('Failed to enable the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
@@ -684,6 +712,10 @@ export default {
           this.editUser.UserDateOfBirth
         );
         // console.log('User updated successfully');
+        toast('User updated successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
 
         // Update the user in search results if in search mode
         if (this.isSearchMode) {
@@ -697,6 +729,10 @@ export default {
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error updating user:', error);
+        toast('Failed to update the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
@@ -716,6 +752,10 @@ export default {
 
         await deleteUserFromGroup(this.editUser.email);
         // console.log('User deleted successfully');
+        toast('User deleted successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
 
         // Remove user from search results if in search mode
         if (this.isSearchMode) {
@@ -728,6 +768,10 @@ export default {
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error deleting user:', error);
+        toast('Failed to delete the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
@@ -736,6 +780,10 @@ export default {
         await removeUserFromGroup(this.editUser.email, 'AGENTS');
         await addUserToGroup(this.editUser.email, 'ADMINS');
         // console.log('User promoted to Admin successfully');
+        toast('User promoted to Admin successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
 
         // If in search mode and viewing agents, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'AGENTS') {
@@ -748,6 +796,10 @@ export default {
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error promoting user to Admin:', error);
+        toast('Failed to promote the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
@@ -765,6 +817,10 @@ export default {
         await removeUserFromGroup(this.editUser.email, 'ADMINS');
         await addUserToGroup(this.editUser.email, 'AGENTS');
         // console.log('User demoted to Agent successfully');
+        toast('User demoted to Agent successfully!', {
+          type: 'success',
+          autoClose: 3000,
+        });
 
         // If in search mode and viewing admins, remove this user from results
         if (this.isSearchMode && this.selectedGroup === 'ADMINS') {
@@ -777,6 +833,10 @@ export default {
         this.fetchUsers(this.selectedGroup); // Refresh the user list
       } catch (error) {
         console.error('Error demoting user to Agent:', error);
+        toast('Failed to demote the user. Please try again.', {
+          type: 'error',
+          autoClose: 3000,
+        });
       }
     },
 
@@ -1611,5 +1671,14 @@ textarea {
 .btn-save:active,
 .btn-primary:active {
   transform: scale(0.98);
+}
+</style>
+<style>
+body.modal-open {
+  overflow: hidden !important;
+  padding-right: 15px;
+  /* Prevents layout shift when scrollbar disappears */
+  position: fixed;
+  width: 100%;
 }
 </style>
