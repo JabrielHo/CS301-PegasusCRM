@@ -1,8 +1,6 @@
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-2e0aaae1b6195c2367325f4f02e2d04e9abb55f0b24a779b69b11b9e10269abc.svg)](https://classroom.github.com/online_ide?assignment_repo_id=17702010&assignment_repo_type=AssignmentRepo)
+# G2T2 CS301 Project — Pegasus CRM
 
-# Project (G2T2)
-
-🌍 This project aims to build a CRM Architecture Landscape for a Global Bank, adhering to modern digital principles. The focus is to create a system that is:
+This project aims to build a CRM Architecture Landscape for a Global Bank, adhering to modern digital principles. The focus is to create a system that is:
 
 - ☁️ Cloud-native
 - 📊 Data-centric
@@ -13,7 +11,14 @@
 - 🌐 Accessible
 - 🌱 Sustainable
 
----
+## Solution Architecture Diagram
+
+<img width="1508" alt="Solution Architecture Diagram" src="./assets/v3NoAZ.drawio.png">
+
+## Screenshots
+<img width="1508" alt="Screenshot 1" src="./assets/agent_dashboard.png">
+<img width="1508" alt="Screenshot 1" src="./assets/agent_manage_account.png">
+
 ## 🚀 Features
 
 ### Backend
@@ -28,8 +33,6 @@
 ### Document Upload
 - **Secure Uploads**: Supports PDF, PNG, and JPG files up to 10MB.
 - **Presigned URLs**: Backend integration for secure file uploads to AWS S3.
-
----
 
 ## 🛠️ Tech Stack
 
@@ -49,8 +52,6 @@
 - **AWS Amplify**: Hosting and deployment for frontend and backend integration.
 - **CI/CD**: Automated pipelines for building, testing, and deploying the application.
 
----
-
 ## 🔑 Authentication
 
 - **Multi-Factor Authentication (MFA)**: Enabled with TOTP.
@@ -59,30 +60,10 @@
   - `ADMINS`: Manage admins and agent accounts.
   - `AGENTS`: Manage client profiles and transactions.
 
----
-
-## 🧪 Testing
-
-- **Website**: [https://itsag2t2.com/](https://itsag2t2.com/)
-- **Test Credentials**:
-  - **Email**: [Insert Email]
-  - **Password**: [Insert Password]
-
----
-
 ## 🛡️ Security
 
 - **Encryption**: All uploads are encrypted and stored securely in compliance with banking regulations.
 - **Access Control**: Role-based access control (RBAC) for secure resource management.
-
----
-
-## 📈 Future Enhancements
-
-- **Chatbot Integration**: AI-powered customer support.
-- **Internationalization**: Support for multiple languages.
-
----
 
 ## 🤝 Contributors
 
@@ -93,10 +74,3 @@
 - Quek De Wang
 - Rainer Tan Wei Hang
 - Nicholas Seah Chong Shiun
-
----
-
-## 📬 Contact
-
-For any inquiries or support, please contact our team at kayong.lee.2023@scis.smu.edu.sg .
-
