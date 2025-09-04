@@ -74,3 +74,4 @@ This project aims to build a CRM Architecture Landscape for a Global Bank, adher
 - Quek De Wang
 - Rainer Tan Wei Hang
 - Nicholas Seah Chong Shiun
+- Godewyn Goh
